@@ -1,6 +1,6 @@
 describe('Sign up', () => {
   it('should introduce code and log in', () => {
-    cy.visit('http://notesclub-front.hec.ngrok.io/signup')
+    cy.visit('/signup')
     cy.get('input[name*="code"]')
       .type('123456789')
 
