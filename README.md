@@ -21,12 +21,16 @@ yarn start
 
 ### Tests
 Jest:
-`cd front`
-`yarn test`
+```
+cd front
+yarn test
+```
 
 Integration (Cypress):
-`cd front`
-`./node_modules/.bin/cypress open`
+```
+cd front
+./node_modules/.bin/cypress open
+```
 
 ## Backend (Ruby on Rails)
 
