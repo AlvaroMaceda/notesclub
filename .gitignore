@@ -30,3 +30,6 @@ config/database.yml
 # Local Netlify folder
 .netlify
 /config/credentials/production.key
+
+
+front/cypress/videos/
