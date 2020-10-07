@@ -9,20 +9,29 @@ Wikipedia has more than 27 million registered patrons who rely on its knowledge-
 [MIT license](LICENSE)
 
 ## Overview
-This project consists of a Ruby on Rails backend and a React single page application (/front).
+This project consists of a frontend in React (/front) and a Ruby on Rails API.
 
 ## Backend (Ruby on Rails)
 
 ### Create db:
+```
 rails db:create
 rails db:migrate
+```
 
 ### Add env variables to .bash_profile
 
-I use ngrok.com so authentication between frontend and backend works in development. However, it requires a pro account so we need to add here another free option.
+We currently use ngrok.com so authentication between frontend and backend works in development. However, it requires a pro account so we need to add here another free option. If you find how to do it, please update this.
+```
 export REACT_APP_NOTESCLUB_API_BASE_URL=http://replace.with.your.url.ngrok.io
 export REACT_APP_NOTESCLUB_FRONT_BASE_URL=http://replace.with.your.url.ngrok.io
+```
 
+At the moment you also need recaptcha credentials - but we should fix this [soon](https://github.com/notesclub/notesclub/issues/7).
+```
+export REACT_APP_NOTESCLUB_RECAPTCHA_KEY=...
+export NOTESCLUB_RECAPTCHA_SECRET=...
+```
 ### Start server
 `rails s`
 
@@ -32,8 +41,10 @@ export REACT_APP_NOTESCLUB_FRONT_BASE_URL=http://replace.with.your.url.ngrok.io
 ## Frontend (React)
 
 ### Start server
-`cd front`
-`yarn start`
+```
+cd front
+yarn start
+```
 
 ### Jest specs
 `cd front`
