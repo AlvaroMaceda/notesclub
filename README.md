@@ -11,6 +11,23 @@ Wikipedia has more than 27 million registered patrons who rely on its knowledge-
 ## Overview
 This project consists of a frontend in React (/front) and a Ruby on Rails API.
 
+## Frontend (React)
+
+### Start server
+```
+cd front
+yarn start
+```
+
+### Tests
+Jest:
+`cd front`
+`yarn test`
+
+Integration (Cypress):
+`cd front`
+`./node_modules/.bin/cypress open`
+
 ## Backend (Ruby on Rails)
 
 ### Create db:
@@ -35,21 +52,5 @@ export NOTESCLUB_RECAPTCHA_SECRET=...
 ### Start server
 `rails s`
 
-### Run specs
+### Tests
 `bundle exec rspec`
-
-## Frontend (React)
-
-### Start server
-```
-cd front
-yarn start
-```
-
-### Jest specs
-`cd front`
-`yarn test`
-
-### Integration specs
-`cd front`
-`./node_modules/.bin/cypress open`
