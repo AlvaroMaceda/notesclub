@@ -27,20 +27,15 @@ class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
       })
   }
 
-  renderTopic = (topic: TopicWithFamily, index: number) => {
-    const user = topic.user
+  renderTopic = (topic: TopicWithFamily, user: User, index: number) => {
     const user_path = user ? `/${user.username}` : ""
     const path = `${user_path}/${topic.slug}`
     return (
-      <>
-        {user &&
-          <li key={index}>
-            <Link to={path} onClick={() => window.location.href = path}>{topic.content}</Link>
-            {" · "}
-            <Link to={user_path} onClick={() => window.location.href = user_path}>{user.name}</Link>
-          </li>
-        }
-      </>
+      <li key={index}>
+        <Link to={path} onClick={() => window.location.href = path}>{topic.content}</Link>
+        {" · "}
+        <Link to={user_path} onClick={() => window.location.href = user_path}>{user.name}</Link>
+      </li>
     )
   }
 
@@ -57,7 +52,7 @@ class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
         {topics &&
           <>
             <ul>
-              {topics.map((topic, index) => this.renderTopic(topic, index))}
+              {topics.map((topic, index) => topic.user && this.renderTopic(topic, topic.user, index))}
             </ul>
             {!currentUser &&
               <>
