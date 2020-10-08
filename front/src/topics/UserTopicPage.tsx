@@ -351,6 +351,13 @@ class UserTopicPage extends React.Component<UserTopicPageProps, UserTopicPageSta
               }
             </>
           }
+
+          {currentUser === null &&
+            <>
+              <Link to="/login" onClick={() => window.location.href = "/login"}>Log in</Link>
+              {" to add your notes."}
+            </>
+          }
         </div>
       </>
     )
