@@ -47,12 +47,6 @@ We currently use ngrok.com so authentication between frontend and backend works 
 export REACT_APP_NOTESCLUB_API_BASE_URL=http://replace.with.your.url.ngrok.io
 export REACT_APP_NOTESCLUB_FRONT_BASE_URL=http://replace.with.your.url.ngrok.io
 ```
-
-At the moment you also need recaptcha credentials - but we should fix this [soon](https://github.com/notesclub/notesclub/issues/7).
-```
-export REACT_APP_NOTESCLUB_RECAPTCHA_KEY=...
-export NOTESCLUB_RECAPTCHA_SECRET=...
-```
 ### Start server
 `rails s`
 

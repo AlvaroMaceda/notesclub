@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
 
   def create
     user = User.find_by_email(params[:email])
-    if !verify_recaptcha
+    if !verify_recaptcha_if_required
       render json: { errors: { 'captcha:' => ["Are you human? If so, please refresh and try again."] } }, status: :unauthorized
     elsif user && user.valid_password?(params[:password])
       Rails.logger.info("action:user_login:#{user.id}")

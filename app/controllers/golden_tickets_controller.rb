@@ -3,7 +3,7 @@ class GoldenTicketsController < ApplicationController
 
   def check
     success = params[:code].present? && GoldenTicket.where(code: params[:code]).exists?
-    if verify_recaptcha
+    if verify_recaptcha_if_required
       render json: { found: success }, status: :ok
     else
       render json: { errors: "Are you human? If so, please refresh and try again." }, status: :unauthorized

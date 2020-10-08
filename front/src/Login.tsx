@@ -3,7 +3,7 @@ import { Form, Button } from 'react-bootstrap'
 import axios from 'axios'
 import { apiDomain } from './appConfig'
 import { Link } from 'react-router-dom'
-import { recaptchaRef } from './utils/recaptchaRef'
+import { recaptchaRef, recaptchaEnabled } from './utils/recaptcha'
 import { backendErrorsToMessage } from './backendSync'
 
 interface LoginProps {
@@ -40,32 +40,31 @@ class Login extends React.Component<LoginProps, LoginState> {
 
   submit = async () => {
     const current = recaptchaRef.current
-    if (current) {
-      const token = await current.executeAsync()
-      const { email, password } = this.state
-      const args = {
-        email: email,
-        password: password,
-        "g-recaptcha-response": token
-      }
-      // axios.defaults.withCredentials = true
-      axios.post(apiDomain() + "/v1/users/login", args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
-        .then(res => {
-          const currentUser = res.data["user"]
-          localStorage.setItem('currentUser', JSON.stringify(currentUser))
-          window.location.href = `/${currentUser.username}`
-          // this.props.setParentState({ currentUsername: currentUser.username, alert: undefined })
-        })
-        .catch(error => {
-          let msg = ""
-          if (error.response && error.response.data) {
-            msg = backendErrorsToMessage(error)
-          } else {
-            msg = "There was an error. Try again later."
-          }
-          this.props.setParentState({ alert: { variant: "danger", message: msg } })
-        })
+    const token = recaptchaEnabled && current ? await current.executeAsync() : ""
+
+    const { email, password } = this.state
+    const args = {
+      email: email,
+      password: password,
+      "g-recaptcha-response": token
     }
+    // axios.defaults.withCredentials = true
+    axios.post(apiDomain() + "/v1/users/login", args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
+      .then(res => {
+        const currentUser = res.data["user"]
+        localStorage.setItem('currentUser', JSON.stringify(currentUser))
+        window.location.href = `/${currentUser.username}`
+        // this.props.setParentState({ currentUsername: currentUser.username, alert: undefined })
+      })
+      .catch(error => {
+        let msg = ""
+        if (error.response && error.response.data) {
+          msg = backendErrorsToMessage(error)
+        } else {
+          msg = "There was an error. Try again later."
+        }
+        this.props.setParentState({ alert: { variant: "danger", message: msg } })
+      })
   }
   public render() {
     const { email, password, error } = this.state

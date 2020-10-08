@@ -4,7 +4,7 @@ import axios from 'axios'
 import { apiDomain } from './appConfig'
 import './WaitingList.scss'
 import { backendErrorsToMessage } from './backendSync'
-import { recaptchaRef } from './utils/recaptchaRef'
+import { recaptchaRef, recaptchaEnabled } from './utils/recaptcha'
 import { Link } from 'react-router-dom'
 
 interface WaitingListProps {
@@ -38,27 +38,26 @@ class WaitingList extends React.Component<WaitingListProps, WaitingListState> {
 
   submit = async () => {
     const current = recaptchaRef.current
-    if (current) {
-      const token = await current.executeAsync()
-      const { email } = this.state
-      const args = {
-        email: email,
-        "g-recaptcha-response": token
-      }
-      axios.post(apiDomain() + "/v1/waiting_users", args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
-        .then(res => {
-          this.setState({ email: "" })
-          this.props.setAppState({ alert: { message: "Saved. We send access codes every week. See you soon!", variant: "success" } })
-        })
-        .catch(res => {
-          if (res.response.status === 401) {
-            this.props.setAppState({ alert: { message: "Error. Are you human? If so, please refresh and try again.", variant: "danger" } })
-          } else {
-            const message = backendErrorsToMessage(res)
-            this.props.setAppState({ alert: { message: message, variant: "danger" } })
-          }
-        })
+    const token = recaptchaEnabled && current ? await current.executeAsync() : ""
+
+    const { email } = this.state
+    const args = {
+      email: email,
+      "g-recaptcha-response": token
     }
+    axios.post(apiDomain() + "/v1/waiting_users", args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
+      .then(res => {
+        this.setState({ email: "" })
+        this.props.setAppState({ alert: { message: "Saved. We send access codes every week. See you soon!", variant: "success" } })
+      })
+      .catch(res => {
+        if (res.response.status === 401) {
+          this.props.setAppState({ alert: { message: "Error. Are you human? If so, please refresh and try again.", variant: "danger" } })
+        } else {
+          const message = backendErrorsToMessage(res)
+          this.props.setAppState({ alert: { message: message, variant: "danger" } })
+        }
+      })
   }
 
   public render() {

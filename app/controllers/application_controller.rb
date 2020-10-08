@@ -73,4 +73,10 @@ class ApplicationController < ActionController::API
     # )
     @current_user = user
   end
+
+  def verify_recaptcha_if_required(args = {})
+    return true if (Rails.env.development? || Rails.env.test?) && ENV['NOTESCLUB_RECAPTCHA_SECRET'].blank?
+
+    verify_recaptcha(args)
+  end
 end
