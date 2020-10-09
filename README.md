@@ -34,8 +34,9 @@ cd front
 
 ## Backend (Ruby on Rails)
 
-### Create db:
+### Set up:
 ```
+cp config/database.yml.example config/database.yml
 rails db:create
 rails db:migrate
 ```
