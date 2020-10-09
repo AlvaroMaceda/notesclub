@@ -37,8 +37,7 @@ cd front
 ### Set up:
 ```
 cp config/database.yml.example config/database.yml
-rails db:create
-rails db:migrate
+rails db:setup
 ```
 
 ### Add env variables to .bash_profile
