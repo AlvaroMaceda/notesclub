@@ -36,6 +36,7 @@ Now run `source ~/.bash_profile` or open a new console to apply the changes.
 
 ### Start server
 ```
+bundle install
 rails s
 ```
 
