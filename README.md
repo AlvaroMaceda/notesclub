@@ -19,7 +19,7 @@ cp config/database.yml.example config/database.yml
 rails db:setup
 ```
 
-This will create the database and populate it with a demo user:
+This demo user will have been created:
 ```
 email: marie@curie.com
 password: mariecurie
