@@ -34,7 +34,7 @@ class ApplicationController < ActionController::API
 
   def authenticate
     begin
-      jwt_payload = JWT.decode(jwt_token, Rails.application.credentials.config[:secret_key_base]).first
+      jwt_payload = JWT.decode(jwt_token, Rails.application.secret_key_base).first
       id = jwt_payload['id']
       Rails.logger.info "authenticate: id: #{id}"
       id
