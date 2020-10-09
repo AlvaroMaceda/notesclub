@@ -16,8 +16,10 @@ This project consists of a frontend in React (/front) and a Ruby on Rails API.
 ### Start server
 ```
 cd front
+yarn install --check-files
 yarn start
 ```
+`yarn start` will say that port 3000 is already in use and ask if you'd like to run the app on another port. Enter yes.
 
 ### Tests
 Jest:
@@ -34,10 +36,16 @@ cd front
 
 ## Backend (Ruby on Rails)
 
-### Set up:
+### Create and populate database with seed data:
 ```
 cp config/database.yml.example config/database.yml
 rails db:setup
+```
+
+This will create the database and populate it with a demo user:
+```
+email: marie@curie.com
+password: mariecurie
 ```
 
 ### Add env variables to .bash_profile
@@ -48,7 +56,11 @@ export REACT_APP_NOTESCLUB_API_BASE_URL=http://replace.with.your.url.ngrok.io
 export REACT_APP_NOTESCLUB_FRONT_BASE_URL=http://replace.with.your.url.ngrok.io
 ```
 ### Start server
-`rails s`
+```
+rails s
+```
 
 ### Tests
-`bundle exec rspec`
+```
+bundle exec rspec
+```
