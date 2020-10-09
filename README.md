@@ -11,7 +11,7 @@ Wikipedia has more than 27 million registered patrons who rely on its knowledge-
 ## Overview
 This project consists of a frontend in React (/front) and a Ruby on Rails API.
 
-## Backend (Ruby on Rails)
+## Backend (Ruby on Rails API)
 
 ### Create and populate database with seed data
 ```
