@@ -125,7 +125,7 @@ class SignUp extends React.Component<SignUpProps, SignUpState> {
                   name="marketing" />
               </Form.Group>
               <p className="small">By clicking on Join, you agree to our <Link to="/terms">terms</Link> and <Link to="/privacy">privacy</Link> conditions.</p>
-              <Button onClick={this.signup}>Join</Button>
+              <Button onClick={this.signup}>Sign up</Button>
             </Form>
           </div>
           <div className="col-lg-4"></div>
