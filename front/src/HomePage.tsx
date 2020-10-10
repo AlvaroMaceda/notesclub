@@ -1,10 +1,5 @@
 import * as React from 'react'
-import { Form, Button } from 'react-bootstrap'
-import axios from 'axios'
-import { apiDomain } from './appConfig'
 import './HomePage.scss'
-import { backendErrorsToMessage } from './backendSync'
-import { recaptchaRef, recaptchaEnabled } from './utils/recaptcha'
 import { Link } from 'react-router-dom'
 
 interface HomePageProps {
