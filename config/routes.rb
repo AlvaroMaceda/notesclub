@@ -14,9 +14,6 @@ Rails.application.routes.draw do
         get 'count'
       end
     end
-    resources :waiting_users, only: [:create]
-    get 'golden_tickets/check', to: 'golden_tickets#check'
     get 'ping', to: 'ping#ping'
-    get 'search/count', to: 'topics#count' # Deprecated. It's used by the chrome extension. Use /topics/count
   end
 end

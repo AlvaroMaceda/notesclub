@@ -1,19 +1,6 @@
 describe('Sign up', () => {
   it('should introduce code and log in', () => {
     cy.visit('/signup')
-    cy.get('input[name*="code"]')
-      .type('123456789')
-
-    cy.server()
-    cy.route({
-      method: 'GET',
-      url: '/v1/golden_tickets/check?code=123456789&*',
-      response: { found: true },
-      status: 200
-    })
-    cy.get('form').within(() => {
-      cy.get('button').click()
-    })
 
     cy.get('input[name="name"]')
       .type('Hector Perez')
@@ -28,6 +15,7 @@ describe('Sign up', () => {
       name: "Hector Perez",
       username: "hector"
     }
+    cy.server()
     cy.route({
       method: 'POST',
       url: '/v1/users',
