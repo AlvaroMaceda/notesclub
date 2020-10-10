@@ -74,9 +74,11 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
     if (inputValue.length > 1) {
       const encodedValue = encodeURIComponent(inputValue)
       const response = await axios.get(`https://openlibrary.org/search.json?q=${encodedValue}&limit=10`)
-      this.setState({
-        suggestions: response.data.docs
-      })
+      if (this.state.value === value) {
+        this.setState({
+          suggestions: response.data.docs
+        })
+      }
     }
   }
 
