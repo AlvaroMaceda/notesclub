@@ -38,7 +38,7 @@ class UsersController < ApplicationController
       track_action("Sign up", name: user.name, username: user.username)
       render json: { user: user.slice(EXPOSED_ATTRIBUTES) }, status: :created
     else
-      Rails.logger.info "Errors: #{creator.errors.inspect}"
+      Rails.logger.info "Errors: #{user.errors.inspect}"
       render json: { errors: errors }, status: :unprocessable_entity
     end
   end
