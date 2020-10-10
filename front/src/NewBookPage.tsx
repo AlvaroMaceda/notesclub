@@ -4,6 +4,7 @@ import { Form, Button } from 'react-bootstrap'
 import { parameterize } from './utils/parameterize'
 import Autosuggest from 'react-autosuggest'
 import './NewBookPage.scss';
+import axios from 'axios'
 
 interface NewBookPageProps {
   setAppState: Function
@@ -13,46 +14,34 @@ interface NewBookPageProps {
 interface NewBookPageState {
   value: string
   newTopicAuthor: string
-  suggestions: Language[]
+  suggestions: Book[]
 }
 
-interface Language {
-  name: string
-  year: number
+interface Book {
+  title_suggest: string
+  author_name: string
 }
 
-// Imagine you have a list of languages that you'd like to autosuggest.
-const languages = [
+const books0 = [
   {
-    name: 'Sapiens',
-    year: 1972
+    title_suggest: 'Sapiens',
+    author_name: 'Harari'
   },
   {
-    name: 'Saaaaa',
-    year: 2012
+    title_suggest: 'Saaaaa',
+    author_name: 'whatever'
   },
   {
-    name: 'Foundation',
-    year: 2012
+    title_suggest: 'Foundation',
+    author_name: 'Asimov'
   }
 ]
 
-const renderSuggestion = (suggestion: Language) => (
+const renderSuggestion = (suggestion: Book) => (
   <div>
-    {suggestion.name}
+    {`${suggestion.title_suggest} by ${suggestion.author_name}`}
   </div>
 )
-
-// Teach Autosuggest how to calculate suggestions for any given input value.
-const getSuggestions = (value: string) => {
-  const inputValue = value.trim().toLowerCase();
-  const inputLength = inputValue.length;
-
-  return inputLength === 0 ? [] : languages.filter(lang =>
-    lang.name.toLowerCase().slice(0, inputLength) === inputValue
-  )
-}
-
 
 class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
   constructor(props: NewBookPageProps) {
@@ -65,23 +54,10 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
     }
   }
 
-  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const target = event.target
-    const name = target.name
-    const value = target.value
-    this.setState((prevState) => ({
-      ...prevState,
-      [name]: value
-    }))
-  }
-
-
   // Autosuggest will call this function every time you need to update suggestions.
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequested = (params: any) => {
-    this.setState({
-      suggestions: getSuggestions(params.value)
-    })
+    this.fetchSuggestions(params.value)
   }
 
   // Autosuggest will call this function every time you need to clear suggestions.
@@ -91,10 +67,21 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
     })
   }
 
-  getSuggestionValue = (suggestion: Language) => {
-    console.log(suggestion)
-    return (suggestion.name)
+  getSuggestionValue = (suggestion: Book) => {
+    return (`${suggestion.title_suggest} by ${suggestion.author_name}`)
   }
+
+  fetchSuggestions = async (value: string) => {
+    const inputValue = value.trim().toLowerCase()
+    if (inputValue.length > 1) {
+      const encodedValue = encodeURIComponent(inputValue)
+      const response = await axios.get(`https://openlibrary.org/search.json?q=${encodedValue}&limit=10`)
+      this.setState({
+        suggestions: response.data.docs
+      })
+    }
+  }
+
 
   public render() {
     const { currentUser } = this.props
