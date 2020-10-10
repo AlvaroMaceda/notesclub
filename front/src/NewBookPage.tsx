@@ -2,24 +2,66 @@ import * as React from 'react'
 import { User } from './User'
 import { Form, Button } from 'react-bootstrap'
 import { parameterize } from './utils/parameterize'
+import Autosuggest from 'react-autosuggest'
+import './NewBookPage.scss';
 
 interface NewBookPageProps {
   setAppState: Function
   currentUser: User
 }
 
-interface NewBookPageState{
-  newTopicTitle: string
+interface NewBookPageState {
+  value: string
   newTopicAuthor: string
+  suggestions: Language[]
 }
+
+interface Language {
+  name: string
+  year: number
+}
+
+// Imagine you have a list of languages that you'd like to autosuggest.
+const languages = [
+  {
+    name: 'Sapiens',
+    year: 1972
+  },
+  {
+    name: 'Saaaaa',
+    year: 2012
+  },
+  {
+    name: 'Foundation',
+    year: 2012
+  }
+]
+
+const renderSuggestion = (suggestion: Language) => (
+  <div>
+    {suggestion.name}
+  </div>
+)
+
+// Teach Autosuggest how to calculate suggestions for any given input value.
+const getSuggestions = (value: string) => {
+  const inputValue = value.trim().toLowerCase();
+  const inputLength = inputValue.length;
+
+  return inputLength === 0 ? [] : languages.filter(lang =>
+    lang.name.toLowerCase().slice(0, inputLength) === inputValue
+  )
+}
+
 
 class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
   constructor(props: NewBookPageProps) {
     super(props)
 
     this.state = {
-      newTopicTitle: "",
-      newTopicAuthor: ""
+      value: '',
+      newTopicAuthor: "",
+      suggestions: []
     }
   }
 
@@ -34,52 +76,51 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
   }
 
 
-  createTopic = (newTopicPath: string) => {
-    const { newTopicTitle } = this.state
+  // Autosuggest will call this function every time you need to update suggestions.
+  // You already implemented this logic above, so just use it.
+  onSuggestionsFetchRequested = (params: any) => {
+    this.setState({
+      suggestions: getSuggestions(params.value)
+    })
+  }
 
-    if (newTopicTitle.length < 2) {
-      this.props.setAppState({ alert: { message: "Book title is too short", variant: "danger" } })
-    } else {
-      window.location.href = newTopicPath
-    }
+  // Autosuggest will call this function every time you need to clear suggestions.
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: []
+    })
+  }
+
+  getSuggestionValue = (suggestion: Language) => {
+    console.log(suggestion)
+    return (suggestion.name)
   }
 
   public render() {
     const { currentUser } = this.props
-    const { newTopicTitle, newTopicAuthor } = this.state
-    const newTopicContent = newTopicAuthor.length > 0 ? `${newTopicTitle} (book) by ${newTopicAuthor}` : ""
-    const newTopicSlug = parameterize(newTopicContent, 100)
-    const newTopicPath = `/${currentUser.username}/${newTopicSlug}?content=${newTopicContent}`
+    const { value, newTopicAuthor, suggestions } = this.state
 
     return (
       <div className="container">
         <div className="row">
           <div className="col-lg-6">
-            <h4>Add a note about a book</h4>
-            <Form>
-              <Form.Group>
-                <Form.Label>Book title</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={newTopicTitle}
-                  name={"newTopicTitle"}
-                  placeholder="E.g. Foundation"
-                  onChange={this.handleChange as any} autoFocus
-                />
-              </Form.Group>
+            <h1>Add book notes</h1>
 
-              <Form.Group>
-                <Form.Label>Book author</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={newTopicAuthor}
-                  name={"newTopicAuthor"}
-                  placeholder="E.g. Isaac Asimov"
-                  onChange={this.handleChange as any}
-                />
-              </Form.Group>
-              <Button onClick={() => this.createTopic(newTopicPath)}>Next</Button>
-            </Form>
+            Title
+            <Autosuggest
+              suggestions={suggestions}
+              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+              onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+              getSuggestionValue={this.getSuggestionValue}
+              renderSuggestion={renderSuggestion}
+              inputProps={{
+                placeholder: 'Type a book title',
+                value,
+                onChange: (form, event) => {
+                  this.setState({ value: event.newValue })
+                }
+              }}
+            />
           </div>
           <div className="col-lg-6"></div>
         </div>
