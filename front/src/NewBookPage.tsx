@@ -13,7 +13,6 @@ interface NewBookPageProps {
 
 interface NewBookPageState {
   value: string
-  newTopicAuthor: string
   suggestions: Book[]
 }
 
@@ -49,7 +48,6 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
 
     this.state = {
       value: '',
-      newTopicAuthor: "",
       suggestions: []
     }
   }
@@ -85,8 +83,10 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
 
   public render() {
     const { currentUser } = this.props
-    const { value, newTopicAuthor, suggestions } = this.state
-
+    const { value, suggestions } = this.state
+    const newTopicContent = value.length > 0 ? `${value.replace(' by ', ' (book) by ')}` : ""
+    const newTopicSlug = parameterize(newTopicContent, 100)
+    const path = `/${currentUser.username}/${newTopicSlug}?content=${newTopicContent}`
     return (
       <div className="container">
         <div className="row">
@@ -94,21 +94,25 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
           <div className="col-lg-6">
             <h1>Add book notes</h1>
 
-            Title
-            <Autosuggest
-              suggestions={suggestions}
-              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-              onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-              getSuggestionValue={this.getSuggestionValue}
-              renderSuggestion={renderSuggestion}
-              inputProps={{
-                placeholder: 'Type a book title',
-                value,
-                onChange: (form, event) => {
-                  this.setState({ value: event.newValue })
-                }
-              }}
-            />
+            <Form>
+              Title and/or author
+              <Autosuggest
+                suggestions={suggestions}
+                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                getSuggestionValue={this.getSuggestionValue}
+                renderSuggestion={renderSuggestion}
+                inputProps={{
+                  placeholder: 'e.g. Foundation by Isaac Asimov',
+                  value: value,
+                  className: 'form-control',
+                  onChange: (form, event) => {
+                    this.setState({ value: event.newValue })
+                  }
+                }}
+              />
+              <Button onClick={() => window.location.href = path}>Next</Button>
+            </Form>
           </div>
           <div className="col-lg-3"></div>
         </div>
