@@ -104,22 +104,24 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
             <h1>Add book notes</h1>
 
             <Form>
-              Title and/or author
-              <Autosuggest
-                suggestions={suggestions}
-                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-                onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-                getSuggestionValue={this.getSuggestionValue}
-                renderSuggestion={renderSuggestion}
-                inputProps={{
-                  placeholder: 'e.g. Foundation by Isaac Asimov',
-                  value: value,
-                  className: 'form-control',
-                  onChange: (form, event) => {
-                    this.setState({ value: event.newValue })
-                  }
-                }}
-              />
+              <Form.Group>
+                <Form.Label>Title and/or author</Form.Label>
+                <Autosuggest
+                  suggestions={suggestions}
+                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                  onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                  getSuggestionValue={this.getSuggestionValue}
+                  renderSuggestion={renderSuggestion}
+                  inputProps={{
+                    placeholder: 'e.g. Foundation by Isaac Asimov',
+                    value: value,
+                    className: 'form-control',
+                    onChange: (form, event) => {
+                      this.setState({ value: event.newValue })
+                    }
+                  }}
+                />
+              </Form.Group>
               <Button onClick={() => window.location.href = path}>Next</Button>
             </Form>
           </div>

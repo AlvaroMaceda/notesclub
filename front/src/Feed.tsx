@@ -90,7 +90,7 @@ class Feed extends React.Component<FeedProps, FeedState> {
           <>
             {"Ready to start? "}
             <Link to="/books/new" onClick={() => window.location.href="/books/new"}>Add a note about a book</Link>.
-            <h1>Recent activity</h1>
+            <h1>Recent notes</h1>
             <ul>
               {topics.map((ref) => (
                 <ReferenceRenderer
