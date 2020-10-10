@@ -38,9 +38,16 @@ const books0 = [
 
 const renderSuggestion = (suggestion: Book) => (
   <div>
-    {`${suggestion.title_suggest} by ${suggestion.author_name}`}
+    {bookAndAuthor(suggestion)}
   </div>
 )
+const distinct = (book: Book, index: number, books: Book[]) => {
+  return books.map(b => bookAndAuthor(b)).indexOf(bookAndAuthor(book)) === index
+}
+
+const bookAndAuthor = (book: Book) => {
+  return (`${book.title_suggest} by ${book.author_name}`)
+}
 
 class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
   constructor(props: NewBookPageProps) {
@@ -73,11 +80,11 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
     const inputValue = value.trim().toLowerCase()
     if (inputValue.length > 1) {
       const encodedValue = encodeURIComponent(inputValue)
-      const response = await axios.get(`https://openlibrary.org/search.json?q=${encodedValue}&limit=10`)
+      const response = await axios.get(`https://openlibrary.org/search.json?q=${encodedValue}&limit=15`)
       if (this.state.value === value) {
-        this.setState({
-          suggestions: response.data.docs
-        })
+        const books: Book[] = response.data.docs
+        const uniqueBooks = books.filter(distinct)
+        this.setState({ suggestions: uniqueBooks })
       }
     }
   }
