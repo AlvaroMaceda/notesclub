@@ -90,6 +90,7 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
     return (
       <div className="container">
         <div className="row">
+          <div className="col-lg-3"></div>
           <div className="col-lg-6">
             <h1>Add book notes</h1>
 
@@ -109,7 +110,7 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
               }}
             />
           </div>
-          <div className="col-lg-6"></div>
+          <div className="col-lg-3"></div>
         </div>
       </div>
     )
