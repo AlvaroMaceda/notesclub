@@ -21,21 +21,6 @@ interface Book {
   author_name: string
 }
 
-const books0 = [
-  {
-    title_suggest: 'Sapiens',
-    author_name: 'Harari'
-  },
-  {
-    title_suggest: 'Saaaaa',
-    author_name: 'whatever'
-  },
-  {
-    title_suggest: 'Foundation',
-    author_name: 'Asimov'
-  }
-]
-
 const renderSuggestion = (suggestion: Book) => (
   <div>
     {bookAndAuthor(suggestion)}
