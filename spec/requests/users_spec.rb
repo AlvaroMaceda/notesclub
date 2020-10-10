@@ -26,12 +26,11 @@ RSpec.describe UsersController, type: :request do
 
   describe "#create" do
     it "should create a user" do
-      GoldenTicket.create!(code: "123456789", user_id: user.id)
-      post "/v1/users", params: { name: "Hec", username: "hec878", email: "hec878@hec.com", password: "mypassword", golden_ticket_code: "123456789"}
+      post "/v1/users", params: { name: "Hec", username: "hec878", email: "hec878@hec.com", password: "mypassword"}
       result = JSON.parse(response.body)
       expect(result["errors"] || []).to eq([])
       expect(response).to have_http_status(:success)
-      expect(User.last.slice("name", "username", "email", "invited_by_id")).to eq("name" => "Hec", "username" => "hec878", "email" => "hec878@hec.com", "invited_by_id" => user.id)
+      expect(User.last.slice("name", "username", "email")).to eq("name" => "Hec", "username" => "hec878", "email" => "hec878@hec.com")
     end
   end
 

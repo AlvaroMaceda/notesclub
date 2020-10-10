@@ -11,8 +11,8 @@ import UserTopicPage from './topics/UserTopicPage'
 import UserPage from './UserPage'
 import BooksPage from './BooksPage'
 import Feed from './Feed'
-import WaitingList from './WaitingList'
-import GoldenTicket from './GoldenTicket'
+import HomePage from './HomePage'
+import SignUp from './SignUp'
 import { User } from './User'
 import { fetchAuthenticatedUser } from './backendSync'
 import ConfirmationToken from './ConfirmationToken'
@@ -103,8 +103,8 @@ class App extends React.Component<AppProps, AppState> {
         }
         {currentUser === null &&
           <Switch>
-            <Route path="/" exact render={() => <WaitingList setAppState={this.updateState} />} />
-            <Route path="/signup" exact render={() => <GoldenTicket setAppState={this.updateState} />} />
+            <Route path="/" exact render={() => <HomePage setAppState={this.updateState} />} />
+            <Route path="/signup" exact render={() => <SignUp setAppState={this.updateState} />} />
             <Route path="/:whatever" exact>
               {<Login setParentState={this.updateState} />}
             </Route>
