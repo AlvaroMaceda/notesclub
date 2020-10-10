@@ -95,8 +95,12 @@ class App extends React.Component<AppProps, AppState> {
         <Route path="/login" exact render={() => <Login setParentState={this.updateState} />} />
         <Route path="/users/confirmation/:token" exact render={({ match }) => <ConfirmationToken token={match.params.token} setAppState={this.updateState} />} />
         <Route path="/books" exact render={({ match }) => <BooksPage currentUser={currentUser} setAppState={this.updateState} />} />
-        {currentUser &&
+        {currentUser ?
           <Route path="/books/new" exact render={({ match }) => <NewBookPage currentUser={currentUser} setAppState={this.updateState} />} />
+        :
+          <Route path="/books/new" exact>
+            {currentUser === null ? <Login setParentState={this.updateState} /> : <div className="container">Loading...</div>}
+          </Route>
         }
         <Route path="/:blogUsername/:topicKey" exact render={({ match }) => <UserTopicPage currentBlogUsername={match.params.blogUsername} currentTopicKey={match.params.topicKey} currentUser={currentUser} setAppState={this.updateState} />} />
         {currentUser &&
