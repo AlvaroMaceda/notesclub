@@ -50,9 +50,8 @@ class Login extends React.Component<LoginProps, LoginState> {
     }
     // axios.defaults.withCredentials = true
     axios.post(apiDomain() + "/v1/users/login", args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
-      .then(res => {
-        const currentUser = res.data["user"]
-        window.location.href = `/${currentUser.username}`
+      .then(_ => {
+        window.location.href = '/books/new'
       })
       .catch(error => {
         let msg = ""
