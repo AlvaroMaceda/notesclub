@@ -57,7 +57,6 @@ cd front
 yarn install --check-files
 yarn start
 ```
-`yarn start` will say that port `3000` is already in use (by the Rails API) and ask if you would like to run the app on another port. Enter yes. It will use the port `3001`.
 
 ### Open browser
 
