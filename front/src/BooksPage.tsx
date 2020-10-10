@@ -47,7 +47,7 @@ class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
       <div className="container">
         <h1>Books:</h1>
         {!topics &&
-          <>Loading...</>
+          <>Loading</>
         }
         {topics &&
           <>
