@@ -39,7 +39,7 @@ class UsersController < ApplicationController
       render json: { user: user.slice(EXPOSED_ATTRIBUTES) }, status: :created
     else
       Rails.logger.info "Errors: #{user.errors.inspect}"
-      render json: { errors: errors }, status: :unprocessable_entity
+      render json: { errors: user.errors }, status: :unprocessable_entity
     end
   end
 
