@@ -60,8 +60,6 @@ class GoldenTicket extends React.Component<GoldenTicketProps, GoldenTicketState>
 
     axios.post(apiDomain() + "/v1/users", args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
       .then(res => {
-        const currentUser = res.data["user"]
-        localStorage.setItem('currentUser', JSON.stringify(currentUser))
         window.location.href = "/help"
       })
       .catch(res => {
