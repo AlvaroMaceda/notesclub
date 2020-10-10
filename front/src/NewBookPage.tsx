@@ -14,6 +14,7 @@ interface NewBookPageProps {
 interface NewBookPageState {
   value: string
   suggestions: Book[]
+  suggestionsDate: Date | null
 }
 
 interface Book {
@@ -40,7 +41,8 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
 
     this.state = {
       value: '',
-      suggestions: []
+      suggestions: [],
+      suggestionsDate: null
     }
   }
 
@@ -64,12 +66,14 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
   fetchSuggestions = async (value: string) => {
     const inputValue = value.trim().toLowerCase()
     if (inputValue.length > 1) {
+      const startTime = new Date() // get time before making request so we only save results if there are no more recent versions.
       const encodedValue = encodeURIComponent(inputValue)
       const response = await axios.get(`https://openlibrary.org/search.json?q=${encodedValue}&limit=15`)
-      if (this.state.value === value) {
+      const { suggestionsDate } = this.state
+      if (suggestionsDate === null || suggestionsDate < startTime) {
         const books: Book[] = response.data.docs
         const uniqueBooks = books.filter(distinct)
-        this.setState({ suggestions: uniqueBooks })
+        this.setState({ suggestions: uniqueBooks, suggestionsDate: startTime })
       }
     }
   }
