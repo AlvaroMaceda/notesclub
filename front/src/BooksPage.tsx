@@ -61,7 +61,11 @@ class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
               </>
             }
             {currentUser &&
-              <Button onClick={() => window.location.href = "/books/new"}>Add notes about a book</Button>
+              <>
+                <Button onClick={() => window.location.href = "/books/new"}>Add notes about a book</Button>
+                {" or browse "}
+                <Link to="/new">recent notes</Link>.
+              </>
             }
           </>
         }

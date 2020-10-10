@@ -6,7 +6,7 @@ import Logout from './Logout';
 import Header from './Header';
 import Footer from './Footer';
 import { Alert } from 'react-bootstrap';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 import UserTopicPage from './topics/UserTopicPage'
 import UserPage from './UserPage'
 import BooksPage from './BooksPage'
@@ -91,8 +91,9 @@ class App extends React.Component<AppProps, AppState> {
         <Route path="/:blogUsername/:topicKey" exact render={({ match }) => <UserTopicPage currentBlogUsername={match.params.blogUsername} currentTopicKey={match.params.topicKey} currentUser={currentUser} setAppState={this.updateState} />} />
         {currentUser &&
           <Switch>
+            <Route path="/" exact render={({ match }) => <Redirect to="/books/new" />} />
+            <Route path="/new" exact render={({ match }) => <Feed currentUser={currentUser} blogUsername={match.params.blogUsername} setAppState={this.updateState} />} />
             <Route path="/:blogUsername" exact render={({ match }) => <UserPage currentUser={currentUser} blogUsername={match.params.blogUsername} setAppState={this.updateState} />} />
-            <Route path="/" exact render={({ match }) => <Feed currentUser={currentUser} blogUsername={match.params.blogUsername} setAppState={this.updateState} />} />
           </Switch>
         }
         {currentUser === undefined &&
