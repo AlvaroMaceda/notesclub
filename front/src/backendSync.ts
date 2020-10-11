@@ -9,7 +9,6 @@ export const fetchBackendUsers = async (ids: number[]) : Promise<User[]> => {
   const response = await axios.get(apiDomain() + '/v1/users', { params: { ids: ids }, headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
     .then(res => res.data)
     .catch(_ => {
-      console.log('Error fetching users')
       return (Promise.reject("Error"))
     })
   return (response)
@@ -19,7 +18,6 @@ export const fetchAuthenticatedUser = async (): Promise<User> => {
   const response = await axios.get(apiDomain() + '/v1/users/me', { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
     .then(res => res.data)
     .catch(res => {
-      console.log('Error fetching user')
       return (Promise.reject(res))
     })
   return (response)
@@ -29,7 +27,6 @@ export const fetchBackendUser = async (username: string): Promise<User> => {
   const response = await axios.get(apiDomain() + '/v1/users', { params: { username: username }, headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
     .then(res => res.data[0])
     .catch(_ => {
-      console.log('Error fetching user')
       return (Promise.reject("Error"))
     })
   return (response)

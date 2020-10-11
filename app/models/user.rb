@@ -4,7 +4,6 @@ class User < ApplicationRecord
   self.skip_session_storage = [:http_auth, :params_auth]
 
   has_many :topics
-  has_many :golden_tickets
   has_many :invitees, class_name: 'User', foreign_key: :invited_by_id
   belongs_to :invited_by, class_name: 'User', foreign_key: :invited_by_id, required: false
 

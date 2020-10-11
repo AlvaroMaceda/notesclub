@@ -47,7 +47,7 @@ class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
       <div className="container">
         <h1>Books:</h1>
         {!topics &&
-          <>Loading...</>
+          <>Loading</>
         }
         {topics &&
           <>
@@ -61,7 +61,11 @@ class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
               </>
             }
             {currentUser &&
-              <Button onClick={() => window.location.href = "/books/new"}>Add notes about a book</Button>
+              <>
+                <Button onClick={() => window.location.href = "/books/new"}>Add notes about a book</Button>
+                {" or browse "}
+                <Link to="/new">recent notes</Link>.
+              </>
             }
           </>
         }

@@ -9,6 +9,7 @@ import { fetchBackendUser, fetchBackendTopics, createBackendTopic } from './../b
 import { getChildren } from './ancestry'
 import { Link } from 'react-router-dom'
 import ReferenceRenderer from './ReferenceRenderer'
+import LoginOrSignup from '../LoginOrSignup'
 
 interface UserTopicPageProps extends RouteComponentProps<any> {
   setAppState: Function
@@ -74,6 +75,7 @@ class UserTopicPage extends React.Component<UserTopicPageProps, UserTopicPageSta
                   const args = { topic: newNonSavedTopic, setAppState: this.props.setAppState, include_ancestors: true, include_descendants: true }
                   createBackendTopic(args)
                     .then(topic => {
+                      this.props.history.push(`/${currentUser.username}/${currentTopicKey}`) // get rid of the content argument
                       this.setTopicAndCreateDescendantIfNone(topic, isOwnBlog)
                     })
                 } else {
@@ -249,16 +251,7 @@ class UserTopicPage extends React.Component<UserTopicPageProps, UserTopicPageSta
             </>
           }
           {(!currentUser && (currentBlogger === null || currentTopic === null)) &&
-            <>
-              <p>No notes on "{currentTopicKey}" yet.</p>
-              <p>
-                {"You can "}
-                <Link to="/login" onClick={() => window.location.href = "/login"}>log in</Link>
-                {" or "}
-                <Link to="/signup" onClick={() => window.location.href = "/signup"}>sign up</Link>
-                {" to add notes."}
-              </p>
-            </>
+            <p>No notes on "{currentTopicKey}" yet.</p>
           }
           {currentBlogger && currentTopic && children && descendants && ancestors &&
             <>
@@ -353,10 +346,7 @@ class UserTopicPage extends React.Component<UserTopicPageProps, UserTopicPageSta
           }
 
           {currentUser === null &&
-            <>
-              <Link to="/login" onClick={() => window.location.href = "/login"}>Log in</Link>
-              {" to add your notes."}
-            </>
+            <LoginOrSignup />
           }
         </div>
       </>

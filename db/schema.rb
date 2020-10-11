@@ -10,18 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_27_093857) do
+ActiveRecord::Schema.define(version: 2020_10_10_161339) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "plpgsql"
-
-  create_table "golden_tickets", force: :cascade do |t|
-    t.integer "user_id"
-    t.string "code"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
 
   create_table "topics", force: :cascade do |t|
     t.text "content"
@@ -61,14 +54,6 @@ ActiveRecord::Schema.define(version: 2020_09_27_093857) do
     t.boolean "marketing", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-  end
-
-  create_table "waiting_users", force: :cascade do |t|
-    t.string "email"
-    t.text "comment"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.integer "golden_ticket_id"
   end
 
 end

@@ -2,15 +2,37 @@ import * as React from 'react'
 import { User } from './User'
 import { Form, Button } from 'react-bootstrap'
 import { parameterize } from './utils/parameterize'
+import Autosuggest from 'react-autosuggest'
+import './NewBookPage.scss';
+import axios from 'axios'
 
 interface NewBookPageProps {
   setAppState: Function
   currentUser: User
 }
 
-interface NewBookPageState{
-  newTopicTitle: string
-  newTopicAuthor: string
+interface NewBookPageState {
+  value: string
+  suggestions: Book[]
+  suggestionsDate: Date | null
+}
+
+interface Book {
+  title_suggest: string
+  author_name: string
+}
+
+const renderSuggestion = (suggestion: Book) => (
+  <div>
+    {bookAndAuthor(suggestion)}
+  </div>
+)
+const distinct = (book: Book, index: number, books: Book[]) => {
+  return books.map(b => bookAndAuthor(b)).indexOf(bookAndAuthor(book)) === index
+}
+
+const bookAndAuthor = (book: Book) => {
+  return (`${book.title_suggest} by ${book.author_name}`)
 }
 
 class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
@@ -18,70 +40,81 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
     super(props)
 
     this.state = {
-      newTopicTitle: "",
-      newTopicAuthor: ""
+      value: '',
+      suggestions: [],
+      suggestionsDate: null
     }
   }
 
-  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const target = event.target
-    const name = target.name
-    const value = target.value
-    this.setState((prevState) => ({
-      ...prevState,
-      [name]: value
-    }))
+  // Autosuggest will call this function every time you need to update suggestions.
+  // You already implemented this logic above, so just use it.
+  onSuggestionsFetchRequested = (params: any) => {
+    this.fetchSuggestions(params.value)
   }
 
+  // Autosuggest will call this function every time you need to clear suggestions.
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: []
+    })
+  }
 
-  createTopic = (newTopicPath: string) => {
-    const { newTopicTitle } = this.state
+  getSuggestionValue = (suggestion: Book) => {
+    return (`${suggestion.title_suggest} by ${suggestion.author_name}`)
+  }
 
-    if (newTopicTitle.length < 2) {
-      this.props.setAppState({ alert: { message: "Book title is too short", variant: "danger" } })
-    } else {
-      window.location.href = newTopicPath
+  fetchSuggestions = async (value: string) => {
+    const inputValue = value.trim().toLowerCase()
+    if (inputValue.length > 1) {
+      const startTime = new Date() // get time before making request so we only save results if there are no more recent versions.
+      const encodedValue = encodeURIComponent(inputValue)
+      const response = await axios.get(`https://openlibrary.org/search.json?q=${encodedValue}&limit=15`)
+      const { suggestionsDate } = this.state
+      if (suggestionsDate === null || suggestionsDate < startTime) {
+        const books: Book[] = response.data.docs
+        const uniqueBooks = books.filter(distinct)
+        this.setState({ suggestions: uniqueBooks, suggestionsDate: startTime })
+      }
     }
   }
+
 
   public render() {
     const { currentUser } = this.props
-    const { newTopicTitle, newTopicAuthor } = this.state
-    const newTopicContent = newTopicAuthor.length > 0 ? `${newTopicTitle} (book) by ${newTopicAuthor}` : ""
+    const { value, suggestions } = this.state
+    const newTopicContent = value.length > 0 ? `${value.replace(' by ', ' (book) by ')}` : ""
     const newTopicSlug = parameterize(newTopicContent, 100)
-    const newTopicPath = `/${currentUser.username}/${newTopicSlug}?content=${newTopicContent}`
-
+    const path = `/${currentUser.username}/${newTopicSlug}?content=${newTopicContent}`
     return (
       <div className="container">
         <div className="row">
+          <div className="col-lg-3"></div>
           <div className="col-lg-6">
-            <h4>Add a note about a book</h4>
+            <h1>Add book notes</h1>
+
             <Form>
               <Form.Group>
-                <Form.Label>Book title</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={newTopicTitle}
-                  name={"newTopicTitle"}
-                  placeholder="E.g. Foundation"
-                  onChange={this.handleChange as any} autoFocus
+                <Form.Label>Title and/or author</Form.Label>
+                <Autosuggest
+                  suggestions={suggestions}
+                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                  onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                  getSuggestionValue={this.getSuggestionValue}
+                  renderSuggestion={renderSuggestion}
+                  inputProps={{
+                    placeholder: 'e.g. Foundation by Isaac Asimov',
+                    value: value,
+                    className: 'form-control',
+                    onChange: (form, event) => {
+                      this.setState({ value: event.newValue })
+                    }
+                  }}
                 />
               </Form.Group>
-
-              <Form.Group>
-                <Form.Label>Book author</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={newTopicAuthor}
-                  name={"newTopicAuthor"}
-                  placeholder="E.g. Isaac Asimov"
-                  onChange={this.handleChange as any}
-                />
-              </Form.Group>
-              <Button onClick={() => this.createTopic(newTopicPath)}>Next</Button>
+              <Button onClick={() => window.location.href = path}>Next</Button>
             </Form>
           </div>
-          <div className="col-lg-6"></div>
+          <div className="col-lg-3"></div>
         </div>
       </div>
     )

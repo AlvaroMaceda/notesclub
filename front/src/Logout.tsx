@@ -10,7 +10,6 @@ class Logout extends React.Component {
   }
 
   rmStorageAndRedirect = () => {
-    localStorage.removeItem('currentUser')
     window.location.href = '/'
   }
 

@@ -6,13 +6,13 @@ import Logout from './Logout';
 import Header from './Header';
 import Footer from './Footer';
 import { Alert } from 'react-bootstrap';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 import UserTopicPage from './topics/UserTopicPage'
 import UserPage from './UserPage'
 import BooksPage from './BooksPage'
 import Feed from './Feed'
-import WaitingList from './WaitingList'
-import GoldenTicket from './GoldenTicket'
+import HomePage from './HomePage'
+import SignUp from './SignUp'
 import { User } from './User'
 import { fetchAuthenticatedUser } from './backendSync'
 import ConfirmationToken from './ConfirmationToken'
@@ -31,7 +31,6 @@ interface alert {
 
 interface AppState {
   currentUser?: User | null
-  currentUsername?: string
   alert?: alert
 }
 
@@ -39,40 +38,27 @@ class App extends React.Component<AppProps, AppState> {
   constructor(props: AppProps) {
     super(props)
 
-    const currentUserStr = localStorage.getItem('currentUser')
-    const currentUsername = currentUserStr ? JSON.parse(currentUserStr).username : undefined
-
     this.state = {
-      currentUsername: currentUsername,
       alert: undefined,
     }
   }
 
   componentDidMount() {
-    const { currentUsername, currentUser } = this.state
+    const { currentUser } = this.state
 
     if (currentUser === undefined) {
-      if (currentUsername) {
-        fetchAuthenticatedUser()
-          .then(currentUser => {
-            this.setState({ currentUser: currentUser === undefined ? null : currentUser })
-          })
-          .catch(error => {
-            if (error && error.response && error.response.status === 401) {
-              localStorage.removeItem('currentUser')
-              window.location.href = "/login"
-            } else {
-              this.setState({ alert: { message: "Sync error. Please try again later. Sorry, we're in alpha!", variant: "danger" } })
-            }
-          })
-      } else {
-        this.setState({ currentUser: null })
-      }
+      fetchAuthenticatedUser()
+        .then(currentUser => {
+          this.setState({ currentUser: currentUser === undefined ? null : currentUser })
+        })
+        .catch(error => {
+          if (error && error.response && error.response.status === 401) {
+            this.setState({ currentUser: null })
+          } else {
+            this.setState({ currentUser: null, alert: { message: "Sync error. Please try again later. Sorry, we're in alpha!", variant: "danger" } })
+          }
+        })
     }
-  }
-
-  setCurrentUser = (user: User) => {
-    this.setState({ currentUsername: user.username })
   }
 
   updateAlert = (variant: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "dark" | "light", message: string) => {
@@ -85,7 +71,7 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   renderRoutes = () => {
-    const { currentUser, currentUsername } = this.state
+    const { currentUser } = this.state
 
     return (
       <Switch>
@@ -95,20 +81,30 @@ class App extends React.Component<AppProps, AppState> {
         <Route path="/login" exact render={() => <Login setParentState={this.updateState} />} />
         <Route path="/users/confirmation/:token" exact render={({ match }) => <ConfirmationToken token={match.params.token} setAppState={this.updateState} />} />
         <Route path="/books" exact render={({ match }) => <BooksPage currentUser={currentUser} setAppState={this.updateState} />} />
-        {currentUser &&
+        {currentUser ?
           <Route path="/books/new" exact render={({ match }) => <NewBookPage currentUser={currentUser} setAppState={this.updateState} />} />
+        :
+          <Route path="/books/new" exact>
+            {currentUser === null ? <Login setParentState={this.updateState} /> : <div className="container">Loading...</div>}
+          </Route>
         }
         <Route path="/:blogUsername/:topicKey" exact render={({ match }) => <UserTopicPage currentBlogUsername={match.params.blogUsername} currentTopicKey={match.params.topicKey} currentUser={currentUser} setAppState={this.updateState} />} />
         {currentUser &&
           <Switch>
+            <Route path="/" exact render={({ match }) => <Redirect to="/books/new" />} />
+            <Route path="/new" exact render={({ match }) => <Feed currentUser={currentUser} blogUsername={match.params.blogUsername} setAppState={this.updateState} />} />
             <Route path="/:blogUsername" exact render={({ match }) => <UserPage currentUser={currentUser} blogUsername={match.params.blogUsername} setAppState={this.updateState} />} />
-            <Route path="/" exact render={({ match }) => <Feed currentUser={currentUser} blogUsername={match.params.blogUsername} setAppState={this.updateState} />} />
           </Switch>
         }
-        {!currentUsername &&
+        {currentUser === undefined &&
           <Switch>
-            <Route path="/" exact render={() => <WaitingList setAppState={this.updateState} />} />
-            <Route path="/signup" exact render={() => <GoldenTicket setAppState={this.updateState} />} />
+            <Route path="/" exact render={() => <div className="container">Loading</div>} />
+          </Switch>
+        }
+        {currentUser === null &&
+          <Switch>
+            <Route path="/" exact render={() => <HomePage setAppState={this.updateState} />} />
+            <Route path="/signup" exact render={() => <SignUp setAppState={this.updateState} />} />
             <Route path="/:whatever" exact>
               {<Login setParentState={this.updateState} />}
             </Route>

@@ -29,16 +29,17 @@ class UsersController < ApplicationController
   end
 
   def create
-    creator = UserCreator.new(params.permit(:email, :password, :name, :username, :golden_ticket_code, :marketing))
-    if creator.create
-      user = creator.user
+    user = User.new(params.permit(:email, :password, :name, :username, :marketing).merge(password_confirmation: params[:password]))
+    if !verify_recaptcha_if_required(model: user)
+      render json: { errors: { captcha: ["Are you human? If so, please refresh and try again."]} }, status: :unauthorized
+    elsif user.save
       log_in_as(user)
       track_user
       track_action("Sign up", name: user.name, username: user.username)
-      render json: { user: creator.user.slice(EXPOSED_ATTRIBUTES) }, status: :created
+      render json: { user: user.slice(EXPOSED_ATTRIBUTES) }, status: :created
     else
-      Rails.logger.info "Errors: #{creator.errors.inspect}"
-      render json: { errors: creator.errors }, status: :unprocessable_entity
+      Rails.logger.info "Errors: #{user.errors.inspect}"
+      render json: { errors: user.errors }, status: :unprocessable_entity
     end
   end
 
