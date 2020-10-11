@@ -17,13 +17,16 @@ This project consists of a frontend in React (/front) and a Ruby on Rails API.
 
 You'll need a PostreSQL database to run the application.
 
-There is a ```docker-compose-yml``` file which will start a PostreSQL and a pgAdmin servers. You will need docker and docker-compose installed in your system. Just run ```docker-compose up``` and you should have a postgresql server available for the project. 
+There is a `docker-compose-yml` file which will start a PostreSQL and a pgAdmin servers. You will need `docker` and `docker-compose` installed in your system. Then, run the following and you should have a postgresql server available for the project:
+```
+docker-compose up
+```
 
-You can acess pgadmin with your browser at http://localhost:8080 (User is "devuser", password "devuser". It will ask a password when connecting to a database, just leave it blank and press enter) You can also access the database server using the command-line client: ```psql "user=devuser password=devuser host=localhost port=5432 dbname=notes_dev"```
+You can acess pgadmin with your browser at http://localhost:8080 (User is "devuser", password "devuser". It will ask a password when connecting to a database, just leave it blank and press enter) You can also access the database server using the command-line client: `psql "user=devuser password=devuser host=localhost port=5432 dbname=notes_dev"`
 
-The servers can be run separately with ```docker-compose up database -d``` for the database and ```docker-compose up pgadmin -d``` for pgAdmin.
+The servers can be run separately with `docker-compose up database -d` for the database and `docker-compose up pgadmin -d` for pgAdmin.
 
-To completely remove the containers and volumes (note that this will destroy all data): ```docker-compose down -v```
+To completely remove the containers and volumes (note that this will destroy all data): `docker-compose down -v`
 
 ### Create and populate database with seed data
 ```
