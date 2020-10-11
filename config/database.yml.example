@@ -8,14 +8,14 @@ development:
   database: notes_dev
   username: devuser
   host: localhost
-  port: 5432
+  port: 5433
 
 test:
   <<: *default
   database: notes_test
   username: testuser
   host: localhost
-  port: 5432
+  port: 5433
 
 production:
   <<: *default
