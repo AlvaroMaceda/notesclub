@@ -3,7 +3,7 @@
         "1": {
             "Name": "notesclub",
             "Group": "Servers",
-            "Port": 5432,
+            "Port": 5433,
             "Username": "devuser",
             "Host": "database",
             "SSLMode": "prefer",
