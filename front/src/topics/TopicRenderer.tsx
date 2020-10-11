@@ -250,9 +250,17 @@ class TopicRenderer extends React.Component<TopicRendererProps, TopicRendererSta
             createBackendTopic({ topic: newNonSavedTopic, setAppState: this.props.setAppState })
               .then(topicWithId => {
                 const selected = this.props.selectedTopic
+                let newSelected
+                if (selected && (selected.tmp_key === topicWithId.tmp_key)) {
+                  topicWithId.content = selected.content
+                  newSelected = topicWithId
+                } else {
+                  newSelected = selected
+                }
+
                 this.props.setUserTopicPageState({
                   descendants: descendants.map((d) => d.tmp_key === topicWithId.tmp_key ? topicWithId : d),
-                  selectedTopic: selected && selected.tmp_key === topicWithId.tmp_key ? topicWithId : selected
+                  selectedTopic: newSelected
                 })
               })
           }
