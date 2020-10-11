@@ -6,10 +6,16 @@ default: &default
 development:
   <<: *default
   database: notes_dev
+  username: devuser
+  host: localhost
+  port: 5432
 
 test:
   <<: *default
   database: notes_test
+  username: testuser
+  host: localhost
+  port: 5432
 
 production:
   <<: *default

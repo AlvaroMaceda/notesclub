@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:  
+
+  database:
+    image: postgres:12.1
+    # user: "${UID}:${GID}"
+    # Temporary
+    ports:
+      - 5432:5432
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./docker/database_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - notesclub
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: devuser
+      PGADMIN_DEFAULT_PASSWORD: devuser
+    ports:
+      - 8080:80
+    volumes:
+      - pga4volume:/var/lib/pgadmin
+      - ./docker/pgadmin4_servers.json:/pgadmin4/servers.json
+    networks:
+      - notesclub
+    logging:
+        driver: none
+
+volumes:
+  db_data:
+  pga4volume:
+    
+networks:
+  notesclub:    
