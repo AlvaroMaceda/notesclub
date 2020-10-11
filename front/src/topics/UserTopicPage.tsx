@@ -75,6 +75,7 @@ class UserTopicPage extends React.Component<UserTopicPageProps, UserTopicPageSta
                   const args = { topic: newNonSavedTopic, setAppState: this.props.setAppState, include_ancestors: true, include_descendants: true }
                   createBackendTopic(args)
                     .then(topic => {
+                      this.props.history.push(`/${currentUser.username}/${currentTopicKey}`) // get rid of the content argument
                       this.setTopicAndCreateDescendantIfNone(topic, isOwnBlog)
                     })
                 } else {
