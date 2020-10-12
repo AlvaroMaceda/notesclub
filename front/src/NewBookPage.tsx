@@ -82,9 +82,9 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
   public render() {
     const { currentUser } = this.props
     const { value, suggestions } = this.state
-    const newTopicContent = value.length > 0 ? `${value.replace(' by ', ' (book) by ')}` : ""
-    const newTopicSlug = parameterize(newTopicContent, 100)
-    const path = `/${currentUser.username}/${newTopicSlug}?content=${newTopicContent}`
+    const newNoteContent = value.length > 0 ? `${value.replace(' by ', ' (book) by ')}` : ""
+    const newNoteSlug = parameterize(newNoteContent, 100)
+    const path = `/${currentUser.username}/${newNoteSlug}?content=${newNoteContent}`
     return (
       <div className="container">
         <div className="row">

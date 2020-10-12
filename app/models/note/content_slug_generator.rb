@@ -1,4 +1,4 @@
-class Topic::ContentSlugGenerator
+class Note::ContentSlugGenerator
   def initialize(content)
     @content = content
   end

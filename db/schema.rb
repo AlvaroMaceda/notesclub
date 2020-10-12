@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_10_161339) do
+ActiveRecord::Schema.define(version: 2020_10_11_175657) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "plpgsql"
 
-  create_table "topics", force: :cascade do |t|
+  create_table "notes", force: :cascade do |t|
     t.text "content"
     t.integer "user_id"
     t.string "ancestry"
@@ -24,10 +24,10 @@ ActiveRecord::Schema.define(version: 2020_10_10_161339) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "slug", null: false
     t.integer "position"
-    t.index ["ancestry"], name: "index_topics_on_ancestry"
-    t.index ["content"], name: "index_topics_on_content", using: :gin
-    t.index ["slug", "user_id"], name: "index_topics_on_slug_and_user_id", unique: true
-    t.index ["user_id"], name: "index_topics_on_user_id"
+    t.index ["ancestry"], name: "index_notes_on_ancestry"
+    t.index ["content"], name: "index_notes_on_content", using: :gin
+    t.index ["slug", "user_id"], name: "index_notes_on_slug_and_user_id", unique: true
+    t.index ["user_id"], name: "index_notes_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|

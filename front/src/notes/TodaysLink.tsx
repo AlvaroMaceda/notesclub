@@ -32,13 +32,13 @@ class TodaysLink extends React.Component<TodaysLinkProps, TodaysLinkState> {
     const year = today.getUTCFullYear()
     const month = pad(today.getUTCMonth() + 1)
     const day = pad(today.getUTCDate())
-    const todayTopicContent = `${year}-${month}-${day}`
-    const todayTopicUrl = currentUser ? `/${currentUser.username}/${todayTopicContent}` : ""
+    const todayNoteContent = `${year}-${month}-${day}`
+    const todayNoteUrl = currentUser ? `/${currentUser.username}/${todayNoteContent}` : ""
 
     return (
       <>
         {"Not sure where to start? "}
-        <Link to={todayTopicUrl} onClick={() => window.location.href = todayTopicUrl}>{todayTopicContent}</Link> is a great place to add notes about the books you're reading.
+        <Link to={todayNoteUrl} onClick={() => window.location.href = todayNoteUrl}>{todayNoteContent}</Link> is a great place to add notes about the books you're reading.
       </>
     )
   }

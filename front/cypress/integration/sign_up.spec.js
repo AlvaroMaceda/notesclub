@@ -42,7 +42,7 @@ describe('Sign up', () => {
 
     cy.route({
       method: 'GET',
-      url: '/v1/topics*',
+      url: '/v1/notes*',
       response: [{
         ancestors: [],
         ancestry: null,
