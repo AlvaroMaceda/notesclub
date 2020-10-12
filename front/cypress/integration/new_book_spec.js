@@ -49,14 +49,14 @@ describe('Sign up', () => {
 
     cy.route({
       method: 'GET',
-      url: '/v1/topics*',
+      url: '/v1/notes*',
       response: [],
       status: 200
     })
 
     cy.route({
       method: 'POST',
-      url: '/v1/topics',
+      url: '/v1/notes',
       response: [],
       status: 200
     })
@@ -67,6 +67,5 @@ describe('Sign up', () => {
 
     const noteTitle = 'Sapiens (book) by Yuval Noah Harari'
     cy.location('pathname').should('eq', `/${user.username}/${parameterize(noteTitle)}`)
-    cy.location('search').should('eq', `?content=${encodeURIComponent(noteTitle)}`)
   })
 })

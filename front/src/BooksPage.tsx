@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { fetchBackendTopics } from './backendSync'
-import { TopicWithFamily } from './topics/Topic'
+import { fetchBackendNotes } from './backendSync'
+import { NoteWithFamily } from './notes/Note'
 import { Link } from 'react-router-dom'
 import { User } from './User'
 import { Button } from 'react-bootstrap'
@@ -11,7 +11,7 @@ interface BooksPageProps {
 }
 
 interface BooksPageState{
-  topics?: TopicWithFamily[]
+  notes?: NoteWithFamily[]
 }
 
 class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
@@ -21,18 +21,18 @@ class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
   }
 
   componentDidMount() {
-    fetchBackendTopics({ ancestry: null, content_like: "%(book)%", include_user: true }, this.props.setAppState)
-      .then(topicsWithUsers => {
-        this.setState({ topics: topicsWithUsers })
+    fetchBackendNotes({ ancestry: null, content_like: "%(book)%", include_user: true }, this.props.setAppState)
+      .then(notesWithUsers => {
+        this.setState({ notes: notesWithUsers })
       })
   }
 
-  renderTopic = (topic: TopicWithFamily, user: User, index: number) => {
+  renderNote = (note: NoteWithFamily, user: User, index: number) => {
     const user_path = user ? `/${user.username}` : ""
-    const path = `${user_path}/${topic.slug}`
+    const path = `${user_path}/${note.slug}`
     return (
       <li key={index}>
-        <Link to={path} onClick={() => window.location.href = path}>{topic.content}</Link>
+        <Link to={path} onClick={() => window.location.href = path}>{note.content}</Link>
         {" · "}
         <Link to={user_path} onClick={() => window.location.href = user_path}>{user.name}</Link>
       </li>
@@ -40,19 +40,19 @@ class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
   }
 
   public render () {
-    const { topics } = this.state
+    const { notes } = this.state
     const { currentUser } = this.props
 
     return (
       <div className="container">
         <h1>Books:</h1>
-        {!topics &&
+        {!notes &&
           <>Loading</>
         }
-        {topics &&
+        {notes &&
           <>
             <ul>
-              {topics.map((topic, index) => topic.user && this.renderTopic(topic, topic.user, index))}
+              {notes.map((note, index) => note.user && this.renderNote(note, note.user, index))}
             </ul>
             {!currentUser &&
               <>

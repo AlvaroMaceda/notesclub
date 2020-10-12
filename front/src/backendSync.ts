@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { User } from './User'
 import { apiDomain } from './appConfig'
-import { Topic, TopicWithFamily } from './topics/Topic'
+import { Note, NoteWithFamily } from './notes/Note'
 // import { sleep } from './utils/sleep'
 
 export const fetchBackendUsers = async (ids: number[]) : Promise<User[]> => {
@@ -32,9 +32,9 @@ export const fetchBackendUser = async (username: string): Promise<User> => {
   return (response)
 }
 
-interface fetchBackendTopicsInterface {
+interface fetchBackendNotesInterface {
   content?: string
-  reference?: string // This is used to fetch topics with content which contains reference or [[reference]]
+  reference?: string // This is used to fetch notes with content which contains reference or [[reference]]
   slug?: string
   user_ids?: number[]
   ids?: number[]
@@ -51,63 +51,63 @@ interface fetchBackendTopicsInterface {
   limit?: number
 }
 
-export const fetchBackendTopics = async (params: fetchBackendTopicsInterface, setAppState: Function): Promise<TopicWithFamily[]> => {
+export const fetchBackendNotes = async (params: fetchBackendNotesInterface, setAppState: Function): Promise<NoteWithFamily[]> => {
   if (params.ancestry === null) { params.ancestry = "" } // Axios skips null and undefined parameters
-  const response = await axios.get(apiDomain() + '/v1/topics', { params: params, headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
+  const response = await axios.get(apiDomain() + '/v1/notes', { params: params, headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
     .then(res => Promise.resolve(res.data))
     .catch(_ => syncError(setAppState))
   return (response)
 }
 
-// export const fetchBackendReferences = async (params: fetchBackendTopicsInterface, setAppState: Function): Promise<Reference[]> => {
+// export const fetchBackendReferences = async (params: fetchBackendNotesInterface, setAppState: Function): Promise<Reference[]> => {
 //   params = { ...params, ...{ include_user: true, include_descendants: true, include_ancestors: true } }
 //   if (params.ancestry === null) { params.ancestry = "" } // Axios skips null and undefined parameters
-//   const response = await axios.get(apiDomain() + '/v1/topics', { params: params, headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
+//   const response = await axios.get(apiDomain() + '/v1/notes', { params: params, headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
 //     .then(res => { return (res.data) })
 //     .catch(_ => syncError(setAppState))
 //   return (response)
 // }
 
-interface createBackendTopic {
-  topic: Topic
+interface createBackendNote {
+  note: Note
   setAppState: Function
   include_ancestors?: boolean
   include_descendants?: boolean
 }
-export const createBackendTopic = async (params: createBackendTopic): Promise<TopicWithFamily> => {
-  const position = params["topic"].position === -1 ? null : params["topic"].position
+export const createBackendNote = async (params: createBackendNote): Promise<NoteWithFamily> => {
+  const position = params["note"].position === -1 ? null : params["note"].position
   const args = {
-    topic: { ...params["topic"], ...{ position: position } },
+    note: { ...params["note"], ...{ position: position } },
     include_ancestors: params["include_ancestors"],
     include_descendants: params["include_descendants"]
   }
 
   return (
-    axios.post(apiDomain() + '/v1/topics', args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
+    axios.post(apiDomain() + '/v1/notes', args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
       .then(res => {
         let t = res.data
-        t["tmp_key"] = params["topic"].tmp_key
+        t["tmp_key"] = params["note"].tmp_key
         return (t)
       })
       .catch(_ => syncError(params["setAppState"]))
   )
 }
 
-export const updateBackendTopic = async (topic: Topic, setAppState: Function, update_topics_with_links?: boolean): Promise<Topic> => {
+export const updateBackendNote = async (note: Note, setAppState: Function, update_notes_with_links?: boolean): Promise<Note> => {
   let args = {
-    topic: topic,
-    update_topics_with_links: update_topics_with_links
+    note: note,
+    update_notes_with_links: update_notes_with_links
   }
   return (
-    axios.put(apiDomain() + `/v1/topics/${topic.id}`, args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
+    axios.put(apiDomain() + `/v1/notes/${note.id}`, args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
       .then(res => res.data)
       .catch(_ => syncError(setAppState))
   )
 }
 
-export const deleteBackendTopic = async (topic: Topic, setAppState: Function): Promise<Topic> => {
+export const deleteBackendNote = async (note: Note, setAppState: Function): Promise<Note> => {
   return (
-    axios.delete(apiDomain() + `/v1/topics/${topic.id}`, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
+    axios.delete(apiDomain() + `/v1/notes/${note.id}`, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
       .then(res => Promise.resolve(res.data))
   )
 }
@@ -131,21 +131,21 @@ export const backendErrorsToMessage = (res: any) => {
   return (errors_arr.join(". "))
 }
 
-// export const updateBackendTopicWithRetries = async (topic: Topic): Promise<Topic> => {
+// export const updateBackendNoteWithRetries = async (note: Note): Promise<Note> => {
 //   return (
-//     updateBackendTopic(topic)
+//     updateBackendNote(note)
 //       .then(t => t)
 //       .catch(_ => {
-//         console.log("Error updating topic. Will retry in 200ms.")
+//         console.log("Error updating note. Will retry in 200ms.")
 //         return (
 //           sleep(200)
-//             .then(_ => updateBackendTopic(topic)
+//             .then(_ => updateBackendNote(note)
 //                 .then(t => t)
 //                 .catch(_ => {
-//                   console.log("Error updating topic. Will retry in 2 seconds.")
+//                   console.log("Error updating note. Will retry in 2 seconds.")
 //                   return (
 //                     sleep(2000)
-//                       .then(_ => updateBackendTopic(topic)
+//                       .then(_ => updateBackendNote(note)
 //                         .then(t => t)
 //                         .catch(_ => Promise.reject("Error"))
 //                       )

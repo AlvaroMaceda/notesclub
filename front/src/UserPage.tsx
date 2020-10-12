@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { User } from './User'
-import { Topic, Reference } from './topics/Topic'
-import { fetchBackendUser, fetchBackendTopics } from './backendSync'
-import ReferenceRenderer from './topics/ReferenceRenderer'
+import { Note, Reference } from './notes/Note'
+import { fetchBackendUser, fetchBackendNotes } from './backendSync'
+import ReferenceRenderer from './notes/ReferenceRenderer'
 import { Link } from 'react-router-dom'
 
 interface UserPageProps {
@@ -12,9 +12,9 @@ interface UserPageProps {
 }
 
 interface UserPageState {
-  topics?: Reference[]
+  notes?: Reference[]
   blogger?: User
-  selectedTopic: Topic | null
+  selectedNote: Note | null
 }
 
 class UserPage extends React.Component<UserPageProps, UserPageState> {
@@ -22,12 +22,12 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
     super(props)
 
     this.state = {
-      selectedTopic: null
+      selectedNote: null
     }
   }
 
   componentDidMount() {
-    this.fetchBackendUserTopics()
+    this.fetchBackendUserNotes()
   }
 
   componentWillMount() {
@@ -39,10 +39,10 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
   }
 
   loadMore = () => {
-    const { topics, blogger } = this.state
-    const lastId = topics ? topics[topics.length - 1].id : undefined
-    if (blogger && topics && lastId && document.scrollingElement && window.innerHeight + document.documentElement.scrollTop + 5 >= document.scrollingElement.scrollHeight) {
-      fetchBackendTopics({
+    const { notes, blogger } = this.state
+    const lastId = notes ? notes[notes.length - 1].id : undefined
+    if (blogger && notes && lastId && document.scrollingElement && window.innerHeight + document.documentElement.scrollTop + 5 >= document.scrollingElement.scrollHeight) {
+      fetchBackendNotes({
         user_ids: [blogger.id],
         ancestry: null,
         skip_if_no_descendants: true,
@@ -52,18 +52,18 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
         limit: 5,
         id_lte: lastId - 1
       }, this.props.setAppState)
-        .then(newTopics => newTopics && this.setState({ topics: topics.concat(newTopics as Reference[]) }))
+        .then(newNotes => newNotes && this.setState({ notes: notes.concat(newNotes as Reference[]) }))
     }
   }
 
-  fetchBackendUserTopics = () => {
+  fetchBackendUserNotes = () => {
     const { blogUsername } = this.props
     fetchBackendUser(blogUsername)
       .then(blogger => {
         this.setState({ blogger: blogger })
 
         if (blogger) {
-          fetchBackendTopics({
+          fetchBackendNotes({
             user_ids: [blogger.id],
             ancestry: null,
             skip_if_no_descendants: true,
@@ -71,7 +71,7 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
             include_ancestors: true,
             include_user: true,
             limit: 20 }, this.props.setAppState)
-            .then(topics => topics && this.setState({ topics: topics as Reference[] }))
+            .then(notes => notes && this.setState({ notes: notes as Reference[] }))
         }
       })
   }
@@ -82,23 +82,23 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
   }
 
   public render () {
-    const { blogger, topics, selectedTopic } = this.state
+    const { blogger, notes, selectedNote } = this.state
     const { currentUser } = this.props
 
      return (
       <div className="container">
-        {blogger && topics && currentUser &&
+        {blogger && notes && currentUser &&
           <>
            {"Ready to start? "}
            <Link to="/books/new" onClick={() => window.location.href = "/books/new"}>Add a note about a book</Link>.
             <h1>{blogger.name === "Help" ? "Help" : `${blogger.name}'s recent notes`}</h1>
             <ul>
-              {topics.map((ref) => (
+              {notes.map((ref) => (
                 <ReferenceRenderer
                   key={ref.id}
-                  topic={ref}
-                  selectedTopic={selectedTopic}
-                  setUserTopicPageState={this.updateState}
+                  note={ref}
+                  selectedNote={selectedNote}
+                  setUserNotePageState={this.updateState}
                   setAppState={this.props.setAppState}
                   currentUser={currentUser}
                   showUser={false} />
@@ -106,7 +106,7 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
             </ul>
           </>
         }
-        { (!blogger || !topics) &&
+        { (!blogger || !notes) &&
           <p>Loading</p>
         }
       </div>

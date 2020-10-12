@@ -1,13 +1,13 @@
-class TopicDeleter
-  def initialize(topic, args = {})
-    @topic = topic
+class NoteDeleter
+  def initialize(note, args = {})
+    @note = note
     @include_descendants = args[:include_descendants] || true
   end
 
   def delete
-    Topic.transaction do
+    Note.transaction do
       delete_descendants if include_descendants
-      topic.destroy!
+      note.destroy!
     end
     true
   rescue  ActiveRecord::RecordNotDestroyed => e
@@ -16,12 +16,12 @@ class TopicDeleter
 
   private
 
-  attr_reader :topic, :include_descendants
+  attr_reader :note, :include_descendants
 
   # We use delete_all instead of each{|t| t.destroy!} because at the moment:
   # - we don't have before_* or after_destroy methods
   # - we do not have associations dependant on this
   def delete_descendants
-    topic.descendants.delete_all
+    note.descendants.delete_all
   end
 end
