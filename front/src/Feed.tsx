@@ -88,8 +88,7 @@ class Feed extends React.Component<FeedProps, FeedState> {
       <div className="container">
         {blogger && notes && currentUser &&
           <>
-            {"Ready to start? "}
-            <Link to="/books/new" onClick={() => window.location.href="/books/new"}>Add a note about a book</Link>.
+            <Link to="/books/new" className="btn btn-primary" onClick={() => window.location.href="/books/new"}>Add book notes</Link>
             <h1>Recent notes</h1>
             <ul>
               {notes.map((ref) => (

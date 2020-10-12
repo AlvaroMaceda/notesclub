@@ -89,8 +89,9 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
       <div className="container">
         {blogger && notes && currentUser &&
           <>
-           {"Ready to start? "}
-           <Link to="/books/new" onClick={() => window.location.href = "/books/new"}>Add a note about a book</Link>.
+            {blogger.name === "Help" &&
+              <Link to="/books/new" className="btn btn-primary" onClick={() => window.location.href = "/books/new"}>Add book notes</Link>
+            }
             <h1>{blogger.name === "Help" ? "Help" : `${blogger.name}'s recent notes`}</h1>
             <ul>
               {notes.map((ref) => (
