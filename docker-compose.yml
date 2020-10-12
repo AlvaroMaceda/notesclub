@@ -15,7 +15,7 @@ services:
       - notesclub
 
   pgadmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:4.25
     environment:
       PGADMIN_DEFAULT_EMAIL: devuser
       PGADMIN_DEFAULT_PASSWORD: devuser
