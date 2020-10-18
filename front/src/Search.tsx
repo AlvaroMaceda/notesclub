@@ -5,6 +5,9 @@ import Autosuggest from 'react-autosuggest'
 import axios from 'axios'
 import { apiDomain } from './appConfig'
 
+import { Subject, asyncScheduler } from "rxjs";
+import { switchMap, throttleTime, filter } from "rxjs/operators";
+
 interface SearchProps {
   currentUser: User
 }
@@ -12,9 +15,10 @@ interface SearchProps {
 interface SearchState {
   value: string
   suggestions: Note[]
-  suggestionsDate: Date | null
 }
 
+const THROTTLE_TIME = 500
+const MINIMUM_SEARCH_LENGTH = 2
 
 const renderSuggestion = (note: Note) => (
   <div>
@@ -22,24 +26,31 @@ const renderSuggestion = (note: Note) => (
   </div>
 )
 
+const hasEnoughLength = (value: string) => value.length >= MINIMUM_SEARCH_LENGTH
+
 class Search extends React.Component<SearchProps, SearchState> {
+
+  lookups: any
+
   constructor(props: SearchProps) {
     super(props)
 
     this.state = {
       value: '',
       suggestions: [],
-      suggestionsDate: null
     }
-  }
 
-  // Autosuggest will call this function every time you need to update suggestions.
-  // You already implemented this logic above, so just use it.
+    this.lookups = new Subject()
+    this.subscribeToLookUps()
+
+  }
   onSuggestionsFetchRequested = (params: any) => {
-    this.fetchSuggestions(params.value)
+    const inputValue = params.value.trim().toLowerCase()
+    if (inputValue.length < MINIMUM_SEARCH_LENGTH) return;    
+
+    this.lookups.next(inputValue)
   }
 
-  // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequested = () => {
     this.setState({
       suggestions: []
@@ -50,31 +61,46 @@ class Search extends React.Component<SearchProps, SearchState> {
     return (note.content)
   }
 
-  fetchSuggestions = async (value: string) => {
-    const inputValue = value.trim().toLowerCase()
-    if (inputValue.length > 1) {
-      const startTime = new Date() // get time before making request so we only save results if there are no more recent versions.
-      const encodedValue = encodeURIComponent(inputValue)
-      const args = {
-        content_like: `%${encodedValue}%`,
-        limit: 15
-      }
-      const response = await axios.get(
-        apiDomain() + '/v1/notes',
-        { 
-          params: args,
-          headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, 
-          withCredentials: true 
-        }
-      ) 
-      const { suggestionsDate } = this.state
-      if (suggestionsDate === null || suggestionsDate < startTime) {
-        const notes: Note[] = response.data
-        this.setState({ suggestions: notes, suggestionsDate: startTime })
-      }
-    }
+  subscribeToLookUps() {
+    this.lookups.pipe(
+      filter(hasEnoughLength),
+      throttleTime(THROTTLE_TIME, asyncScheduler, {trailing:true}), // {trailing: true} is for launching the last request (that's the request we are interested in)    
+      switchMap( (value: string) => this.launchLookUpRequest(value) ), // switchMap will ignore all requests except last one
+    ).subscribe( 
+      (data: any) => this.calculationResponse(data),
+      (error: any) => this.calculationError(error)
+    )
   }
 
+  calculationError(error: any) {
+    // TO-DO: show some error message on UI?
+    console.log(`Search request has failed: ${error.response}`);
+    // We must resubscribe because the original subscription has errored out and isn't valid anymore
+    this.subscribeToLookUps()
+  }
+
+  calculationResponse(response: any) {
+    if(response.error) return
+
+    const notes: Note[] = response.data
+    this.setState({ ...this.state, suggestions: notes })
+  }
+
+  async launchLookUpRequest(value: string) {
+    const encodedValue = encodeURIComponent(value)
+    const args = {
+      content_like: `%${encodedValue}%`,
+      limit: 15
+    }
+    return axios.get(
+      apiDomain() + '/v1/notes',
+      { 
+        params: args,
+        headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, 
+        withCredentials: true 
+      }
+    )
+  }
 
   public render() {
     const { suggestions, value } = this.state
