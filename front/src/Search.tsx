@@ -1,12 +1,11 @@
 import * as React from 'react'
 import { User } from './User'
 import { Note } from './notes/Note'
-import Autosuggest from 'react-autosuggest'
-import axios from 'axios'
+import Autosuggest, {SuggestionsFetchRequestedParams}  from 'react-autosuggest'
+import axios, {AxiosResponse, AxiosError} from 'axios';
 import { apiDomain } from './appConfig'
-
-import { Subject, asyncScheduler } from "rxjs";
-import { switchMap, throttleTime, filter } from "rxjs/operators";
+import { Subject, asyncScheduler } from 'rxjs'
+import { switchMap, throttleTime, filter } from 'rxjs/operators'
 
 interface SearchProps {
   currentUser: User
@@ -30,7 +29,7 @@ const hasEnoughLength = (value: string) => value.length >= MINIMUM_SEARCH_LENGTH
 
 class Search extends React.Component<SearchProps, SearchState> {
 
-  lookups: any
+  lookups: Subject<any>
 
   constructor(props: SearchProps) {
     super(props)
@@ -44,7 +43,7 @@ class Search extends React.Component<SearchProps, SearchState> {
     this.subscribeToLookUps()
 
   }
-  onSuggestionsFetchRequested = (params: any) => {
+  onSuggestionsFetchRequested = (params: SuggestionsFetchRequestedParams) => {
     const inputValue = params.value.trim().toLowerCase()
     if (inputValue.length < MINIMUM_SEARCH_LENGTH) return;    
 
@@ -67,23 +66,21 @@ class Search extends React.Component<SearchProps, SearchState> {
       throttleTime(THROTTLE_TIME, asyncScheduler, {trailing:true}), // {trailing: true} is for launching the last request (that's the request we are interested in)    
       switchMap( (value: string) => this.launchLookUpRequest(value) ), // switchMap will ignore all requests except last one
     ).subscribe( 
-      (data: any) => this.calculationResponse(data),
-      (error: any) => this.calculationError(error)
+      (data: AxiosResponse) => this.calculationResponse(data),
+      (error: AxiosError) => this.calculationError(error)
     )
   }
 
-  calculationError(error: any) {
+  calculationError(error: AxiosError) {
     // TO-DO: show some error message on UI?
-    console.log(`Search request has failed: ${error.response}`);
+    console.log(`Search request has failed: ${error}`);
     // We must resubscribe because the original subscription has errored out and isn't valid anymore
     this.subscribeToLookUps()
   }
 
-  calculationResponse(response: any) {
-    if(response.error) return
-
+  calculationResponse(response: AxiosResponse) {
     const notes: Note[] = response.data
-    this.setState({ ...this.state, suggestions: notes })
+    this.setState({ suggestions: notes })
   }
 
   async launchLookUpRequest(value: string) {
