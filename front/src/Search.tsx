@@ -29,7 +29,7 @@ const hasEnoughLength = (value: string) => value.length >= MINIMUM_SEARCH_LENGTH
 
 class Search extends React.Component<SearchProps, SearchState> {
 
-  lookups: Subject<any>
+  lookups: Subject<string>
 
   constructor(props: SearchProps) {
     super(props)
