@@ -78,9 +78,8 @@ class Search extends React.Component<SearchProps, SearchState> {
     this.subscribeToLookUps()
   }
 
-  calculationResponse(response: AxiosResponse) {
-    const notes: Note[] = response.data
-    this.setState({ suggestions: notes })
+  calculationResponse(response: AxiosResponse<Note[]>) {
+    this.setState({ suggestions: response.data })
   }
 
   async launchLookUpRequest(value: string) {
@@ -89,7 +88,7 @@ class Search extends React.Component<SearchProps, SearchState> {
       content_like: `%${encodedValue}%`,
       limit: 15
     }
-    return axios.get(
+    return axios.get<Note[]>(
       apiDomain() + '/v1/notes',
       { 
         params: args,
