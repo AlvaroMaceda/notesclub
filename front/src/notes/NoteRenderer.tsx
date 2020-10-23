@@ -23,7 +23,7 @@ interface NoteRendererProps {
   isReference: boolean
 }
 
-const auto_grow = (element: any) => {
+const auto_grow = (element: HTMLElement) => {
   element.style.height = "5px";
   element.style.height = (element.scrollHeight) + "px";
 }
@@ -34,7 +34,7 @@ interface NoteRendererState {
 class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState> {
   // We don't use #? so we know if the result between parentheses had a hashtag:
   readonly NOTES_LINK_REGEX = /\[\[([^[]*)\]\]|#\[\[([^[]*)\]\]|#([^\s.:,;[()]*)/
-  private textAreaRef: ReactTextareaAutocomplete<{ username: any; content: any; }> | null
+  private textAreaRef: ReactTextareaAutocomplete<{ username: string; content: string; }> | null
 
   constructor(props: NoteRendererProps) {
     super(props)
