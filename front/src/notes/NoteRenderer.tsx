@@ -387,31 +387,29 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
 
   renderSelectedNote = (note: Note) => {
     return (
-      <div className="app">
-        <ReactTextareaAutocomplete
-          ref={(textAreaRef) => { this.textAreaRef = textAreaRef; }}
-          onFocus={(e) => auto_grow(e.target)}
-          onChange={this.handleChange as any} autoFocus
-          onKeyDown={this.onKeyDown}
-          name={`note_${note.id}`}
-          value={note.content}
-          loadingComponent={() => <span>Loading</span>}
-          trigger={{
-            "[[": {
-              dataProvider: token => this.fetchSuggestions(token),
-              allowWhitespace: true,
-              component: Item,
-              output: (item, trigger) => `[[${item.content}]]`
-            },
-            "#": {
-              dataProvider: token => this.fetchSuggestions(token),
-              component: Item,
-              allowWhitespace: true,
-              output: (item, trigger) => item.content.match(/\s/) ? `#[[${item.content}]]` : `#${item.content}`
-            }
-          }}
-        />
-      </div>
+      <ReactTextareaAutocomplete
+        ref={(textAreaRef) => { this.textAreaRef = textAreaRef; }}
+        onFocus={(e) => auto_grow(e.target)}
+        onChange={this.handleChange as any} autoFocus
+        onKeyDown={this.onKeyDown}
+        name={`note_${note.id}`}
+        value={note.content}
+        loadingComponent={() => <span>Loading</span>}
+        trigger={{
+          "[[": {
+            dataProvider: token => this.fetchSuggestions(token),
+            allowWhitespace: true,
+            component: Item,
+            output: (item, trigger) => `[[${item.content}]]`
+          },
+          "#": {
+            dataProvider: token => this.fetchSuggestions(token),
+            component: Item,
+            allowWhitespace: true,
+            output: (item, trigger) => item.content.match(/\s/) ? `#[[${item.content}]]` : `#${item.content}`
+          }
+        }}
+      />
     )
   }
 
