@@ -397,6 +397,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
             "#": {
               dataProvider: token => this.fetchSuggestions(token),
               component: Item,
+              allowWhitespace: true,
               output: (item, trigger) => item.content.match(/\s/) ? `#[[${item.content}]]` : `#${item.content}`
             }
           }}
