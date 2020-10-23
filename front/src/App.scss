@@ -30,4 +30,7 @@
 
 .selectedNote {
   width: 100%;
+  resize: none;
+  overflow: hidden;
+  height: 25px;
 }

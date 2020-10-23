@@ -23,6 +23,11 @@ interface NoteRendererProps {
   isReference: boolean
 }
 
+const auto_grow = (element: any) => {
+  element.style.height = "5px";
+  element.style.height = (element.scrollHeight) + "px";
+}
+
 interface NoteRendererState {
 }
 
@@ -350,6 +355,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
 
   handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target
+    auto_grow(event.target)
     const value = target.value
     let { selectedNote } = this.props
     if (selectedNote) {
@@ -382,6 +388,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
       <div className="app">
         <ReactTextareaAutocomplete
           className="selectedNote"
+          onFocus={(e) => auto_grow(e.target)}
           onChange={this.handleChange as any} autoFocus
           onKeyDown={this.onKeyDown}
           name={`note_${note.id}`}
