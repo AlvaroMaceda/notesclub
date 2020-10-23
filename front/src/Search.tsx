@@ -109,7 +109,7 @@ class Search extends React.Component<SearchProps, SearchState> {
     return (
       <Autosuggest
         onSuggestionSelected={(_, { suggestion }) => {
-          goToNote(suggestion.user?.username, suggestion.slug)
+          goToNote(suggestion.user?.username, suggestion.slug, true)
         }}
         suggestions={suggestions}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
@@ -134,12 +134,13 @@ class Search extends React.Component<SearchProps, SearchState> {
 
 }
 
-function goToNote(username?: string , value?: string) {
+function goToNote(username?: string , value?: string, already_exists?: boolean) {
   if( !username || !value ) return
 
   const slug = parameterize(value)
-  const content = encodeURIComponent(value)
-  window.location.href = `/${username}/${slug}?content=${content}`
+  let new_url = `/${username}/${slug}`
+  if (!already_exists) { new_url = new_url + `?content=${encodeURIComponent(value)}` }
+  window.location.href = new_url
 }
 
 export default Search
