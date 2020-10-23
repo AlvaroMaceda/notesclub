@@ -1,9 +1,12 @@
 import * as React from 'react'
 import { User } from './User'
-import { Note } from './notes/Note'
-import Autosuggest from 'react-autosuggest'
-import axios from 'axios'
+import { NoteWithFamily } from './notes/Note'
+import Autosuggest, {SuggestionsFetchRequestedParams}  from 'react-autosuggest'
+import axios, {AxiosResponse, AxiosError} from 'axios';
 import { apiDomain } from './appConfig'
+import { Subject, asyncScheduler } from 'rxjs'
+import { switchMap, throttleTime, filter } from 'rxjs/operators'
+import { parameterize } from './utils/parameterize'
 
 interface SearchProps {
   currentUser: User
@@ -11,93 +14,129 @@ interface SearchProps {
 
 interface SearchState {
   value: string
-  suggestions: Note[]
-  suggestionsDate: Date | null
+  suggestions: NoteWithFamily[]
 }
 
+const THROTTLE_TIME = 500
+const MINIMUM_SEARCH_LENGTH = 2
 
-const renderSuggestion = (note: Note) => (
+const renderSuggestion = (note: NoteWithFamily) => (
   <div>
     {note.content}
   </div>
 )
 
+const hasEnoughLength = (value: string) => value.length >= MINIMUM_SEARCH_LENGTH
+
 class Search extends React.Component<SearchProps, SearchState> {
+
+  lookups: Subject<string>
+
   constructor(props: SearchProps) {
     super(props)
 
     this.state = {
       value: '',
       suggestions: [],
-      suggestionsDate: null
     }
+
+    this.lookups = new Subject()
+    this.subscribeToLookUps()
   }
 
-  // Autosuggest will call this function every time you need to update suggestions.
-  // You already implemented this logic above, so just use it.
-  onSuggestionsFetchRequested = (params: any) => {
-    this.fetchSuggestions(params.value)
+  onSuggestionsFetchRequested = (params: SuggestionsFetchRequestedParams) => {
+    const inputValue = params.value.trim().toLowerCase()
+    if (inputValue.length < MINIMUM_SEARCH_LENGTH) return;    
+
+    this.lookups.next(inputValue)
   }
 
-  // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequested = () => {
     this.setState({
       suggestions: []
     })
   }
 
-  getSuggestionValue = (note: Note) => {
+  getSuggestionValue = (note: NoteWithFamily) => {
     return (note.content)
   }
 
-  fetchSuggestions = async (value: string) => {
-    const inputValue = value.trim().toLowerCase()
-    if (inputValue.length > 1) {
-      const startTime = new Date() // get time before making request so we only save results if there are no more recent versions.
-      const encodedValue = encodeURIComponent(inputValue)
-      const args = {
-        content_like: `%${encodedValue}%`,
-        limit: 15
-      }
-      const response = await axios.get(
-        apiDomain() + '/v1/notes',
-        { 
-          params: args,
-          headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, 
-          withCredentials: true 
-        }
-      ) 
-      const { suggestionsDate } = this.state
-      if (suggestionsDate === null || suggestionsDate < startTime) {
-        const notes: Note[] = response.data
-        this.setState({ suggestions: notes, suggestionsDate: startTime })
-      }
-    }
+  subscribeToLookUps() {
+    this.lookups.pipe(
+      filter(hasEnoughLength),
+      throttleTime(THROTTLE_TIME, asyncScheduler, {trailing:true}), // {trailing: true} is for launching the last request (that's the request we are interested in)    
+      switchMap( (value: string) => this.launchLookUpRequest(value) ), // switchMap will ignore all requests except last one
+    ).subscribe( 
+      (data: AxiosResponse) => this.calculationResponse(data),
+      (error: AxiosError) => this.calculationError(error)
+    )
   }
 
+  calculationError(error: AxiosError) {
+    // TO-DO: show some error message on UI?
+    console.log(`Search request has failed: ${error}`);
+    // We must resubscribe because the original subscription has errored out and isn't valid anymore
+    this.subscribeToLookUps()
+  }
+
+  calculationResponse(response: AxiosResponse<NoteWithFamily[]>) {
+    this.setState({ suggestions: response.data })
+  }
+
+  async launchLookUpRequest(value: string) {
+    const encodedValue = encodeURIComponent(value)
+    const args = {
+      content_like: `%${encodedValue}%`,
+      limit: 15,
+      include_user: true
+    }
+    return axios.get<NoteWithFamily[]>(
+      apiDomain() + '/v1/notes',
+      { 
+        params: args,
+        headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, 
+        withCredentials: true 
+      }
+    )
+  }
 
   public render() {
     const { suggestions, value } = this.state
     
     return (
       <Autosuggest
+        onSuggestionSelected={(_, { suggestion }) => {
+          goToNote(suggestion.user?.username, suggestion.slug)
+        }}
         suggestions={suggestions}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         getSuggestionValue={this.getSuggestionValue}
         renderSuggestion={renderSuggestion}
         inputProps={{
-          placeholder: 'e.g. Foundation by Isaac Asimov',
+          placeholder: 'Search',
           value: value,
           className: 'form-control',
-          onChange: (form, event) => {
-            this.setState({ value: event.newValue })
+          onChange: (_, { newValue, method }) => {
+            this.setState({ value: newValue })
+          },
+          onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if(event.key!=="Enter") return
+            goToNote(this.props.currentUser.username,value)
           }
         }}
       />
     )
   }
 
+}
+
+function goToNote(username?: string , value?: string) {
+  if( !username || !value ) return 
+
+  const slug = parameterize(value)
+  const content = encodeURIComponent(value)
+  window.location.href = `/${username}/${slug}?content=${content}`
 }
 
 export default Search
