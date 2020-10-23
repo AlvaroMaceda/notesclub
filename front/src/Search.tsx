@@ -20,11 +20,14 @@ interface SearchState {
 const THROTTLE_TIME = 500
 const MINIMUM_SEARCH_LENGTH = 2
 
-const renderSuggestion = (note: NoteWithFamily) => (
-  <div>
-    {note.content}
-  </div>
-)
+const renderSuggestion = (note: NoteWithFamily) => {
+  const user = note.user
+  return (
+    <div>
+      { user ? `${note.content} · @${user.username}` : note.content }
+    </div >
+  )
+}
 
 const hasEnoughLength = (value: string) => value.length >= MINIMUM_SEARCH_LENGTH
 
@@ -46,7 +49,7 @@ class Search extends React.Component<SearchProps, SearchState> {
 
   onSuggestionsFetchRequested = (params: SuggestionsFetchRequestedParams) => {
     const inputValue = params.value.trim().toLowerCase()
-    if (inputValue.length < MINIMUM_SEARCH_LENGTH) return;    
+    if (inputValue.length < MINIMUM_SEARCH_LENGTH) return;
 
     this.lookups.next(inputValue)
   }
@@ -64,9 +67,9 @@ class Search extends React.Component<SearchProps, SearchState> {
   subscribeToLookUps() {
     this.lookups.pipe(
       filter(hasEnoughLength),
-      throttleTime(THROTTLE_TIME, asyncScheduler, {trailing:true}), // {trailing: true} is for launching the last request (that's the request we are interested in)    
+      throttleTime(THROTTLE_TIME, asyncScheduler, {trailing:true}), // {trailing: true} is for launching the last request (that's the request we are interested in)
       switchMap( (value: string) => this.launchLookUpRequest(value) ), // switchMap will ignore all requests except last one
-    ).subscribe( 
+    ).subscribe(
       (data: AxiosResponse) => this.calculationResponse(data),
       (error: AxiosError) => this.calculationError(error)
     )
@@ -92,17 +95,17 @@ class Search extends React.Component<SearchProps, SearchState> {
     }
     return axios.get<NoteWithFamily[]>(
       apiDomain() + '/v1/notes',
-      { 
+      {
         params: args,
-        headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, 
-        withCredentials: true 
+        headers: { 'Content-Type': 'application/json', "Accept": "application/json" },
+        withCredentials: true
       }
     )
   }
 
   public render() {
     const { suggestions, value } = this.state
-    
+
     return (
       <Autosuggest
         onSuggestionSelected={(_, { suggestion }) => {
@@ -132,7 +135,7 @@ class Search extends React.Component<SearchProps, SearchState> {
 }
 
 function goToNote(username?: string , value?: string) {
-  if( !username || !value ) return 
+  if( !username || !value ) return
 
   const slug = parameterize(value)
   const content = encodeURIComponent(value)
