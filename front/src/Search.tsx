@@ -6,6 +6,7 @@ import axios, {AxiosResponse, AxiosError} from 'axios';
 import { apiDomain } from './appConfig'
 import { Subject, asyncScheduler } from 'rxjs'
 import { switchMap, throttleTime, filter } from 'rxjs/operators'
+import { parameterize } from './utils/parameterize'
 
 interface SearchProps {
   currentUser: User
@@ -105,8 +106,7 @@ class Search extends React.Component<SearchProps, SearchState> {
     return (
       <Autosuggest
         onSuggestionSelected={(_, { suggestion }) => {
-          const username = suggestion.user?.username || ''
-          window.location.href = `/${username}/${suggestion.slug}`
+          goToNote(suggestion.user?.username, suggestion.slug)
         }}
         suggestions={suggestions}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
@@ -117,14 +117,26 @@ class Search extends React.Component<SearchProps, SearchState> {
           placeholder: 'Search',
           value: value,
           className: 'form-control',
-          onChange: (form, event) => {
-            this.setState({ value: event.newValue })
+          onChange: (_, { newValue, method }) => {
+            this.setState({ value: newValue })
+          },
+          onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if(event.key!=="Enter") return
+            goToNote(this.props.currentUser.username,value)
           }
         }}
       />
     )
   }
 
+}
+
+function goToNote(username?: string , value?: string) {
+  if( !username || !value ) return 
+
+  const slug = parameterize(value)
+  const content = encodeURIComponent(value)
+  window.location.href = `/${username}/${slug}?content=${content}`
 }
 
 export default Search
