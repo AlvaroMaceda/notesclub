@@ -8,7 +8,7 @@ import { deleteBackendNote } from './../backendSync'
 import './CurrentNoteContentRenderer.scss'
 import { escapeRegExp } from './../utils/escapeRegex'
 import { withRouter } from 'react-router-dom'
-import { RouteComponentProps } from 'react-router-dom'
+import { Link, RouteComponentProps } from 'react-router-dom'
 
 interface CurrentNoteContentRendererProps extends RouteComponentProps {
   selectedNote: Note | null
@@ -128,10 +128,10 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
             :
               currentNote.content
             }
-          {!selectedNote && currentUser && currentNote.user_id === currentUser.id &&
-              <Button onClick={this.confirmDelete} className="delete-button" variant="link">
+            {!selectedNote && currentUser && currentNote.user_id === currentUser.id &&
+              <Link to='#' onClick={this.confirmDelete} className="delete-button">
                 <img src={process.env.PUBLIC_URL + '/images/close-outline.svg'} alt="delete" />
-              </Button>
+              </Link>
             }
           </span>
         }
