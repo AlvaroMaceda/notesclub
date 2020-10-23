@@ -286,14 +286,14 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
         case "ArrowDown":
           if (!isReference && event.shiftKey && (event.ctrlKey || event.metaKey)) {
             this.moveNoteBelow()
-          } else if (textAreaRef && textAreaRef.getCaretPosition() == selectedNote.content.length) {
+          } else if (textAreaRef && textAreaRef.getCaretPosition() === selectedNote.content.length) {
             this.selectNoteBelow()
           } // Otherwise, do nothing here (move caret one row below within the same note)
           break
         case "ArrowUp":
           if (!isReference && event.shiftKey && (event.ctrlKey || event.metaKey)) {
             this.moveNoteAbove()
-          } else if (textAreaRef && textAreaRef.getCaretPosition() == 0) {
+          } else if (textAreaRef && textAreaRef.getCaretPosition() === 0) {
             this.selectNoteAbove()
           } // Otherwise, do nothing here (move caret one row above within the same note)
           break
