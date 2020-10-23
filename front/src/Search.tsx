@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { User } from './User'
-import { Note } from './notes/Note'
+import { NoteWithFamily } from './notes/Note'
 import Autosuggest, {SuggestionsFetchRequestedParams}  from 'react-autosuggest'
 import axios, {AxiosResponse, AxiosError} from 'axios';
 import { apiDomain } from './appConfig'
@@ -13,13 +13,13 @@ interface SearchProps {
 
 interface SearchState {
   value: string
-  suggestions: Note[]
+  suggestions: NoteWithFamily[]
 }
 
 const THROTTLE_TIME = 500
 const MINIMUM_SEARCH_LENGTH = 2
 
-const renderSuggestion = (note: Note) => (
+const renderSuggestion = (note: NoteWithFamily) => (
   <div>
     {note.content}
   </div>
@@ -41,8 +41,8 @@ class Search extends React.Component<SearchProps, SearchState> {
 
     this.lookups = new Subject()
     this.subscribeToLookUps()
-
   }
+
   onSuggestionsFetchRequested = (params: SuggestionsFetchRequestedParams) => {
     const inputValue = params.value.trim().toLowerCase()
     if (inputValue.length < MINIMUM_SEARCH_LENGTH) return;    
@@ -56,7 +56,7 @@ class Search extends React.Component<SearchProps, SearchState> {
     })
   }
 
-  getSuggestionValue = (note: Note) => {
+  getSuggestionValue = (note: NoteWithFamily) => {
     return (note.content)
   }
 
@@ -78,7 +78,7 @@ class Search extends React.Component<SearchProps, SearchState> {
     this.subscribeToLookUps()
   }
 
-  calculationResponse(response: AxiosResponse<Note[]>) {
+  calculationResponse(response: AxiosResponse<NoteWithFamily[]>) {
     this.setState({ suggestions: response.data })
   }
 
@@ -86,9 +86,10 @@ class Search extends React.Component<SearchProps, SearchState> {
     const encodedValue = encodeURIComponent(value)
     const args = {
       content_like: `%${encodedValue}%`,
-      limit: 15
+      limit: 15,
+      include_user: true
     }
-    return axios.get<Note[]>(
+    return axios.get<NoteWithFamily[]>(
       apiDomain() + '/v1/notes',
       { 
         params: args,
@@ -103,13 +104,17 @@ class Search extends React.Component<SearchProps, SearchState> {
     
     return (
       <Autosuggest
+        onSuggestionSelected={(_, { suggestion }) => {
+          const username = suggestion.user?.username || ''
+          window.location.href = `/${username}/${suggestion.slug}`
+        }}
         suggestions={suggestions}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         getSuggestionValue={this.getSuggestionValue}
         renderSuggestion={renderSuggestion}
         inputProps={{
-          placeholder: 'e.g. Foundation by Isaac Asimov',
+          placeholder: 'Search',
           value: value,
           className: 'form-control',
           onChange: (form, event) => {
