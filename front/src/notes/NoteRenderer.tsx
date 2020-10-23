@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { Note, noteKey, newNoteWithDescendants, sameNote, noteOrAncestorBelow, noteAbove, lastDescendantOrSelf } from './Note'
-import { createBackendNote, updateBackendNote, deleteBackendNote } from './../backendSync'
+import { createBackendNote, updateBackendNote, deleteBackendNote, fetchBackendNotes } from './../backendSync'
 import { getChildren, areSibling, getParent } from './ancestry'
 import { parameterize } from './../utils/parameterize'
 import { User } from './../User'
@@ -358,6 +358,25 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     }
   }
 
+  fetchSuggestions = (token: string) => {
+    const { currentUser, setAppState } = this.props
+    token = token.replace(/^\[/, '')
+    console.log('token:')
+    console.log(token)
+    if (currentUser) {
+      return (
+        fetchBackendNotes({ content_like: `%${encodeURIComponent(token)}%`, ancestry: null, user_ids: [currentUser.id] }, setAppState)
+          .then(notes => notes.map((note) => {
+            return (
+              { username: currentUser.username, content: note.content }
+            )
+          }))
+      )
+    } else {
+      return []
+    }
+  }
+
   renderSelectedNote = (note: Note) => {
     return (
       <div className="app">
@@ -370,24 +389,13 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
           loadingComponent={() => <span>Loading</span>}
           trigger={{
             "[[": {
-              dataProvider: token => {
-                return [
-                  { username: "curie", content: "Dune (book)" },
-                  { username: "curie", content: "Foundation (book) by Asimov" },
-                  { username: "curie", content: "something" }
-                ];
-              },
+              dataProvider: token => this.fetchSuggestions(token),
+              allowWhitespace: true,
               component: Item,
               output: (item, trigger) => `[[${item.content}]]`
             },
             "#": {
-              dataProvider: token => {
-                return [
-                  { username: "curie", content: "Dune (book)" },
-                  { username: "curie", content: "Foundation (book) by Asimov" },
-                  { username: "curie", content: "something" }
-                ];
-              },
+              dataProvider: token => this.fetchSuggestions(token),
               component: Item,
               output: (item, trigger) => item.content.match(/\s/) ? `#[[${item.content}]]` : `#${item.content}`
             }
