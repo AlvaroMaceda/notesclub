@@ -34,13 +34,13 @@ interface NoteRendererState {
 class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState> {
   // We don't use #? so we know if the result between parentheses had a hashtag:
   readonly NOTES_LINK_REGEX = /\[\[([^[]*)\]\]|#\[\[([^[]*)\]\]|#([^\s.:,;[()]*)/
+  private textAreaRef: ReactTextareaAutocomplete<{ username: any; content: any; }> | null
 
   constructor(props: NoteRendererProps) {
     super(props)
 
-    this.state = {
-
-    }
+    this.state = {}
+    this.textAreaRef = null
     this.onKeyDown = this.onKeyDown.bind(this)
   }
 
@@ -230,6 +230,8 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     let { descendants } = this.props
 
     if (selectedNote) {
+      const textAreaRef = this.textAreaRef
+
       switch (event.key) {
         case "Enter":
           if (isReference) {
@@ -284,16 +286,16 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
         case "ArrowDown":
           if (!isReference && event.shiftKey && (event.ctrlKey || event.metaKey)) {
             this.moveNoteBelow()
-          } else {
+          } else if (textAreaRef && textAreaRef.getCaretPosition() == selectedNote.content.length) {
             this.selectNoteBelow()
-          }
+          } // Otherwise, do nothing here (move caret one row below within the same note)
           break
         case "ArrowUp":
           if (!isReference && event.shiftKey && (event.ctrlKey || event.metaKey)) {
             this.moveNoteAbove()
-          } else {
+          } else if (textAreaRef && textAreaRef.getCaretPosition() == 0) {
             this.selectNoteAbove()
-          }
+          } // Otherwise, do nothing here (move caret one row above within the same note)
           break
         case "Backspace":
           if (!isReference && selectedNote.content === "") {
@@ -387,6 +389,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     return (
       <div className="app">
         <ReactTextareaAutocomplete
+          ref={(textAreaRef) => { this.textAreaRef = textAreaRef; }}
           onFocus={(e) => auto_grow(e.target)}
           onChange={this.handleChange as any} autoFocus
           onKeyDown={this.onKeyDown}
