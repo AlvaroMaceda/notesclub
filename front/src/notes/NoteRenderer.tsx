@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { Form } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { Note, noteKey, newNoteWithDescendants, sameNote, noteOrAncestorBelow, noteAbove, lastDescendantOrSelf } from './Note'
 import { createBackendNote, updateBackendNote, deleteBackendNote } from './../backendSync'
@@ -7,6 +6,8 @@ import { getChildren, areSibling, getParent } from './ancestry'
 import { parameterize } from './../utils/parameterize'
 import { User } from './../User'
 import StringWithHtmlLinks from './StringWithHtmlLinks'
+import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
+import { Item } from './Item'
 
 interface NoteRendererProps {
   selectedNote: Note | null
@@ -219,7 +220,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     }
   }
 
-  onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+  onKeyDown(event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { note, selectedNote, isReference } = this.props
     let { descendants } = this.props
 
@@ -359,17 +360,40 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
 
   renderSelectedNote = (note: Note) => {
     return (
-      <>
-        <Form.Group>
-          <Form.Control
-            type="text"
-            value={note.content}
-            name={`note_${note.id}`}
-            onKeyDown={this.onKeyDown}
-            onChange={this.handleChange as any} autoFocus
-          />
-        </Form.Group>
-      </>
+      <div className="app">
+        <ReactTextareaAutocomplete
+          className="selectedNote"
+          onChange={this.handleChange as any} autoFocus
+          onKeyDown={this.onKeyDown}
+          name={`note_${note.id}`}
+          value={note.content}
+          loadingComponent={() => <span>Loading</span>}
+          trigger={{
+            "[[": {
+              dataProvider: token => {
+                return [
+                  { username: "curie", content: "Dune (book)" },
+                  { username: "curie", content: "Foundation (book) by Asimov" },
+                  { username: "curie", content: "something" }
+                ];
+              },
+              component: Item,
+              output: (item, trigger) => `[[${item.content}]]`
+            },
+            "#": {
+              dataProvider: token => {
+                return [
+                  { username: "curie", content: "Dune (book)" },
+                  { username: "curie", content: "Foundation (book) by Asimov" },
+                  { username: "curie", content: "something" }
+                ];
+              },
+              component: Item,
+              output: (item, trigger) => item.content.match(/\s/) ? `#[[${item.content}]]` : `#${item.content}`
+            }
+          }}
+        />
+      </div>
     )
   }
 
