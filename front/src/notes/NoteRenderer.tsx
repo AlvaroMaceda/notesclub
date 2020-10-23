@@ -387,7 +387,6 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     return (
       <div className="app">
         <ReactTextareaAutocomplete
-          className="selectedNote"
           onFocus={(e) => auto_grow(e.target)}
           onChange={this.handleChange as any} autoFocus
           onKeyDown={this.onKeyDown}
