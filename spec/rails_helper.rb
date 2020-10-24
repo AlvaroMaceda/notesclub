@@ -68,3 +68,16 @@ end
 def log_in(user)
   cookies[:jwt] = user.generate_jwt
 end
+
+# Silences warnings of specific Gems
+silenced_warnings = [
+  /Class level methods will no longer inherit scoping from `create!` in Rails 6.1/,
+] # list of warnings you want to silence
+
+silenced_expr = Regexp.new(silenced_warnings.join('|'))
+
+ActiveSupport::Deprecation.behavior = lambda do |msg, stack, deprecation_horizon, gem_name|
+  unless msg =~ silenced_expr
+    ActiveSupport::Deprecation::DEFAULT_BEHAVIORS[:stderr].call(msg, stack, deprecation_horizon, gem_name)
+  end
+end

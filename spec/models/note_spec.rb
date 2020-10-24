@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+
+
 RSpec.describe Note, type: :model do
   fixtures(:users)
   let(:user) { users(:user1) }
