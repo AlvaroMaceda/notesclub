@@ -91,7 +91,7 @@ class NotesController < ApplicationController
   end
 
   def update
-    updator = NoteUpdator.new(@note, params[:update_notes_with_links])
+    updator = NoteUpdatorService.new(@note, params[:update_notes_with_links])
     if updator.update(params.require(:note).permit(:content, :ancestry, :position, :slug))
       track_action("Update note", note_id: @note.id)
       render json: @note, status: :ok
@@ -101,7 +101,7 @@ class NotesController < ApplicationController
   end
 
   def destroy
-    destroyer = NoteDeleter.new(@note, include_descendants: true)
+    destroyer = NoteDeleterService.new(@note, include_descendants: true)
     if destroyer.delete
       track_action("Delete note")
       render json: @note, status: :ok
