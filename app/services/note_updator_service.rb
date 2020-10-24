@@ -1,4 +1,4 @@
-class NoteUpdator
+class NoteUpdatorService
   def initialize(note, update_notes_with_links = false)
     @note = note
     @update_notes_with_links = update_notes_with_links
