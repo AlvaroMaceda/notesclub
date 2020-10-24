@@ -85,9 +85,9 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
     const { blogger, notes, selectedNote } = this.state
     const { currentUser } = this.props
 
-     return (
-      <div className="container">
-        {blogger && notes && currentUser &&
+    return (
+      <div className="topic-container container">
+         {blogger && notes && currentUser &&
           <>
             {blogger.name === "Help" &&
               <Link to="/books/new" className="btn btn-primary" onClick={() => window.location.href = "/books/new"}>Add book notes</Link>

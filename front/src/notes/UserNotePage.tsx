@@ -235,7 +235,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
 
     return (
       <>
-        <div className="container">
+        <div className="topic-container container">
           {currentBlogger && !currentNote &&
           <h1><a href={`/${currentBlogger.username}`}>{currentBlogger.name}</a></h1>
           }

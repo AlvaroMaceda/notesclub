@@ -85,7 +85,7 @@ class Feed extends React.Component<FeedProps, FeedState> {
     const { currentUser } = this.props
 
     return (
-      <div className="container">
+      <div className="topic-container container">
         {blogger && notes && currentUser &&
           <>
             <Link to="/books/new" className="btn btn-primary" onClick={() => window.location.href="/books/new"}>Add book notes</Link>

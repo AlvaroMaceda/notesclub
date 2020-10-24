@@ -1,12 +1,14 @@
 import * as React from 'react'
-import { Form } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { Note, noteKey, newNoteWithDescendants, sameNote, noteOrAncestorBelow, noteAbove, lastDescendantOrSelf } from './Note'
-import { createBackendNote, updateBackendNote, deleteBackendNote } from './../backendSync'
+import { createBackendNote, updateBackendNote, deleteBackendNote, fetchBackendNotes } from './../backendSync'
 import { getChildren, areSibling, getParent } from './ancestry'
 import { parameterize } from './../utils/parameterize'
 import { User } from './../User'
 import StringWithHtmlLinks from './StringWithHtmlLinks'
+import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
+import { Item } from './Item'
+import './../NoteRenderer.scss';
 
 interface NoteRendererProps {
   selectedNote: Note | null
@@ -22,19 +24,24 @@ interface NoteRendererProps {
   isReference: boolean
 }
 
+const auto_grow = (element: HTMLElement) => {
+  element.style.height = "5px";
+  element.style.height = (element.scrollHeight) + "px";
+}
+
 interface NoteRendererState {
 }
 
 class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState> {
   // We don't use #? so we know if the result between parentheses had a hashtag:
   readonly NOTES_LINK_REGEX = /\[\[([^[]*)\]\]|#\[\[([^[]*)\]\]|#([^\s.:,;[()]*)/
+  private textAreaRef: ReactTextareaAutocomplete<{ username: string; content: string; }> | null
 
   constructor(props: NoteRendererProps) {
     super(props)
 
-    this.state = {
-
-    }
+    this.state = {}
+    this.textAreaRef = null
     this.onKeyDown = this.onKeyDown.bind(this)
   }
 
@@ -219,11 +226,13 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     }
   }
 
-  onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+  onKeyDown(event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { note, selectedNote, isReference } = this.props
     let { descendants } = this.props
 
     if (selectedNote) {
+      const textAreaRef = this.textAreaRef
+
       switch (event.key) {
         case "Enter":
           if (isReference) {
@@ -278,16 +287,16 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
         case "ArrowDown":
           if (!isReference && event.shiftKey && (event.ctrlKey || event.metaKey)) {
             this.moveNoteBelow()
-          } else {
+          } else if (textAreaRef && textAreaRef.getCaretPosition() === selectedNote.content.length) {
             this.selectNoteBelow()
-          }
+          } // Otherwise, do nothing here (move caret one row below within the same note)
           break
         case "ArrowUp":
           if (!isReference && event.shiftKey && (event.ctrlKey || event.metaKey)) {
             this.moveNoteAbove()
-          } else {
+          } else if (textAreaRef && textAreaRef.getCaretPosition() === 0) {
             this.selectNoteAbove()
-          }
+          } // Otherwise, do nothing here (move caret one row above within the same note)
           break
         case "Backspace":
           if (!isReference && selectedNote.content === "") {
@@ -349,6 +358,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
 
   handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target
+    auto_grow(event.target)
     const value = target.value
     let { selectedNote } = this.props
     if (selectedNote) {
@@ -357,19 +367,52 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     }
   }
 
+  fetchSuggestions = (token: string) => {
+    const { currentUser, setAppState } = this.props
+    token = token.replace(/^\[/, '')
+    console.log('token:')
+    console.log(token)
+    if (currentUser) {
+      return (
+        fetchBackendNotes({ content_like: `%${encodeURIComponent(token)}%`, ancestry: null, user_ids: [currentUser.id] }, setAppState)
+          .then(notes => notes.map((note) => {
+            return (
+              { username: currentUser.username, content: note.content }
+            )
+          }))
+      )
+    } else {
+      return []
+    }
+  }
+
   renderSelectedNote = (note: Note) => {
     return (
-      <>
-        <Form.Group>
-          <Form.Control
-            type="text"
-            value={note.content}
-            name={`note_${note.id}`}
-            onKeyDown={this.onKeyDown}
-            onChange={this.handleChange as any} autoFocus
-          />
-        </Form.Group>
-      </>
+      <ReactTextareaAutocomplete
+        ref={(textAreaRef) => { this.textAreaRef = textAreaRef; }}
+        onFocus={(e) => auto_grow(e.target)}
+        onChange={this.handleChange as any} autoFocus
+        onKeyDown={this.onKeyDown}
+        name={`note_${note.id}`}
+        value={note.content}
+        loadingComponent={() => <span>Loading</span>}
+        dropdownClassName="editNoteDropDown"
+        itemClassName="editNoteItem"
+        trigger={{
+          "[[": {
+            dataProvider: token => this.fetchSuggestions(token),
+            allowWhitespace: true,
+            component: Item,
+            output: (item, trigger) => `[[${item.content}]]`
+          },
+          "#": {
+            dataProvider: token => this.fetchSuggestions(token),
+            component: Item,
+            allowWhitespace: true,
+            output: (item, trigger) => item.content.match(/\s/) ? `#[[${item.content}]]` : `#${item.content}`
+          }
+        }}
+      />
     )
   }
 

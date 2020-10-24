@@ -27,3 +27,22 @@
 .grey {
   color: grey;
 }
+
+.topic-container {
+  input[type="text"], textarea {
+    outline: none;
+    box-shadow:none;
+    border: none;
+    padding: 0px;
+    height: 25px;
+    width: 100%;
+    resize: none;
+    overflow: hidden;
+  }
+  .form-group {
+    margin: 2px 0px;
+  }
+  .form-control {
+    margin: 2px 0px;
+  }
+}

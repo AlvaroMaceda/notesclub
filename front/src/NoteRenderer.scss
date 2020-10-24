@@ -1,0 +1,25 @@
+
+.editNoteDropDown {
+  li {
+    list-style-type: none;
+  }
+}
+
+.editNoteItem {
+  border: solid;
+  border-color: grey;
+  border-width: 1px;
+}
+
+.rta {
+  margin-bottom: 60px !important;
+}
+
+.rta__autocomplete {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.rta__entity--selected {
+  background-color: lightgrey;
+}
