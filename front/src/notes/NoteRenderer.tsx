@@ -8,6 +8,7 @@ import { User } from './../User'
 import StringWithHtmlLinks from './StringWithHtmlLinks'
 import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
 import { Item } from './Item'
+import './../NoteRenderer.scss';
 
 interface NoteRendererProps {
   selectedNote: Note | null
@@ -395,6 +396,8 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
         name={`note_${note.id}`}
         value={note.content}
         loadingComponent={() => <span>Loading</span>}
+        dropdownClassName="editNoteDropDown"
+        itemClassName="editNoteItem"
         trigger={{
           "[[": {
             dataProvider: token => this.fetchSuggestions(token),
