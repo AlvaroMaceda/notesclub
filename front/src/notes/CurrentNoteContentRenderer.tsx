@@ -22,6 +22,7 @@ interface CurrentNoteContentRendererProps extends RouteComponentProps {
 
 interface CurrentNoteContentRendererState {
   showDeleteModal: boolean
+  lastUpdateDate?: Date
 }
 
 class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRendererProps, CurrentNoteContentRendererState> {
@@ -64,17 +65,17 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
         descendants: descendants,
         references: references
       })
+      const startTime = new Date()
+
       // We also need to update all notes which include [[currentNote.content]] in their content
       updateBackendNote(currentNote, this.props.setAppState, true)
         .then(note => {
-          this.props.setUserNotePageState({
-            selectedNote: note,
-            currentNote: note,
-            descendants: descendants,
-            references: references
-          })
-          if (note && note.slug) {
-            this.props.history.push(note.slug)
+          const { lastUpdateDate } = this.state
+          if (!lastUpdateDate || startTime > lastUpdateDate) {
+            this.setState({ lastUpdateDate: startTime })
+            if (note && note.slug) {
+              this.props.history.push(note.slug)
+            }
           }
         })
     }
