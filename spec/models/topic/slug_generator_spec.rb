@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Note::SlugGenerator, type: :model do
+  fixtures(:users)
   let(:note) { Note.new(content: 'Climate Change', user_id: 2) }
 
   describe 'new record' do
