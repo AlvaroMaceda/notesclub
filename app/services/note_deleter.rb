@@ -4,7 +4,7 @@ class NoteDeleter < ApplicationService
     @include_descendants = args[:include_descendants] || true
   end
 
-  def delete
+  def call
     Note.transaction do
       delete_descendants if include_descendants
       note.destroy!
