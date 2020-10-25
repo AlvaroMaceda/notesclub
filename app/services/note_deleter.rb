@@ -11,7 +11,7 @@ class NoteDeleter < ApplicationService
       delete_descendants if include_descendants
       note.destroy!
     end
-    true
+    Result.ok
   rescue  ActiveRecord::RecordNotDestroyed
     false
   end
