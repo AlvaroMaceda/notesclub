@@ -12,6 +12,6 @@ RSpec.describe NoteDeleter do
 
     result = nil
     expect { result = NoteDeleter.call(t1, include_descendants: true) }.to change { Note.count }.by(-4)
-    expect(result).to eq(true)
+    expect(result.success?).to be true
   end
 end
