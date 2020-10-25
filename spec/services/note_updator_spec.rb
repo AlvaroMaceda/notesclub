@@ -1,13 +1,13 @@
 require 'rails_helper'
 
-RSpec.describe NoteUpdatorService do
+RSpec.describe NoteUpdator do
   fixtures(:users, :notes)
 
   let(:note) { notes(:note1) }
 
   it "should create new notes if they do not exist" do
     Note.create!(content: "This already exists", user_id: note.user_id)
-    updator = NoteUpdatorService.new(note)
+    updator = NoteUpdator.new(note)
     expect{ updator.update(content: "[[Books]] and [[Music]] and [[This already exists]]") }.to change{ Note.count }.by(2)
     expect(note.reload.content).to eq("[[Books]] and [[Music]] and [[This already exists]]")
     t2, t1 = Note.order(id: :desc).limit(2)
@@ -36,7 +36,7 @@ RSpec.describe NoteUpdatorService do
       t4 = Note.create!(content: "Great [[Books]]", user: user2)
 
       update_notes_with_links = true
-      updator = NoteUpdatorService.new(t1, update_notes_with_links)
+      updator = NoteUpdator.new(t1, update_notes_with_links)
       expect(updator.update(content: "Books and articles")).to eq(true)
       expect(t1.reload.content).to eq("Books and articles")
       expect(t2.reload.content).to eq("I like [[Books and articles]] and [[Music]] and [[Books and articles]]")

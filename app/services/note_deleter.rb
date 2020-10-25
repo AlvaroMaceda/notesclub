@@ -1,4 +1,4 @@
-class NoteDeleterService
+class NoteDeleter < ApplicationService
   def initialize(note, args = {})
     @note = note
     @include_descendants = args[:include_descendants] || true

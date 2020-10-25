@@ -12,7 +12,7 @@ class Note < ApplicationRecord
   before_save :nulify_empty_ancestry
   # If at any time we need before_* or after_delete
   # or an association dependent on destroy
-  # We'll need to change NoteDeleterService#delete_descendants
+  # We'll need to change NoteDeleter#delete_descendants
 
   def as_json(options = {})
     json = super(options)
