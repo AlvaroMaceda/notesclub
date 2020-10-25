@@ -60,9 +60,16 @@ rails s
 Open `http://localhost:3000/v1/ping` on your browser and the API will return `pong`.
 
 ### Tests
+
 ```
 bundle exec rspec
 ```
+
+You can also user [Guard](https://github.com/guard/guard) to watch changes and run tests on modified files:
+```
+bundle exec guard
+```
+
 
 ## Frontend (React)
 
