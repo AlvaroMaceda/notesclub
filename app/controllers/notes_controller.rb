@@ -107,8 +107,7 @@ class NotesController < ApplicationController
   end
 
   def destroy
-    destroyer = NoteDeleter.new(@note, include_descendants: true)
-    if destroyer.delete
+    if NoteDeleter.call(@note, include_descendants: true)
       track_action("Delete note")
       render json: @note, status: :ok
     else
