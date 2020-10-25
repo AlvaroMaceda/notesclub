@@ -5,9 +5,7 @@ RSpec.describe Note, type: :model do
   let(:user) { users(:user1) }
 
   context "#create" do
-
     it "should create a record" do
-      p Note.all
       t = Note.new(content: "Climate Change", user: user)
       t.save
       expect(t.errors.full_messages).to eq([])
