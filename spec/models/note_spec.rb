@@ -5,12 +5,9 @@ RSpec.describe Note, type: :model do
   let(:user) { users(:user1) }
 
   context "#create" do
-    before do
-      Note.find(3).destroy # Somehow destroy_all doesn't find the note with id=3
-      Note.destroy_all
-    end
 
     it "should create a record" do
+      p Note.all
       t = Note.new(content: "Climate Change", user: user)
       t.save
       expect(t.errors.full_messages).to eq([])
