@@ -83,8 +83,9 @@ class NotesController < ApplicationController
 
   def create
     args = params.require(:note).permit(:content, :ancestry, :position, :slug).merge(user_id: current_user.id)
-    note = Note.new(args)
-    if note.save
+    result = NoteCreator.call(args)
+    if result.success?
+      note = result.value
       track_action("Create note", note_id: note.id)
       methods = []
       methods << :descendants if params[:include_descendants]
@@ -92,9 +93,9 @@ class NotesController < ApplicationController
       methods << :user if params[:include_user]
       render json: note.to_json(methods: methods), status: :created
     else
-      render json: note.errors.full_messages, status: :bad_request
+      render json: result.errors, status: :bad_request
     end
-  end
+  end  
 
   def update
     result = NoteUpdator.call(@note, update_notes_with_links: params[:update_notes_with_links], data: params.require(:note).permit(:content, :ancestry, :position, :slug))
