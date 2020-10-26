@@ -11,7 +11,7 @@ class NoteDeleter < ApplicationService
     end
     Result.ok
   rescue  ActiveRecord::RecordNotDestroyed => e
-    false
+    Result.error
   end
 
   private
