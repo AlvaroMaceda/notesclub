@@ -10,6 +10,7 @@ RSpec.describe Result do
     result = Result.ok(whatever)
     
     expect(result.success?).to be true 
+    expect(result.error?).to be false
     expect(result.value).to eq whatever
     expect(result.errors).to be_nil
   end
@@ -18,6 +19,7 @@ RSpec.describe Result do
     result = Result.error(whatever)
     
     expect(result.success?).to be false
+    expect(result.error?).to be true
     expect(result.errors).to eq whatever
     expect(result.value).to be_nil
   end

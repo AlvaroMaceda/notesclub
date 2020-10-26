@@ -18,6 +18,10 @@ class Result
     @success
   end  
 
+  def error?
+    !@success
+  end
+
   private
 
   class << self

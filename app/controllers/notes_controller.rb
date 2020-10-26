@@ -89,14 +89,14 @@ class NotesController < ApplicationController
   end
 
   def update
-    updator = NoteUpdator.new(@note, params[:update_notes_with_links])
-    if updator.update(params.require(:note).permit(:content, :ancestry, :position, :slug))
+    result = NoteUpdator.call(@note, update_notes_with_links: params[:update_notes_with_links], data: params.require(:note).permit(:content, :ancestry, :position, :slug))
+    if result.success?
       track_action("Update note", note_id: @note.id)
       render json: @note, status: :ok
     else
-      render json: @note.errors.full_messages, status: :not_modified
+      render json: result.errors, status: :not_modified
     end
-  end
+  end  
 
   def destroy
     if NoteDeleter.call(@note, include_descendants: true)
