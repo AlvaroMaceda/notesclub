@@ -106,7 +106,7 @@ RSpec.describe NotesController, type: :request do
   end
 
   context "#update" do
-    it "should update the content" do
+    it "should update the content" do 
       note1.update!(user_id: user.id)
       put "/v1/notes/#{note1.id}", params: { note: { content: "The sky is blue" } }
       expect(response.status).to eq 200

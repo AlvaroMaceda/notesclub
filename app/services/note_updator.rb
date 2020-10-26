@@ -1,23 +1,27 @@
 # frozen_string_literal: true
 
 class NoteUpdator < ApplicationService
-  def initialize(note, update_notes_with_links = false)
+  def initialize(note, args)
     @note = note
-    @update_notes_with_links = update_notes_with_links
+    @update_notes_with_links = args[:update_notes_with_links]
     @original_content = note.content
+    @data = args[:data]
   end
 
-  def update(args)
-    args[:slug] = Note::ContentSlugGenerator.new(args[:content]).generate if args[:content].present? && args[:ancestry].nil?
+  def call
+    @data[:slug] = Note::ContentSlugGenerator.new(@data[:content]).generate if @data[:content].present? && @data[:ancestry].nil?
     Note.transaction do
-      note.update!(args)
+      @note.update!(@data)
       create_new_notes_from_links!
       update_notes_with_links! if update_notes_with_links
     end
-    true
+    Result.ok
   rescue ActiveRecord::RecordInvalid => e
-    Rails.logger.error("Error updating note #{note.inspect}\nparams: #{args.inspect}\n#{e.message}\n#{e.backtrace.join("\n")}")
-    false
+    Rails.logger.error("Error updating note #{note.inspect}\nparams: #{@data.inspect}\n#{e.message}\n#{e.backtrace.join("\n")}")
+    Result.error @note.errors.full_messages
+  rescue => e
+    Rails.logger.error("Error updating note #{note.inspect}\nparams: #{@data.inspect}\n#{e.message}\n#{e.backtrace.join("\n")}")
+    Result.error e.message
   end
 
   private
