@@ -41,7 +41,7 @@ password: mariecurie
 ```
 
 ### Configure env variables
-In development and test environments variables are readed from ```./.env``` file. You should copy the provided ```./.env.example``` file to ```.env```  before running the project. This will affect front and backend environment variables.
+In development and test environments variables are read from `./.env` file. You should copy the provided `./.env.example` file to `.env`  before running the project. This will affect front and backend environment variables.
 
 Alternatively, you can add environment variables to your bash_profile:
 ```
@@ -50,7 +50,7 @@ export REACT_APP_NOTESCLUB_API_BASE_URL=http://localhost:3000
 export REACT_APP_NOTESCLUB_FRONT_BASE_URL=http://localhost:3001
 ```
 
-Then  run `source ~/.bash_profile` or open a new console to apply the changes.
+Then, run `source ~/.bash_profile` or open a new console to apply the changes.
 
 ### Start server
 ```
