@@ -24,7 +24,7 @@
 #  * zeus: 'zeus rspec' (requires the server to be started separately)
 #  * 'just' rspec: 'rspec'
 
-guard :rspec, cmd: "bundle exec rspec" do
+def watch_rspec
   require "guard/rspec/dsl"
   dsl = Guard::RSpec::Dsl.new(self)
 
@@ -68,3 +68,22 @@ guard :rspec, cmd: "bundle exec rspec" do
     Dir[File.join("**/#{m[1]}.feature")][0] || "spec/acceptance"
   end
 end
+
+# With this configuration, you can run specific tests in guard.
+# Just type "focus" to run rspec tests with :focus tag
+# Type "test" to run all tests again
+group :test do
+  guard 'rspec', cmd: 'bundle exec rspec' do
+    watch_rspec
+  end
+end
+
+group :focus do
+  guard 'rspec', cmd: 'bundle exec rspec --tag focus' do
+    watch_rspec
+  end
+end
+
+scope group: :test
+
+
