@@ -1,4 +1,6 @@
 class NoteUpdator < ApplicationService
+
+  # TO-DO: receive a note id as parameter, not a Note
   def initialize(note, args)
     @note = note
     @update_notes_with_links = args[:update_notes_with_links]

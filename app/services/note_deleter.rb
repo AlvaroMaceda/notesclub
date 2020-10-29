@@ -1,4 +1,6 @@
 class NoteDeleter < ApplicationService
+
+  # TO-DO: receive a note id as parameter, not a Note
   def initialize(note, args = {})
     @note = note
     @include_descendants = args[:include_descendants] || true
