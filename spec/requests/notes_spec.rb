@@ -27,6 +27,7 @@ RSpec.describe NotesController, type: :request do
     rm_timestamps!(t)&.sort_by {|k,v| k}
   end
 
+  # TO-DO: We are testing here NoteFinder functionallity. We should simplify the tests
   context "#index" do
     it "should find notes by ids" do
       get "/v1/notes", params: { ids: [note1.id, note2.id], ancestry: nil }

@@ -5,40 +5,10 @@ class NotesController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index, :count]
 
   def index
-    track_note if params["user_ids"] && params["user_ids"].is_a?(Array) && params["user_ids"].size == 1
-    notes = Note
-    notes = notes.where(id: params["ids"]) if params["ids"].present? && params["ids"].is_a?(Array)
-    notes = notes.where(user_id: params["user_ids"]) if params["user_ids"].present? && params["user_ids"].is_a?(Array)
-    notes = notes.where(ancestry: params["ancestry"]&.empty? ? nil : params["ancestry"]) if params.include?("ancestry")
-    notes = notes.where(slug: params["slug"]) if params["slug"]
-    notes = notes.where(content: params["content"]) if params["content"]
-
-    if params["content_like"]
-      notes = notes.where("lower(content) like ?", params['content_like'].downcase)
-    end
-    if params["except_ids"].present?
-      notes = notes.where.not(id: params["except_ids"])
-    end
-    if params["id_lte"].present?
-      notes = notes.where("notes.id <= ?", params["id_lte"])
-    end
-    if params["id_gte"].present?
-      notes = notes.where("notes.id >= ?", params["id_gte"])
-    end
-    if params["except_slug"].present?
-      notes = notes.where.not(slug: params["except_slug"])
-    end
-    if params["skip_if_no_descendants"]
-      notes = notes.joins("inner join notes as t on t.ancestry = cast(notes.id as VARCHAR(255)) and t.position=1 and t.content != ''")
-    end
-    limit = params["limit"] ? [params["limit"].to_i, 100].min : 100
-    limit = 1 if params["slug"] || (params["ids"] && params["ids"].size == 1)
-    notes = notes.order(id: :desc).limit(limit)
-    methods = []
-    methods << :descendants if params[:include_descendants]
-    methods << :ancestors if params[:include_ancestors]
-    methods << :user if params[:include_user]
-    render json: notes.to_json(methods: methods), status: :ok
+    result = NoteFinder.call(params)
+    
+    render json: result.errors, status: :bad_request if result.error?
+    render json: result.value, status: :ok
   end
 
   def count
@@ -61,16 +31,13 @@ class NotesController < ApplicationController
   end
 
   def show
-    notes = Note
-    notes = notes.where(id: params[:id]) if params[:id]
-    notes = notes.where(slug: params[:slug].downcase) if params[:slug]
-    note = notes.first
+    params.permit("id", "slug", "include_descendants")
+    params[:ids] = params.delete :id
+  
+    result = NoteFinder.call(params)
 
-    if params[:include_descendants]
-      render json: note.to_json(methods: :descendants)
-    else
-      render json: note
-    end
+    render json: result.errors, status: :bad_request if result.error?
+    render json: result.value[0], status: :ok
   end
 
   def create
