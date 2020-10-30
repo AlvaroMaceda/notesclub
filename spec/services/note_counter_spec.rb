@@ -5,8 +5,6 @@ RSpec.describe NoteCounter do
   fixtures(:users, :notes)
   let(:user) { users(:user1) }
   let(:note1) { notes(:note1) }
-  # let(:note2) { notes(:note2) }
-  # let(:note5) { notes(:note5) }
 
   it "should count non-root notes regardless of descendants" do
     url = 'http://climate.com'
