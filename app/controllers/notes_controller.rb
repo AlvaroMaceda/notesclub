@@ -14,22 +14,10 @@ class NotesController < ApplicationController
   end
 
   def count
-    if params["url"].present?
-      url = params["url"].downcase
-      # We count all non-root notes (ancestry != nil):
-      count1 = Note.
-        where("lower(content) like ?", "%#{url}%").
-        where("ancestry is not null").limit(10).count
-      # We also count root notes with a first child where content is not empty:
-      count2 = Note.
-        joins("inner join notes as t on t.ancestry = cast(notes.id as VARCHAR(255)) and t.position=1 and t.content != ''").
-        where("notes.ancestry is null").
-        where("lower(notes.content) like ?", "%#{url}%").limit(10).count
-      count = [count1 + count2, 10].min
-    else
-      count = 0
-    end
-    render json: count, status: :ok
+    result = NoteCounter.call(params['url'])
+
+    render json: result.errors, status: :bad_request if result.error?
+    render json: result.value, status: :ok
   end
 
   def show
