@@ -31,41 +31,31 @@ RSpec.describe NotesController, type: :request do
 
   # TO-DO: We are testing here NoteFinder functionallity. We should simplify the tests
   context "#index" do
-    it "should find notes by ids" do
+    it "should find notes", focus:true do
+      call_params = {
+        "ids" => ["1", "2"], 
+        "ancestry" => nil
+      }
+      returned_notes = [
+        note1.as_json,
+        note2.as_json
+      ]
+      expect(NoteFinder).to receive(:call).
+            with(controller_parameters(call_params)).
+            and_return(Result.ok returned_notes)
+
+      get "/v1/notes", params: call_params
+      expect(response).to have_http_status(:success)
+      notes = JSON.parse(response.body).sort_by { |t| t["id"] }.map { |t| prep(t) }
+      expect(notes).to eq([prep(note1.attributes), prep(note2.attributes)])
+    end
+
+    it "should return a json error if there is an error", focus:true do
+      allow(NoteFinder).to receive(:call).and_return(Result.error "Something terrible happened")
       get "/v1/notes", params: { ids: [note1.id, note2.id], ancestry: nil }
-      expect(response).to have_http_status(:success)
-      notes = JSON.parse(response.body).sort_by { |t| t["id"] }.map { |t| prep(t) }
-      expect(notes).to eq([prep(note1.attributes), prep(note2.attributes)])
+      expect(response).to have_http_status(:bad_request)
     end
 
-    it "should filter per user_ids and ancestry" do
-      get "/v1/notes", params: { user_ids: [user.id], ancestry: nil }
-      expect(response).to have_http_status(:success)
-      notes = JSON.parse(response.body).sort_by { |t| t["id"] }.map { |t| prep(t) }
-      expect(notes).to eq([
-        prep({ "ancestry" => nil, "content" => "Climate Change", "id" => 1, "position" => 1, "user_id" => 1, "slug" => "climate_change" }),
-        prep({ "ancestry" => nil, "content" => "2020-08-28",     "id" => 2, "position" => 2, "user_id" => 1, "slug" => "2020-08-28" })
-      ])
-      expect(response.status).to eq(200)
-    end
-
-    describe "when include_user is true" do
-      it "should ONLY include exposed USER attributes" do
-        get "/v1/notes", params: { ids: [note1.id], ancestry: nil, include_user: true }
-        expect(response).to have_http_status(:success)
-        note = JSON.parse(response.body)[0]
-        expect(note["user"].except("created_at", "updated_at")).to eq({ "id" => note1.user.id, "name" => note1.user.name, "username" => note1.user.username })
-      end
-    end
-
-    it "should search by like" do
-      note1.update!(content: "This is great: [[https://thisurl.com/whatever]]")
-      note2.update!(content: "[[https://thisurl.com/whatever]]")
-      get "/v1/notes", params: { content_like: "%[[https://thisurl.com/whatever]]%" }
-      expect(response).to have_http_status(:success)
-      notes = JSON.parse(response.body).sort_by { |t| t["id"] }.map { |t| prep(t) }
-      expect(notes).to eq([prep(note1.attributes), prep(note2.attributes)])
-    end
   end
 
   context "#show" do

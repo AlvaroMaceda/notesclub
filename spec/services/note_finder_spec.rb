@@ -70,7 +70,7 @@ RSpec.describe NoteFinder do
     expect(data(result.value)).to match_array data([note1 ,note2])
   end
 
-  it "should return descendants if flag is passed", focus:true do
+  it "should return descendants if flag is passed" do
     Note.where.not(id: [2, 3, 4]).destroy_all
 
     result = NoteFinder.call(ids: note2.id, include_descendants: true)

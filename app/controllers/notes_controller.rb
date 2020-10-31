@@ -9,7 +9,7 @@ class NotesController < ApplicationController
   def index
     result = NoteFinder.call(params)
     
-    render json: result.errors, status: :bad_request if result.error?
+    return render json: result.errors, status: :bad_request if result.error?
     render json: result.value, status: :ok
   end
 
