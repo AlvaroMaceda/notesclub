@@ -21,7 +21,7 @@ class BooksPage extends React.Component<BooksPageProps, BooksPageState> {
   }
 
   componentDidMount() {
-    fetchBackendNotes({ ancestry: null, content_like: "%(book)%", include_user: true }, this.props.setAppState)
+    fetchBackendNotes({ ancestry: null, content_like: "%(book)%", include_user: true, skip_if_no_descendants: true }, this.props.setAppState)
       .then(notesWithUsers => {
         this.setState({ notes: notesWithUsers })
       })

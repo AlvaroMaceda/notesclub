@@ -14,7 +14,7 @@ class NotesController < ApplicationController
     notes = notes.where(content: params["content"]) if params["content"]
 
     if params["content_like"]
-      notes = notes.where("lower(content) like ?", params['content_like'].downcase)
+      notes = notes.where("lower(notes.content) like ?", params['content_like'].downcase)
     end
     if params["except_ids"].present?
       notes = notes.where.not(id: params["except_ids"])
