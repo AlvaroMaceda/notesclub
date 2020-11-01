@@ -1,4 +1,6 @@
-require 'rails_helper'
+# frozen_string_literal: true
+
+require "rails_helper"
 
 RSpec.describe NoteUpdator do
   fixtures(:users, :notes)
@@ -8,7 +10,7 @@ RSpec.describe NoteUpdator do
   it "should create new notes if they do not exist" do
     Note.create!(content: "This already exists", user_id: note.user_id)
     updator = NoteUpdator.new(note)
-    expect{ updator.update(content: "[[Books]] and [[Music]] and [[This already exists]]") }.to change{ Note.count }.by(2)
+    expect { updator.update(content: "[[Books]] and [[Music]] and [[This already exists]]") }.to change { Note.count }.by(2)
     expect(note.reload.content).to eq("[[Books]] and [[Music]] and [[This already exists]]")
     t2, t1 = Note.order(id: :desc).limit(2)
     expect(t1.attributes.slice(*%w(ancestry content slug user_id))).to eq({

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateWaitingUsers < ActiveRecord::Migration[6.0]
   def change
     create_table :waiting_users do |t|

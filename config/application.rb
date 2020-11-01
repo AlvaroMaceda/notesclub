@@ -1,4 +1,6 @@
-require_relative 'boot'
+# frozen_string_literal: true
+
+require_relative "boot"
 
 require "rails"
 # Pick the frameworks you want:
@@ -38,8 +40,8 @@ module Arbol
 
     config.middleware.insert_before 0, Rack::Cors, debug: true do
       allow do
-        origins ENV['REACT_APP_NOTESCLUB_FRONT_BASE_URL'], 'https://book.notes.club'
-        resource '*',
+        origins ENV["REACT_APP_NOTESCLUB_FRONT_BASE_URL"], "https://book.notes.club"
+        resource "*",
           credentials: true,
           headers: :any,
           methods: [:get, :post, :put, :patch, :delete, :options, :head]
@@ -47,8 +49,8 @@ module Arbol
     end
 
     config.action_dispatch.default_headers = {
-      'Referrer-Policy' => 'origin-when-cross-origin',
-      'Access-Control-Expose-Headers' => 'x-pagination, Content-Length'
+      "Referrer-Policy" => "origin-when-cross-origin",
+      "Access-Control-Expose-Headers" => "x-pagination, Content-Length"
     }
   end
 end

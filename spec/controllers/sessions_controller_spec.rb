@@ -1,4 +1,6 @@
-require 'rails_helper'
+# frozen_string_literal: true
+
+require "rails_helper"
 
 RSpec.describe SessionsController, type: :request do
   fixtures :users
@@ -17,7 +19,7 @@ RSpec.describe SessionsController, type: :request do
     it "sets cookie" do
       # It seems we can not test encrypted cookies in controller specs https://github.com/rails/rails/issues/27145
       # TODO: Test it in an integration spec
-      expect_any_instance_of(ActionDispatch::Cookies::CookieJar).to receive(:signed).and_return({jwt: nil })
+      expect_any_instance_of(ActionDispatch::Cookies::CookieJar).to receive(:signed).and_return({ jwt: nil })
       post "/v1/users/login", { params: { email: "hec2@hec.com", password: "hec2hec" } }
       expect(cookies[:jwt])
     end
@@ -25,7 +27,7 @@ RSpec.describe SessionsController, type: :request do
     it "returns user attributes" do
       post "/v1/users/login", { params: { email: "hec2@hec.com", password: "hec2hec" } }
       json = JSON.parse(response.body)
-      expect(json).to eq({"user" => {"id" => @user.id, "name" => @user.name, "username" => @user.username}})
+      expect(json).to eq({ "user" => { "id" => @user.id, "name" => @user.name, "username" => @user.username } })
     end
   end
 end

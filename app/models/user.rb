@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
   devise :database_authenticatable, :confirmable, :rememberable, :validatable
 
   self.skip_session_storage = [:http_auth, :params_auth]
 
   has_many :notes
-  has_many :invitees, class_name: 'User', foreign_key: :invited_by_id
-  belongs_to :invited_by, class_name: 'User', foreign_key: :invited_by_id, required: false
+  has_many :invitees, class_name: "User", foreign_key: :invited_by_id
+  belongs_to :invited_by, class_name: "User", foreign_key: :invited_by_id, required: false
 
   after_create :reset_jwt_token
 
