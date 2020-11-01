@@ -71,6 +71,7 @@ AllCops:
     - '**/Vagabondfile'
     - '**/Vagrantfile'
   Exclude:
+    - 'front/**/*'
     - 'node_modules/**/*'
     - 'tmp/**/*'
     - 'vendor/**/*'
