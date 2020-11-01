@@ -12,7 +12,7 @@ class NoteDeleter
       note.destroy!
     end
     true
-  rescue  ActiveRecord::RecordNotDestroyed => e
+  rescue  ActiveRecord::RecordNotDestroyed
     false
   end
 

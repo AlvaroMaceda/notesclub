@@ -8,9 +8,9 @@ RSpec.describe NoteDeleter do
 
   it "should destroy note and descendants" do
     t1 = Note.create!(content: "bla", user: user1)
-    t2 = t1.children.create!(content: "bla", user: user1)
+    t1.children.create!(content: "bla", user: user1)
     t3 = t1.children.create!(content: "bla", user: user1)
-    t4 = t3.children.create!(content: "bla", user: user1)
+    t3.children.create!(content: "bla", user: user1)
 
     destroyer = NoteDeleter.new(t1, include_descendants: true)
     result = nil
