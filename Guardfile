@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A sample Guardfile
 # More info at https://github.com/guard/guard#readme
 
@@ -73,17 +75,15 @@ end
 # Just type "focus" to run rspec tests with :focus tag
 # Type "test" to run all tests again
 group :test do
-  guard 'rspec', cmd: 'bundle exec rspec' do
+  guard "rspec", cmd: "bundle exec rspec" do
     watch_rspec
   end
 end
 
 group :focus do
-  guard 'rspec', cmd: 'bundle exec rspec --tag focus' do
+  guard "rspec", cmd: "bundle exec rspec --tag focus" do
     watch_rspec
   end
 end
 
 scope group: :test
-
-

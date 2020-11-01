@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Note::ContentSlugGenerator
   def initialize(content)
     @content = content
@@ -8,5 +10,5 @@ class Note::ContentSlugGenerator
   end
 
   private
-  attr_reader :content
+    attr_reader :content
 end

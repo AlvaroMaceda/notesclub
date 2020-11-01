@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UsersController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index, :create, :confirmation]
   before_action :authenticate_param_user!, only: :update
@@ -31,7 +33,7 @@ class UsersController < ApplicationController
   def create
     user = User.new(params.permit(:email, :password, :name, :username, :marketing).merge(password_confirmation: params[:password]))
     if !verify_recaptcha_if_required(model: user)
-      render json: { errors: { captcha: ["Are you human? If so, please refresh and try again."]} }, status: :unauthorized
+      render json: { errors: { captcha: ["Are you human? If so, please refresh and try again."] } }, status: :unauthorized
     elsif user.save
       log_in_as(user)
       track_user
@@ -55,12 +57,11 @@ class UsersController < ApplicationController
   end
 
   private
+    def authenticate_param_user!
+      head :unauthorized if current_user.id.to_s != params[:id]
+    end
 
-  def authenticate_param_user!
-    head :unauthorized if current_user.id.to_s != params[:id]
-  end
-
-  def user_params
-    params.require(:user).permit(:name, :username, :email, :password)
-  end
+    def user_params
+      params.require(:user).permit(:name, :username, :email, :password)
+    end
 end

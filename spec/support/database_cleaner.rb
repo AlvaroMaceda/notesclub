@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)
@@ -7,7 +9,7 @@ RSpec.configure do |config|
   config.before(:all) do
     DatabaseCleaner.start
   end
-  
+
   config.after(:all) do
     DatabaseCleaner.clean
   end
@@ -16,7 +18,7 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
   end
 
-  config.before(:each, :js => true) do
+  config.before(:each, js: true) do
     DatabaseCleaner.strategy = :truncation
   end
 
@@ -33,7 +35,7 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do |example|
-    unless example.metadata[:skip_db_cleaner]      
+    unless example.metadata[:skip_db_cleaner]
       DatabaseCleaner.clean
     end
   end

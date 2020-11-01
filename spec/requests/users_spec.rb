@@ -1,4 +1,6 @@
-require 'rails_helper'
+# frozen_string_literal: true
+
+require "rails_helper"
 
 RSpec.describe UsersController, type: :request do
   fixtures(:users)
@@ -7,10 +9,10 @@ RSpec.describe UsersController, type: :request do
   describe "#index" do
     it "should return success and attributes" do
       log_in(user)
-      get "/v1/users", params: { username: "hec"}
+      get "/v1/users", params: { username: "hec" }
       expect(response).to have_http_status(:success)
       result = JSON.parse(response.body)
-      expect(result.first.slice(*%w(id name username))).to eq({"id" => user.id, "name" => user.name, "username" => user.username})
+      expect(result.first.slice(*%w(id name username))).to eq({ "id" => user.id, "name" => user.name, "username" => user.username })
     end
   end
 
@@ -20,13 +22,13 @@ RSpec.describe UsersController, type: :request do
       get "/v1/users/#{user.id}"
       expect(response).to have_http_status(:success)
       result = JSON.parse(response.body)
-      expect(result.slice(*%w(id name username))).to eq({"id" => user.id, "name" => user.name, "username" => user.username})
+      expect(result.slice(*%w(id name username))).to eq({ "id" => user.id, "name" => user.name, "username" => user.username })
     end
   end
 
   describe "#create" do
     it "should create a user" do
-      post "/v1/users", params: { name: "Hec", username: "hec878", email: "hec878@hec.com", password: "mypassword"}
+      post "/v1/users", params: { name: "Hec", username: "hec878", email: "hec878@hec.com", password: "mypassword" }
       result = JSON.parse(response.body)
       expect(result["errors"] || []).to eq([])
       expect(response).to have_http_status(:success)

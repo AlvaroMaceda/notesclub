@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Note < ApplicationRecord
   has_ancestry
   acts_as_list scope: [:ancestry, :user_id]
@@ -19,28 +21,27 @@ class Note < ApplicationRecord
     methods = options[:methods] || []
     methods = [methods] if methods.is_a?(Symbol)
     if methods.include?(:user)
-      json['user'] = self.user.slice(UsersController::EXPOSED_ATTRIBUTES)
+      json["user"] = self.user.slice(UsersController::EXPOSED_ATTRIBUTES)
     end
     json
   end
 
   private
+    def set_content
+      self.content = should_titleize? ? slug.titleize : slug if content.blank? && slug.present?
+    end
 
-  def set_content
-    self.content = should_titleize? ? slug.titleize : slug if content.blank? && slug.present?
-  end
+    def should_titleize?
+      month_regex = /\A[0-9]{4}-[0-9]{2}\z/         # E.g. 2020-09
+      date_regex = /\A[0-9]{4}-[0-9]{2}-[0-9]{2}\z/ # E.g. 2020-09-10
+      !month_regex.match(slug) && !date_regex.match(slug)
+    end
 
-  def should_titleize?
-    month_regex = /\A[0-9]{4}-[0-9]{2}\z/         # E.g. 2020-09
-    date_regex = /\A[0-9]{4}-[0-9]{2}-[0-9]{2}\z/ # E.g. 2020-09-10
-    !month_regex.match(slug) && !date_regex.match(slug)
-  end
+    def set_slug
+      self.slug = SlugGenerator.new(self).generate_unique_slug if slug.blank?
+    end
 
-  def set_slug
-    self.slug = SlugGenerator.new(self).generate_unique_slug if slug.blank?
-  end
-
-  def nulify_empty_ancestry
-    self.ancestry = nil if ancestry.blank?
-  end
+    def nulify_empty_ancestry
+      self.ancestry = nil if ancestry.blank?
+    end
 end

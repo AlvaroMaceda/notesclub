@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-require 'spec_helper'
-ENV['RAILS_ENV'] ||= 'test'
-require File.expand_path('../config/environment', __dir__)
+require "spec_helper"
+ENV["RAILS_ENV"] ||= "test"
+require File.expand_path("../config/environment", __dir__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
-require 'rspec/rails'
+require "rspec/rails"
 # Add additional requires below this line. Rails is not loaded until this point!
 
-Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -76,10 +78,10 @@ silenced_warnings = [
   /Class level methods will no longer inherit scoping from `create!` in Rails 6.1/,
 ] # list of warnings you want to silence
 
-silenced_expr = Regexp.new(silenced_warnings.join('|'))
+silenced_expr = Regexp.new(silenced_warnings.join("|"))
 
 ActiveSupport::Deprecation.behavior = lambda do |msg, stack, deprecation_horizon, gem_name|
-  unless msg =~ silenced_expr
+  unless msg&.match?(silenced_expr)
     ActiveSupport::Deprecation::DEFAULT_BEHAVIORS[:stderr].call(msg, stack, deprecation_horizon, gem_name)
   end
 end

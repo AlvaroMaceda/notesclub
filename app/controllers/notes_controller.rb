@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NotesController < ApplicationController
   before_action :set_note, only: [:update, :destroy]
   before_action :authenticate_param_id!, only: [:update, :destroy]
@@ -14,7 +16,7 @@ class NotesController < ApplicationController
     notes = notes.where(content: params["content"]) if params["content"]
 
     if params["content_like"]
-      notes = notes.where("lower(notes.content) like ?", params['content_like'].downcase)
+      notes = notes.where("lower(notes.content) like ?", params["content_like"].downcase)
     end
     if params["except_ids"].present?
       notes = notes.where.not(id: params["except_ids"])
@@ -42,8 +44,8 @@ class NotesController < ApplicationController
   end
 
   def count
-    if params['url'].present?
-      url = params['url'].downcase
+    if params["url"].present?
+      url = params["url"].downcase
       # We count all non-root notes (ancestry != nil):
       count1 = Note.
         where("lower(content) like ?", "%#{url}%").
@@ -110,26 +112,25 @@ class NotesController < ApplicationController
   end
 
   private
-
-  def track_note
-    id = params["user_ids"].first
-    blogger = User.find_by(id: id)
-    if params["slug"]
-      track_action("Get note", { blog_username: blogger.username, note_slug: params['slug'], blogger_id: blogger.id })
-    else
-      track_action("Get user notes", { blog_username: blogger.username, blogger_id: blogger.id })
+    def track_note
+      id = params["user_ids"].first
+      blogger = User.find_by(id: id)
+      if params["slug"]
+        track_action("Get note", { blog_username: blogger.username, note_slug: params["slug"], blogger_id: blogger.id })
+      else
+        track_action("Get user notes", { blog_username: blogger.username, blogger_id: blogger.id })
+      end
     end
-  end
 
-  def set_note
-    @note = Note.find(params[:id])
-  end
+    def set_note
+      @note = Note.find(params[:id])
+    end
 
-  def authenticate_param_id!
-    head :unauthorized if current_user.id != @note.user_id
-  end
+    def authenticate_param_id!
+      head :unauthorized if current_user.id != @note.user_id
+    end
 
-  def authenticate_param_user_id!
-    head :unauthorized if !params[:note] || current_user.id.to_s != params[:note][:user_id].to_s
-  end
+    def authenticate_param_user_id!
+      head :unauthorized if !params[:note] || current_user.id.to_s != params[:note][:user_id].to_s
+    end
 end

@@ -1,4 +1,6 @@
-require 'rails_helper'
+# frozen_string_literal: true
+
+require "rails_helper"
 
 
 
@@ -90,9 +92,9 @@ RSpec.describe Note, type: :model do
 
   context "#destroy" do
     it "should delete descendants" do
-      t0 = Note.create!(content: "note 0", user: user)
+      Note.create!(content: "note 0", user: user)
       t1 = Note.create!(content: "note 1", user: user)
-      t2 = t1.children.create!(content: "note 1", user: user)
+      t1.children.create!(content: "note 1", user: user)
 
       expect { t1.destroy }.to change { Note.count }.by(-2)
     end

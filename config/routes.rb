@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
-  scope :v1, defaults: { format: :json} do
+  scope :v1, defaults: { format: :json } do
     resources :users, only: [:index, :show, :create, :update] do
       collection do
-        post 'confirmation'
-        get 'me'
+        post "confirmation"
+        get "me"
       end
     end
     devise_for :users, controllers: { sessions: :sessions },
@@ -11,9 +13,9 @@ Rails.application.routes.draw do
                        skip: [:confirmations], skip_helpers: [:confirmations]
     resources :notes, only: [:index, :show, :create, :update, :destroy] do
       collection do
-        get 'count'
+        get "count"
       end
     end
-    get 'ping', to: 'ping#ping'
+    get "ping", to: "ping#ping"
   end
 end
