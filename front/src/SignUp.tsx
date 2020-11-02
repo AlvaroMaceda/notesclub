@@ -120,7 +120,7 @@ class SignUp extends React.Component<SignUpProps, SignUpState> {
               <Form.Group controlId="termsAndConditions">
                 <Form.Check
                   type="checkbox"
-                  label="Join the Book Notes Club newsletter."
+                  label="Join the Notes Club newsletter."
                   onChange={this.handleChange as any}
                   name="marketing" />
               </Form.Group>
