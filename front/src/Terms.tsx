@@ -27,11 +27,11 @@ class Terms extends React.Component<TermsProps, TermsState> {
 
         <p><b>Content</b></p>
         <p>Our Service allows you to post, link, store, share and otherwise make available certain information, text, graphics, videos, or other material ("Content"). You are responsible for the legality of them.</p>
-        <p>All the content you write on Book Notes Club can be accessed by any other Book Notes Club member. Also, every month we'll <b>release all notes</b> under the <b>Creative Commons Zero (<a href="https://creativecommons.org/share-your-work/public-domain/cc0/">CC0</a>)</b> license.</p>
+        <p>All the content you write on Notes Club can be accessed by any other Notes Club member. Also, every month we'll <b>release all notes</b> under the <b>Creative Commons Zero (<a href="https://creativecommons.org/share-your-work/public-domain/cc0/">CC0</a>)</b> license.</p>
 
         <p><b>Links To Other Web Sites</b></p>
-        <p>Our Service may contain links to third­party web sites or services that are not owned or controlled by Book Notes Club.</p>
-        <p>Book Notes Club has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services. You further acknowledge and agree that Book Notes Club shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such web sites or services.</p>
+        <p>Our Service may contain links to third party web sites or services that are not owned or controlled by Notes Club.</p>
+        <p>Notes Club has no control over, and assumes no responsibility for, the content, privacy policies, or practices of any third party web sites or services. You further acknowledge and agree that Notes Club shall not be responsible or liable, directly or indirectly, for any damage or loss caused or alleged to be caused by or in connection with use of or reliance on any such content, goods or services available on or through any such web sites or services.</p>
 
         <p><b>Changes</b></p>
         <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material we will try to provide at least 30 (change this) days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.</p>

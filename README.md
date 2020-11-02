@@ -1,4 +1,4 @@
-# Book Notes Club
+# Notes Club
 https://notes.club
 
 ## Background

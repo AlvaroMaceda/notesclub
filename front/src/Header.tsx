@@ -29,14 +29,14 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
           </Nav>
-          {currentUser &&  
-            <Search currentUser={currentUser} /> 
+          {currentUser &&
+            <Search currentUser={currentUser} />
           }
           <Nav.Link href='/books'>Books</Nav.Link>
           {currentUser && currentUser.name !== "Help" &&
             <Nav.Link href="/help">Help</Nav.Link>
           }
-          {currentUser &&  
+          {currentUser &&
             <Nav.Link href={`/${currentUser.username}`}>{(currentUser.name || currentUser.username)}</Nav.Link>
           }
           <Nav.Link href='/logout'>Logout</Nav.Link>
@@ -64,7 +64,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
 
     return (
       <Navbar bg="light" expand="lg">
-        <Navbar.Brand href="/">Book Notes Club</Navbar.Brand>
+        <Navbar.Brand href="/">Notes Club</Navbar.Brand>
         {currentUser ? this.renderLoggedInHeader() : this.renderAnonymousHeader()}
       </Navbar>
     )
