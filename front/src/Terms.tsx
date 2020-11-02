@@ -27,7 +27,7 @@ class Terms extends React.Component<TermsProps, TermsState> {
 
         <p><b>Content</b></p>
         <p>Our Service allows you to post, link, store, share and otherwise make available certain information, text, graphics, videos, or other material ("Content"). You are responsible for the legality of them.</p>
-        <p>All the content you write on Notes Club can be accessed by any other Notes Club member. Also, every month we'll <b>release all notes</b> under the <b>Creative Commons Zero (<a href="https://creativecommons.org/share-your-work/public-domain/cc0/">CC0</a>)</b> license.</p>
+        <p>All the content you write on Notes Club can be accessed by any other Notes Club member.</p>
 
         <p><b>Links To Other Web Sites</b></p>
         <p>Our Service may contain links to third party web sites or services that are not owned or controlled by Notes Club.</p>
