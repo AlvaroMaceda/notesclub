@@ -26,7 +26,7 @@ class NotesController < ApplicationController
 
     result = NoteFinder.call(params)
 
-    render json: result.errors, status: :bad_request if result.error?
+    return render json: result.errors, status: :bad_request if result.error?
     render json: result.value[0], status: :ok
   end
 

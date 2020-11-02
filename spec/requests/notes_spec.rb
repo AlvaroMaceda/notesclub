@@ -58,9 +58,30 @@ RSpec.describe NotesController, type: :request do
   end
 
   context "#show" do
-    it "should return descendants if flag is passed" do
-      Note.where.not(id: [2, 3, 4]).destroy_all
+    it "should return a note" do
+      call_params = {
+        "ids" => "2",
+        "include_descendants" => "true"
+      }
+      returned_note = [{
+        "id" => 2,
+        "content" => "2020-08-28",
+        "user_id" => 1,
+        "ancestry" => nil,
+        "slug" => "2020-08-28",
+        "position" => 1,
+        "descendants" => [
+          { "id" => 3, "position" => 1, "content" => "I started to read [[How to take smart notes]]", "user_id" => 1, "ancestry" => "2", "slug" => "jdjiwe23m" },
+          { "id" => 4, "position" => 1, "content" => "I #love it", "user_id" => 1, "ancestry" => "2/3", "slug" => "ds98wekjwe" }
+        ]
+      }]
+
+      expect(NoteFinder).to receive(:call).
+            with(controller_parameters(call_params)).
+            and_return(Result.ok returned_note)
+
       get "/v1/notes/#{note2.id}", params: { include_descendants: true }
+
       expect(response).to have_http_status(:success)
       note2 = JSON.parse(response.body)
       expect(rm_timestamps!(note2)).to eq({
@@ -76,6 +97,12 @@ RSpec.describe NotesController, type: :request do
         ]
       })
       expect(response.status).to eq(200)
+    end
+
+    it "should return a json error if there is an error", focus: true do
+      allow(NoteFinder).to receive(:call).and_return(Result.error "Something terrible happened")
+      get "/v1/notes/#{note2.id}", params: { include_descendants: true }
+      expect(response).to have_http_status(:bad_request)
     end
   end
 
