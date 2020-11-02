@@ -41,3 +41,6 @@ front/cypress/videos/
 /config/credentials/produciton.key
 
 latest.dump
+.DS_Store
+front/.DS_Store
+front/public/.DS_Store
