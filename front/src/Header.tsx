@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Navbar, Nav } from 'react-bootstrap'
 import { User } from './User'
-import Search from './Search'
 
 interface HeaderProps {
   setParentState: Function
@@ -29,9 +28,6 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
           </Nav>
-          {currentUser &&
-            <Search currentUser={currentUser} />
-          }
           <Nav.Link href='/books'>Books</Nav.Link>
           {currentUser && currentUser.name !== "Help" &&
             <Nav.Link href="/help">Help</Nav.Link>
