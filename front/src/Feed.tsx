@@ -40,8 +40,8 @@ class Feed extends React.Component<FeedProps, FeedState> {
 
   loadMore = () => {
     const { notes } = this.state
-    const lastId = notes ? notes[notes.length - 1].id : undefined
-    if (notes && lastId && document.scrollingElement && window.innerHeight + document.documentElement.scrollTop + 5 >= document.scrollingElement.scrollHeight) {
+    const lastCreatedAt = notes ? notes[notes.length - 1].created_at : undefined
+    if (notes && lastCreatedAt && document.scrollingElement && window.innerHeight + document.documentElement.scrollTop + 5 >= document.scrollingElement.scrollHeight) {
       fetchBackendNotes({
         ancestry: null,
         skip_if_no_descendants: true,
@@ -49,7 +49,7 @@ class Feed extends React.Component<FeedProps, FeedState> {
         include_ancestors: true,
         include_user: true,
         limit: 5,
-        id_lte: lastId - 1
+        created_at_lt: lastCreatedAt
       }, this.props.setAppState)
         .then(newNotes => newNotes && this.setState({ notes: notes.concat(newNotes as Reference[]) }))
     }

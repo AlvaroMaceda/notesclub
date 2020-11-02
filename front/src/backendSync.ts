@@ -48,6 +48,7 @@ interface fetchBackendNotesInterface {
   skip_if_no_descendants?: boolean
   except_slug?: string
   id_lte?: number
+  created_at_lt?: string
   limit?: number
 }
 

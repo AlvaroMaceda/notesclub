@@ -27,6 +27,12 @@ class NotesController < ApplicationController
     if params["id_gte"].present?
       notes = notes.where("notes.id >= ?", params["id_gte"])
     end
+    if params["created_at_lt"].present?
+      notes = notes.where("notes.created_at < ?", params["created_at_lt"])
+    end
+    if params["created_at_gt"].present?
+      notes = notes.where("notes.created_at > ?", params["created_at_gt"])
+    end
     if params["except_slug"].present?
       notes = notes.where.not(slug: params["except_slug"])
     end
@@ -35,7 +41,7 @@ class NotesController < ApplicationController
     end
     limit = params["limit"] ? [params["limit"].to_i, 100].min : 100
     limit = 1 if params["slug"] || (params["ids"] && params["ids"].size == 1)
-    notes = notes.order(id: :desc).limit(limit)
+    notes = notes.order(created_at: :desc).limit(limit)
     methods = []
     methods << :descendants if params[:include_descendants]
     methods << :ancestors if params[:include_ancestors]
