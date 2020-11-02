@@ -8,6 +8,7 @@ export interface Note {
   ancestry: string | null
   position: number
   user_id: number
+  created_at?: string
   tmp_key?: string // Used for react keys when there is no id
 }
 
