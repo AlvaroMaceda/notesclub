@@ -3,7 +3,7 @@ import { User } from './User'
 import { Note, Reference } from './notes/Note'
 import { fetchBackendUser, fetchBackendNotes } from './backendSync'
 import ReferenceRenderer from './notes/ReferenceRenderer'
-import TodaysLink from './notes/TodaysLink'
+import Search from './Search'
 
 interface FeedProps {
   blogUsername: string
@@ -85,28 +85,32 @@ class Feed extends React.Component<FeedProps, FeedState> {
     const { currentUser } = this.props
 
     return (
-      <div className="topic-container container">
-        {blogger && notes && currentUser &&
-          <>
-            <TodaysLink currentUser={currentUser} />
-            <h1>Recent notes</h1>
-            <ul>
-              {notes.map((ref) => (
-                <ReferenceRenderer
-                  key={ref.id}
-                  note={ref}
-                  selectedNote={selectedNote}
-                  setUserNotePageState={this.updateState}
-                  setAppState={this.props.setAppState}
-                  currentUser={currentUser}
-                  showUser={true} />
-              ))}
-            </ul>
-          </>
+      <div className="container">
+        {currentUser &&
+          <Search currentUser={currentUser} />
         }
-        { (!blogger || !notes) &&
-          <p>Loading</p>
-        }
+        <div className="topic-container">
+          {blogger && notes && currentUser &&
+            <>
+              <h1>Recent notes</h1>
+              <ul>
+                {notes.map((ref) => (
+                  <ReferenceRenderer
+                    key={ref.id}
+                    note={ref}
+                    selectedNote={selectedNote}
+                    setUserNotePageState={this.updateState}
+                    setAppState={this.props.setAppState}
+                    currentUser={currentUser}
+                    showUser={true} />
+                ))}
+              </ul>
+            </>
+          }
+          { (!blogger || !notes) &&
+            <p>Loading</p>
+          }
+        </div>
       </div>
     )
   }
