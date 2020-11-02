@@ -6,7 +6,7 @@ import Logout from './Logout';
 import Header from './Header';
 import Footer from './Footer';
 import { Alert } from 'react-bootstrap';
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
 import UserNotePage from './notes/UserNotePage'
 import UserPage from './UserPage'
 import BooksPage from './BooksPage'
