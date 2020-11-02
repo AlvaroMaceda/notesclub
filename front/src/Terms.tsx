@@ -22,7 +22,7 @@ class Terms extends React.Component<TermsProps, TermsState> {
       <div className="container">
         <h1>Terms and Conditions ("Terms")</h1>
         <p>Last updated: 14/10/2020</p>
-        <p>Please read these Terms and Conditions carefully before using the https://book.notes.club website</p>
+        <p>Please read these Terms and Conditions carefully before using the https://notes.club website</p>
         <p>Your access to and use of the Service is conditioned on your acceptance of and compliance with these Terms. These Terms apply to all visitors, users and others who access or use the Service. By accessing or using the Service you agree to be bound by these Terms. If you disagree with any part of the terms then you may not access the Service.</p>
 
         <p><b>Content</b></p>

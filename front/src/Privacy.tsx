@@ -22,7 +22,7 @@ class Privacy extends React.Component<PrivacyProps, PrivacyState> {
       <div className="container">
         <h1>Privacy Policy</h1>
         <p>Last updated: 24/9/2020</p>
-        <p>Book Notes Club ("us", "we", or "our") operates http://book.notes.club (the "Site"). This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site.</p>
+        <p>Book Notes Club ("us", "we", or "our") operates http://notes.club (the "Site"). This page informs you of our policies regarding the collection, use and disclosure of Personal Information we receive from users of the Site.</p>
         <p>We use your Personal Information only for providing and improving the Site. By using the Site, you agree to the collection and use of information in accordance with this policy.</p>
 
         <p><b>Information Collection And Use</b></p>

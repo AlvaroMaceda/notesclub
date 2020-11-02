@@ -1,5 +1,5 @@
 # Book Notes Club
-https://book.notes.club
+https://notes.club
 
 ## Background
 
