@@ -37,17 +37,15 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
     }
   }
 
-  componentDidMount() {
-    const { currentNoteKey, currentUser } = this.props
-    if (currentUser && (this.props.currentBlogUsername === 'note' || this.props.currentBlogUsername === 'user') ){
-      // This is used by Wikir's Chrome Extension so it can redirect to a note without knowing the username
-      // We should use history.push or replace, but I couldn't make it work. Although I didn't spend much time.
-      const params = queryString.parse(this.props.location.search)
-      if (params["content"]) {
-        window.location.href = `/${currentUser.username}/${currentNoteKey}?content=${params["content"]}`
-      } else {
-        window.location.href = `/${currentUser.username}/${currentNoteKey}`
-      }
+  redirectToUserNote = (username: string) => {
+    const { currentNoteKey } = this.props
+    // This is used by Wikir's Chrome Extension so it can redirect to a note without knowing the username
+    // We should use history.push or replace, but I couldn't make it work. Although I didn't spend much time.
+    const params = queryString.parse(this.props.location.search)
+    if (params["content"]) {
+      window.location.href = `/${username}/${currentNoteKey}?content=${params["content"]}`
+    } else {
+      window.location.href = `/${username}/${currentNoteKey}`
     }
   }
 
@@ -220,8 +218,11 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
 
   public render () {
     const { currentBlogger, currentNote, selectedNote, descendants, ancestors, references, unlinkedReferences } = this.state
-    const { currentUser, currentNoteKey } = this.props
+    const { currentUser, currentNoteKey, currentBlogUsername } = this.props
 
+    if (currentUser && (currentBlogUsername === "notes" || currentBlogUsername === "user" || currentBlogUsername === "note")) {
+      this.redirectToUserNote(currentUser.username)
+    }
     if (currentBlogger === undefined && currentUser !== undefined) {
       this.fetchBloggerAndCurrentNote()
     }
