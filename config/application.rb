@@ -40,7 +40,7 @@ module Arbol
 
     config.middleware.insert_before 0, Rack::Cors, debug: true do
       allow do
-        origins ENV["REACT_APP_NOTESCLUB_FRONT_BASE_URL"], "https://book.notes.club"
+        origins ENV["REACT_APP_NOTESCLUB_FRONT_BASE_URL"], "https://notes.club"
         resource "*",
           credentials: true,
           headers: :any,
