@@ -28,7 +28,7 @@ class Note < ApplicationRecord
 
   private
     def set_content
-      # self.content = should_titleize? ? slug.titleize : slug if content.blank? && slug.present?
+      self.content = should_titleize? ? slug.titleize : slug if content.blank? && slug.present?
     end
 
     def should_titleize?
