@@ -140,8 +140,11 @@ RSpec.describe NotesController, type: :request do
 
   context "#destroy" do
     it "should delete a note" do
+      response_note = note1.as_json
+
       expect { delete "/v1/notes/#{note1.id}" }.to change { Note.count }.by(-1)
       expect(response.status).to eq 200
+      expect(JSON.parse(response.body)).to eq(response_note)
     end
 
     it "should return unauthorized if id doesn't match the auhtenticated user" do

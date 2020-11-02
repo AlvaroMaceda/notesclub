@@ -57,11 +57,12 @@ class NotesController < ApplicationController
   end
 
   def destroy
-    if NoteDeleter.call(@note)
+    result = NoteDeleter.call(params[:id])
+    if result.success?
       track_action("Delete note")
-      render json: @note, status: :ok
+      render json: result.value, status: :ok
     else
-      Rails.logger.error("Error deleting note #{@note.inspect} - params: #{params.inspect}")
+      Rails.logger.error("Error deleting note #{params[:id]} - params: #{params.inspect}")
       render json: { errors: "Couldn't delete note or descendants" }, status: :not_modified
     end
   end
