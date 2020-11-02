@@ -8,13 +8,13 @@ class NotesController < ApplicationController
 
   def index
     result = NoteFinder.call(params)
-    
+
     return render json: result.errors, status: :bad_request if result.error?
     render json: result.value, status: :ok
   end
 
   def count
-    result = NoteCounter.call(params['url'])
+    result = NoteCounter.call(params["url"])
 
     render json: result.errors, status: :bad_request if result.error?
     render json: result.value, status: :ok
@@ -23,7 +23,7 @@ class NotesController < ApplicationController
   def show
     params.permit("id", "slug", "include_descendants")
     params[:ids] = params.delete :id
-  
+
     result = NoteFinder.call(params)
 
     render json: result.errors, status: :bad_request if result.error?
@@ -44,7 +44,7 @@ class NotesController < ApplicationController
     else
       render json: result.errors, status: :bad_request
     end
-  end  
+  end
 
   def update
     result = NoteUpdator.call(@note, update_notes_with_links: params[:update_notes_with_links], data: params.require(:note).permit(:content, :ancestry, :position, :slug))
@@ -54,7 +54,7 @@ class NotesController < ApplicationController
     else
       render json: result.errors, status: :not_modified
     end
-  end  
+  end
 
   def destroy
     if NoteDeleter.call(@note, include_descendants: true)

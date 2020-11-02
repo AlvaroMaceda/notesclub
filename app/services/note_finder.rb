@@ -1,14 +1,15 @@
-class NoteFinder < ApplicationService
+# frozen_string_literal: true
 
+class NoteFinder < ApplicationService
   def initialize(search_params = {})
     search_params = search_params.transform_keys(&:to_sym)
 
     @params = search_params.slice(
       :ids, :except_ids, :id_lte, :id_gte,
       :slug, :except_slug,
-      :user_ids, 
+      :user_ids,
       :content, :content_like,
-      :ancestry, 
+      :ancestry,
       :skip_if_no_descendants,
       :include_user, :include_ancestors, :include_descendants,
       :limit
@@ -58,6 +59,4 @@ class NoteFinder < ApplicationService
 
     Result.ok notes.as_json(methods: methods)
   end
-  
-
 end

@@ -1,13 +1,14 @@
-require 'rails_helper'
+# frozen_string_literal: true
+
+require "rails_helper"
 
 RSpec.describe NoteCreator do
-
   fixtures(:users)
   let(:user) { users(:user1) }
 
-  it 'creates notes' do
+  it "creates notes" do
     data = {
-      content: 'Some irrelevant content',
+      content: "Some irrelevant content",
       ancestry: nil,
       position: 0,
       slug: nil,
@@ -20,9 +21,9 @@ RSpec.describe NoteCreator do
     expect(result.value).to be_a Note
   end
 
-  it 'returns error on invalid data' do
+  it "returns error on invalid data" do
     data = {
-      content: 'More irrelevant content',
+      content: "More irrelevant content",
       ancestry: nil,
       position: -8,
       slug: nil,
@@ -30,9 +31,8 @@ RSpec.describe NoteCreator do
     }
 
     result = NoteCreator.call data
-    
+
     expect(result.error?).to be true
     expect(result.errors).not_to be nil
   end
-
 end

@@ -31,9 +31,9 @@ RSpec.describe NotesController, type: :request do
 
   # TO-DO: We are testing here NoteFinder functionallity. We should simplify the tests
   context "#index" do
-    it "should find notes", focus:true do
+    it "should find notes" do
       call_params = {
-        "ids" => ["1", "2"], 
+        "ids" => ["1", "2"],
         "ancestry" => nil
       }
       returned_notes = [
@@ -50,12 +50,11 @@ RSpec.describe NotesController, type: :request do
       expect(notes).to eq([prep(note1.attributes), prep(note2.attributes)])
     end
 
-    it "should return a json error if there is an error", focus:true do
+    it "should return a json error if there is an error", focus: true do
       allow(NoteFinder).to receive(:call).and_return(Result.error "Something terrible happened")
       get "/v1/notes", params: { ids: [note1.id, note2.id], ancestry: nil }
       expect(response).to have_http_status(:bad_request)
     end
-
   end
 
   context "#show" do
@@ -97,7 +96,7 @@ RSpec.describe NotesController, type: :request do
   end
 
   context "#update" do
-    it "should update the content" do 
+    it "should update the content" do
       note1.update!(user_id: user.id)
       put "/v1/notes/#{note1.id}", params: { note: { content: "The sky is blue" } }
       expect(response.status).to eq 200

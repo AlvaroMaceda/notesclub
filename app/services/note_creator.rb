@@ -1,5 +1,6 @@
-class NoteCreator < ApplicationService
+# frozen_string_literal: true
 
+class NoteCreator < ApplicationService
   def initialize(data)
     @data = data
   end
