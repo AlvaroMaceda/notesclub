@@ -3,7 +3,7 @@ import { User } from './User'
 import { Note, Reference } from './notes/Note'
 import { fetchBackendUser, fetchBackendNotes } from './backendSync'
 import ReferenceRenderer from './notes/ReferenceRenderer'
-import { Link } from 'react-router-dom'
+import TodaysLink from './notes/TodaysLink'
 
 interface FeedProps {
   blogUsername: string
@@ -88,7 +88,7 @@ class Feed extends React.Component<FeedProps, FeedState> {
       <div className="topic-container container">
         {blogger && notes && currentUser &&
           <>
-            <Link to="/books/new" className="btn btn-primary" onClick={() => window.location.href="/books/new"}>Add book notes</Link>
+            <TodaysLink currentUser={currentUser} />
             <h1>Recent notes</h1>
             <ul>
               {notes.map((ref) => (
