@@ -39,3 +39,5 @@ config/database.yml.bak
 front/cypress/videos/
 
 /config/credentials/produciton.key
+
+latest.dump
