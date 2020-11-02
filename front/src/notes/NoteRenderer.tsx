@@ -272,6 +272,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
                   selectedNote: newSelected
                 })
               })
+            event.preventDefault()
           }
           break
         case "Escape":
@@ -370,8 +371,6 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
   fetchSuggestions = (token: string) => {
     const { currentUser, setAppState } = this.props
     token = token.replace(/^\[/, '')
-    console.log('token:')
-    console.log(token)
     if (currentUser) {
       return (
         fetchBackendNotes({ content_like: `%${encodeURIComponent(token)}%`, ancestry: null, user_ids: [currentUser.id] }, setAppState)
