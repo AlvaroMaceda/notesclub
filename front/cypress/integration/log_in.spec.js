@@ -34,7 +34,7 @@ describe('Sign up', () => {
     })
 
 
-    cy.location('pathname').should('eq', '/books/new')
+    cy.location('pathname').should('eq', '/')
     cy.get('nav').within(() => {
       cy.contains('Marie Curie')
       cy.contains('Logout')

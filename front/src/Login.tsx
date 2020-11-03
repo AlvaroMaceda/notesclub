@@ -51,7 +51,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     // axios.defaults.withCredentials = true
     axios.post(apiDomain() + "/v1/users/login", args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
       .then(_ => {
-        window.location.href = '/books/new'
+        window.location.href = '/'
       })
       .catch(error => {
         let msg = ""
@@ -93,8 +93,8 @@ class Login extends React.Component<LoginProps, LoginState> {
               </Form.Group>
 
               <Button onClick={this.submit}>Login</Button>
-              {" or join the "}
-              <Link to="/" onClick={() => window.location.href = `/`}>waiting list</Link>.
+              {" or "}
+              <Link to="/signup" onClick={() => window.location.href = `/signup`}>sign up</Link>.
             </Form>
           </div>
           <div className="col-lg-4"></div>
