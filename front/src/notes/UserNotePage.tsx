@@ -251,7 +251,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
               </p>
             </>
           }
-          {(!currentUser && (currentBlogger === null || currentNote === null)) &&
+          {(!currentUser && currentBlogUsername !== "notes" && (currentBlogger === null || currentNote === null)) &&
             <p>No notes on "{currentNoteKey}" yet.</p>
           }
           {currentBlogger && currentNote && children && descendants && ancestors &&
