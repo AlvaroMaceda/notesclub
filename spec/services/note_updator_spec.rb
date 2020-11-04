@@ -7,6 +7,13 @@ RSpec.describe NoteUpdator do
 
   let(:note) { notes(:note1) }
 
+  it "returns the updated note" do
+    result = NoteUpdator.call(note.id, data: { content: note.content + " additional content" })
+
+    expect(result.success?).to be true
+    expect(rm_timestamps(result.value)).to eq rm_timestamps(note.reload.as_json)
+  end
+
   it "should create new notes if they do not exist" do
     Note.create!(content: "This already exists", user_id: note.user_id)
 
@@ -17,7 +24,7 @@ RSpec.describe NoteUpdator do
 
     new_content = "[[#{new_note_1_content}]] and [[#{new_note_2_content}]] and [[This already exists]]"
 
-    expect { NoteUpdator.call(note, data: { content: new_content }) }.to change { Note.count }.by(2)
+    expect { NoteUpdator.call(note.id, data: { content: new_content }) }.to change { Note.count }.by(2)
     expect(note.reload.content).to eq(new_content)
 
     new_note_1 = Note.find_by(slug: new_note_1_slug)
@@ -38,8 +45,9 @@ RSpec.describe NoteUpdator do
   end
 
   it "returns an error when something fails" do
-    result = NoteUpdator.call(note, data: { content: nil })
+    result = NoteUpdator.call("BANANA", POTATO: "ONION")
     expect(result.error?).to be true
+    expect(result.errors).to match(/Couldn't find Note with 'id'/)
   end
 
   context "when update_notes_with_links=true" do
@@ -52,7 +60,7 @@ RSpec.describe NoteUpdator do
       note3 = Note.create!(content: "Favourite [[Books]]", user: user1)
       note4 = Note.create!(content: "Great [[Books]]", user: user2)
 
-      result = NoteUpdator.call(note1, update_notes_with_links: true, data: { content: "Books and articles" })
+      result = NoteUpdator.call(note1.id, update_notes_with_links: true, data: { content: "Books and articles" })
 
       expect(result.success?).to be true
       expect(note1.reload.content).to eq("Books and articles")

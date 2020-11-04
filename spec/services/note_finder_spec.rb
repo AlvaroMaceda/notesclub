@@ -2,21 +2,12 @@
 
 require "rails_helper"
 
-def rm_timestamps(obj)
-  obj = obj.except("created_at", "updated_at")
-  obj["descendants"] = obj["descendants"].map { |o| o.except("created_at", "updated_at") } if obj["descendants"]
-  obj["ancestors"] = obj["ancestors"].map { |o| o.except("created_at", "updated_at") } if obj["ancestors"]
-  obj["user"] = obj["user"].except("created_at", "updated_at") if obj["user"]
-  obj
-end
-
 def data(a)
   return rm_timestamps(a) unless a.kind_of?(Array)
   a.map do |t|
     rm_timestamps(t.as_json)
   end
 end
-
 
 RSpec.describe NoteFinder do
   fixtures(:users, :notes)

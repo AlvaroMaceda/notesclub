@@ -13,18 +13,6 @@ RSpec.describe NotesController, type: :request do
     log_in(user)
   end
 
-  def rm_timestamps!(obj)
-    obj.except!("created_at", "updated_at")
-    obj["descendants"].map { |o| o.except!("created_at", "updated_at") } if obj["descendants"]
-    obj["ancestors"].map { |o| o.except!("created_at", "updated_at") } if obj["ancestors"]
-    obj["user"].except!("created_at", "updated_at") if obj["user"]
-    obj
-  end
-
-  def rm_timestamps_from_array!(arr)
-    arr.map { |obj| rm_timestamps!(obj) }
-  end
-
   def prep(t)
     rm_timestamps!(t)&.sort_by { |k, v| k }
   end
@@ -128,6 +116,17 @@ RSpec.describe NotesController, type: :request do
       put "/v1/notes/#{note1.id}", params: { note: { content: "The sky is blue" } }
       expect(response.status).to eq 200
       expect(note1.reload.content).to eq("The sky is blue")
+    end
+
+    it "should return the updated note" do
+      note1.update!(user_id: user.id)
+      put "/v1/notes/#{note1.id}", params: { note: { content: "The sky is blue" } }
+
+      returned_note = rm_timestamps!(JSON.parse(response.body))
+      updated_note = rm_timestamps!(note1.reload.as_json)
+
+      expect(response.status).to eq 200
+      expect(returned_note).to eq(updated_note)
     end
 
     it "should return unauthorized if user_id doesn't match the auhtenticated user" do
