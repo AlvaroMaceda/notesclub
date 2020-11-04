@@ -6,7 +6,7 @@ import Logout from './Logout';
 import Header from './Header';
 import Footer from './Footer';
 import { Alert } from 'react-bootstrap';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom'
 import UserNotePage from './notes/UserNotePage'
 import UserPage from './UserPage'
 import BooksPage from './BooksPage'
@@ -87,6 +87,9 @@ class App extends React.Component<AppProps, AppState> {
           <Route path="/books/new" exact>
             {currentUser === null ? <Login setParentState={this.updateState} /> : <div className="container">Loading...</div>}
           </Route>
+        }
+        {currentUser === null &&
+          <Redirect path="/notes/:noteKey" exact to="/login" />
         }
         <Route path="/:blogUsername/:noteKey" exact render={({ match }) => <UserNotePage currentBlogUsername={match.params.blogUsername} currentNoteKey={match.params.noteKey} currentUser={currentUser} setAppState={this.updateState} />} />
         {currentUser &&
