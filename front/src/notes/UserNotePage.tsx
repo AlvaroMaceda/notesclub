@@ -25,7 +25,6 @@ interface UserNotePageState {
   descendants?: Note[]
   ancestors?: Note[]
   references?: Reference[]
-  unlinkedReferences?: Reference[]
 }
 
 class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState> {
@@ -124,7 +123,6 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
             refs = refs.sort((a, b) => a.user_id === currentUser.id ? -1 : 1)
           }
           this.setState({ references: refs })
-          this.setUnlinkedReferences()
         })
     }
   }
@@ -138,35 +136,6 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
       return (sameNote(refRoot, currentRoot))
     } else {
       return (false)
-    }
-  }
-
-  setUnlinkedReferences = () => {
-    const { currentNote, references } = this.state
-    const { currentUser, currentNoteKey } = this.props
-    if (currentUser !== undefined && references) {
-      const content_like = currentNote ? currentNote.content : currentNoteKey
-      const except_ids = (references.filter(ref => ref.id).map((ref) => ref.id as number))
-      fetchBackendNotes(
-        {
-          include_descendants: true,
-          include_ancestors: true,
-          include_user: true,
-          content_like: `${content_like}`,
-          except_ids: except_ids
-        },
-        this.props.setAppState)
-        .then(unlinkedReferences => {
-          let unlinkedRef = this.uniqueUnlinkedReferences(references, unlinkedReferences as Reference[])
-            .filter(r => !this.inCurrentNote(r))
-          if (currentNote) {
-            unlinkedRef = unlinkedRef.sort((a, b) => a.user_id === currentNote.user_id ? -1 : 1)
-          }
-          if (currentUser) {
-            unlinkedRef.sort((a, b) => a.user_id === currentUser.id ? -1 : 1)
-          }
-          this.setState({ unlinkedReferences: unlinkedRef })
-        })
     }
   }
 
@@ -205,19 +174,8 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
     return (root)
   }
 
-  uniqueUnlinkedReferences = (references: Reference[], unlinkedReferences: Reference[]): Reference[] => {
-    const referenceRoots = references ? this.getReferenceRoots(references) || [] : []
-    const referenceRootIds = referenceRoots.map(r => r?.id).filter(r => r)
-    return (
-      (unlinkedReferences || []).filter(r => {
-        const root_id = this.getReferenceRoot(r, r.ancestors).id
-        return (!referenceRootIds.includes(root_id))
-      })
-    )
-  }
-
   public render () {
-    const { currentBlogger, currentNote, selectedNote, descendants, ancestors, references, unlinkedReferences } = this.state
+    const { currentBlogger, currentNote, selectedNote, descendants, ancestors, references } = this.state
     const { currentUser, currentNoteKey, currentBlogUsername } = this.props
 
     if (currentUser && (currentBlogUsername === "notes" || currentBlogUsername === "user" || currentBlogUsername === "note")) {
@@ -230,7 +188,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
 
     const ancestor_count = ancestors ? ancestors.length : 0
     const isOwnBlog = currentUser && currentBlogger && currentUser.id === currentBlogger.id
-    const linkToOwnPage = !isOwnBlog && references && unlinkedReferences && currentUser && (currentNote === null || (currentNote && !references.find((t) => t.slug === currentNote.slug && t.user_id === currentUser.id) && !unlinkedReferences.find((t) => t.slug === currentNote.slug && t.user_id === currentUser.id)))
+    const linkToOwnPage = !isOwnBlog && references && currentUser && (currentNote === null || (currentNote && !references.find((t) => t.slug === currentNote.slug && t.user_id === currentUser.id)))
     const currentUsername = currentUser ? currentUser.username : ""
     const ownPagePath = currentNote ? `/${currentUsername}/${currentNote.slug}?content=${currentNote.content}` : `/${currentUsername}/${currentNoteKey}`
 
@@ -314,23 +272,6 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
                   References:
                     <ul>
                     {references.map((ref) => (
-                      <ReferenceRenderer
-                        key={ref.id}
-                        note={ref}
-                        selectedNote={selectedNote}
-                        setUserNotePageState={this.updateState}
-                        setAppState={this.props.setAppState}
-                        currentUser={currentUser}
-                        showUser={true} />
-                    ))}
-                  </ul>
-                </>
-              }
-              {unlinkedReferences && unlinkedReferences.length > 0 &&
-                <>
-                  Related:
-                    <ul>
-                    {unlinkedReferences.map((ref) => (
                       <ReferenceRenderer
                         key={ref.id}
                         note={ref}
