@@ -3,7 +3,7 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index, :create, :confirmation]
   before_action :authenticate_param_user!, only: :update
-  EXPOSED_ATTRIBUTES = %w(id name username created_at updated_at).freeze
+  EXPOSED_ATTRIBUTES = %w(id name username created_at updated_at avatar_url).freeze
 
   def index
     users = User.select(EXPOSED_ATTRIBUTES)
@@ -38,7 +38,8 @@ class UsersController < ApplicationController
       log_in_as(user)
       track_user
       track_action("Sign up", name: user.name, username: user.username)
-      render json: { user: user.slice(EXPOSED_ATTRIBUTES) }, status: :created
+      AvatarUpdater.new(user).update
+      render json: { user: user.reload.slice(EXPOSED_ATTRIBUTES) }, status: :created
     else
       Rails.logger.info "Errors: #{user.errors.inspect}"
       render json: { errors: user.errors }, status: :unprocessable_entity
