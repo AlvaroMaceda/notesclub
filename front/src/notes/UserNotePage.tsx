@@ -270,7 +270,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
               {references && references.length > 0 &&
                 <>
                   References:
-                    <ul>
+                  <div>
                     {references.map((ref) => (
                       <ReferenceRenderer
                         key={ref.id}
@@ -281,7 +281,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
                         currentUser={currentUser}
                         showUser={true} />
                     ))}
-                  </ul>
+                  </div>
                 </>
               }
             </>

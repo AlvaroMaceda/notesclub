@@ -4,6 +4,7 @@ import { Note, Reference, noteKey, sameNote } from './Note'
 import { User } from './../User'
 import { getChildren } from './ancestry'
 import NoteRenderer from './NoteRenderer'
+import '../Reference.scss'
 
 interface ReferenceRendererProps {
   note: Reference
@@ -30,38 +31,49 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
     const user_path = `/${user.username}`
     const path = `${user_path}/${note.slug}`
     const content = note.content.replace(/\[\[|\]\]/g, '')
+
     return (
       <>
-        <Link to={path} onClick={() => window.location.href = path}>{content}</Link>
         { showUser &&
           <>
-            {" by "}
-            <Link to={user_path} onClick={() => window.location.href = user_path}>{user.name || user.username}</Link>
+            <div className="avatar-div">
+              <img src={user.avatar_url} className="avatar-img" />
+            </div>
+            <div className="reference-username">
+              <Link to={user_path} onClick={() => window.location.href = user_path}>{user.name || user.username}</Link>
+              { " " }
+              <Link to={user_path} onClick={() => window.location.href = user_path}>@{user.username}</Link>
+            </div>
           </>
         }
+        <div className="reference-content">
+          <Link to={path} onClick={() => window.location.href = path}>{content}</Link>
+        </div>
       </>
     )
   }
 
   renderDescendants = (note: Reference, children: Note[]) => {
     return (
-      <ul>
-        {children.map((subNote) => (
-          <NoteRenderer
-            currentBlogger={note.user}
-            key={"sub" + noteKey(subNote)}
-            note={subNote}
-            descendants={note.descendants}
-            siblings={children}
-            currentNote={note}
-            renderSubnotes={true}
-            selectedNote={this.props.selectedNote}
-            setUserNotePageState={this.props.setUserNotePageState}
-            setAppState={this.props.setAppState}
-            currentUser={this.props.currentUser}
-            isReference={true} />
-        ))}
-      </ul>
+      <div className="reference-content">
+        <ul>
+          {children.map((subNote) => (
+            <NoteRenderer
+              currentBlogger={note.user}
+              key={"sub" + noteKey(subNote)}
+              note={subNote}
+              descendants={note.descendants}
+              siblings={children}
+              currentNote={note}
+              renderSubnotes={true}
+              selectedNote={this.props.selectedNote}
+              setUserNotePageState={this.props.setUserNotePageState}
+              setAppState={this.props.setAppState}
+              currentUser={this.props.currentUser}
+              isReference={true} />
+          ))}
+        </ul>
+      </div>
     )
   }
 
@@ -70,20 +82,22 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
     descendantsAndNote = descendantsAndNote.concat(note)
 
     return (
-      <ul>
-        <NoteRenderer
-          currentBlogger={note.user}
-          note={note}
-          descendants={descendantsAndNote}
-          siblings={[note]}
-          currentNote={parent}
-          renderSubnotes={true}
-          selectedNote={this.props.selectedNote}
-          setUserNotePageState={this.props.setUserNotePageState}
-          setAppState={this.props.setAppState}
-          currentUser={this.props.currentUser}
-          isReference={true} />
-      </ul>
+      <div className="reference-content">
+        <ul>
+          <NoteRenderer
+            currentBlogger={note.user}
+            note={note}
+            descendants={descendantsAndNote}
+            siblings={[note]}
+            currentNote={parent}
+            renderSubnotes={true}
+            selectedNote={this.props.selectedNote}
+            setUserNotePageState={this.props.setUserNotePageState}
+            setAppState={this.props.setAppState}
+            currentUser={this.props.currentUser}
+            isReference={true} />
+        </ul>
+      </div>
     )
   }
 
@@ -110,7 +124,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
     return (
       <>
         {second_line_count > 0 &&
-          <li key={`ref_${first_element.id}`}>
+          <div key={`ref_${first_element.id}`} className="reference">
             {this.renderElement(first_element, note.user, showUser)}
             <p>
               {second_line.map((ancestor, index) => {
@@ -123,22 +137,22 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
               })}
             </p>
             {this.renderParentWithDescendants(note, parent)}
-          </li>
+          </div>
         }
 
         {second_line_count === 0 && first_element.id === note.id &&
-          <li key={`ref_${first_element.id}`}>
+          <div key={`ref_${first_element.id}`} className="reference">
             {this.renderElement(first_element, note.user, showUser)}
 
             {this.renderDescendants(note, children)}
-          </li>
+          </div>
         }
 
         {second_line_count === 0 && !sameNote(first_element, note) &&
-          <li key={`ref_${first_element.id}`}>
+          <div key={`ref_${first_element.id}`} className="reference">
             {this.renderElement(first_element, note.user, true)}
             {this.renderParentWithDescendants(note, parent)}
-          </li>
+          </div>
         }
       </>
     )
