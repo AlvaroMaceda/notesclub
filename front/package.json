@@ -33,7 +33,7 @@
     "typescript": "~3.8"
   },
   "scripts": {
-    "start": "PORT=3001 bundle exec dotenv -f ../.env react-scripts start || react-scripts start",
+    "start": "PORT=3001 bundle exec dotenv -f ../.env react-scripts start || PORT=3001 react-scripts start",
     "build": "bundle exec dotenv -f ../.env react-scripts build  || react-scripts build",
     "test": "bundle exec dotenv -f ../.env react-scripts test  || react-scripts test",
     "eject": "react-scripts eject"
