@@ -40,8 +40,8 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
 
   loadMore = () => {
     const { notes, blogger } = this.state
-    const lastId = notes ? notes[notes.length - 1].id : undefined
-    if (blogger && notes && lastId && document.scrollingElement && window.innerHeight + document.documentElement.scrollTop + 5 >= document.scrollingElement.scrollHeight) {
+    const lastCreatedAt = notes ? notes[notes.length - 1].created_at : undefined
+    if (blogger && notes && lastCreatedAt && document.scrollingElement && window.innerHeight + document.documentElement.scrollTop + 5 >= document.scrollingElement.scrollHeight) {
       fetchBackendNotes({
         user_ids: [blogger.id],
         ancestry: null,
@@ -50,7 +50,7 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
         include_ancestors: true,
         include_user: true,
         limit: 5,
-        id_lte: lastId - 1
+        created_at_lt: lastCreatedAt
       }, this.props.setAppState)
         .then(newNotes => newNotes && this.setState({ notes: notes.concat(newNotes as Reference[]) }))
     }
