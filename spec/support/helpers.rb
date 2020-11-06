@@ -8,10 +8,12 @@ def rm_timestamps!(obj)
   obj
 end
 
+# TO-DO: refactor this
 def rm_timestamps(obj)
-  obj = obj.except("created_at", "updated_at")
+  obj = obj.except("created_at", "updated_at", :created_at, :updated_at)
   obj["descendants"] = obj["descendants"].map { |o| o.except("created_at", "updated_at") } if obj["descendants"]
-  obj["ancestors"] = obj["ancestors"].map { |o| o.except("created_at", "updated_at") } if obj["ancestors"]
+  obj["ancestors"] = obj["ancestors"].map { |o| o.except("created_at", "updated_at", :created_at, :updated_at) } if obj["ancestors"]
+  obj[:ancestors] = obj[:ancestors].map { |o| o.except("created_at", "updated_at", :created_at, :updated_at) } if obj[:ancestors]
   obj["user"] = obj["user"].except("created_at", "updated_at") if obj["user"]
   obj
 end

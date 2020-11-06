@@ -35,12 +35,8 @@ class NotesController < ApplicationController
     result = NoteCreator.call(args)
     if result.success?
       note = result.value
-      track_action("Create note", note_id: note.id)
-      methods = []
-      methods << :descendants if params[:include_descendants]
-      methods << :ancestors if params[:include_ancestors]
-      methods << :user if params[:include_user]
-      render json: note.to_json(methods: methods), status: :created
+      track_action("Create note", note_id: note[:id])
+      render json: note, status: :created
     else
       render json: result.errors, status: :bad_request
     end
