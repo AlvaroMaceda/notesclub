@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class NoteDeleter < ApplicationService
-  # TO-DO: receive a note id as parameter, not a Note
   def initialize(note_id)
     @note_id = note_id
   end
