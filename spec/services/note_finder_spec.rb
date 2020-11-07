@@ -46,7 +46,7 @@ RSpec.describe NoteFinder do
     it "should ONLY include exposed USER attributes" do
       result = NoteFinder.call(ids: note1.id, ancestry: nil, include_user: true)
 
-      expected_user_data = { "id" => note1.user.id, "name" => note1.user.name, "username" => note1.user.username }
+      expected_user_data = { "id" => note1.user.id, "name" => note1.user.name, "username" => note1.user.username, "avatar_url" => nil }
 
       expect(result.success?).to be true
       expect(result.value[0]["user"].except("created_at", "updated_at")).to eq expected_user_data
@@ -54,7 +54,7 @@ RSpec.describe NoteFinder do
     it "should work with a string value" do
       result = NoteFinder.call(ids: note1.id, ancestry: nil, include_user: "true")
 
-      expected_user_data = { "id" => note1.user.id, "name" => note1.user.name, "username" => note1.user.username }
+      expected_user_data = { "id" => note1.user.id, "name" => note1.user.name, "username" => note1.user.username, "avatar_url" => nil  }
 
       expect(result.success?).to be true
       expect(result.value[0]["user"].except("created_at", "updated_at")).to eq expected_user_data
