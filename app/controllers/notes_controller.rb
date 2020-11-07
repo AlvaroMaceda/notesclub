@@ -7,112 +7,58 @@ class NotesController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index, :count]
 
   def index
-    track_note if params["user_ids"] && params["user_ids"].is_a?(Array) && params["user_ids"].size == 1
-    notes = Note
-    notes = notes.where(id: params["ids"]) if params["ids"].present? && params["ids"].is_a?(Array)
-    notes = notes.where(user_id: params["user_ids"]) if params["user_ids"].present? && params["user_ids"].is_a?(Array)
-    notes = notes.where(ancestry: params["ancestry"]&.empty? ? nil : params["ancestry"]) if params.include?("ancestry")
-    notes = notes.where(slug: params["slug"]) if params["slug"]
-    notes = notes.where(content: params["content"]) if params["content"]
+    result = NoteFinder.call(params)
 
-    if params["content_like"]
-      notes = notes.where("lower(notes.content) like ?", params["content_like"].downcase)
-    end
-    if params["except_ids"].present?
-      notes = notes.where.not(id: params["except_ids"])
-    end
-    if params["id_lte"].present?
-      notes = notes.where("notes.id <= ?", params["id_lte"])
-    end
-    if params["id_gte"].present?
-      notes = notes.where("notes.id >= ?", params["id_gte"])
-    end
-    if params["created_at_lt"].present?
-      notes = notes.where("notes.created_at < ?", params["created_at_lt"])
-    end
-    if params["created_at_gt"].present?
-      notes = notes.where("notes.created_at > ?", params["created_at_gt"])
-    end
-    if params["except_slug"].present?
-      notes = notes.where.not(slug: params["except_slug"])
-    end
-    if params["skip_if_no_descendants"]
-      notes = notes.joins("inner join notes as t on t.ancestry = cast(notes.id as VARCHAR(255)) and t.position=1 and t.content != ''")
-    end
-    limit = params["limit"] ? [params["limit"].to_i, 100].min : 100
-    limit = 1 if params["slug"] || (params["ids"] && params["ids"].size == 1)
-    notes = notes.order(created_at: :desc).limit(limit)
-    methods = []
-    methods << :descendants if params[:include_descendants]
-    methods << :ancestors if params[:include_ancestors]
-    methods << :user if params[:include_user]
-    render json: notes.to_json(methods: methods), status: :ok
+    return render json: result.errors, status: :bad_request if result.error?
+    render json: result.value, status: :ok
   end
 
   def count
-    if params["url"].present?
-      url = params["url"].downcase
-      # We count all non-root notes (ancestry != nil):
-      count1 = Note.
-        where("lower(content) like ?", "%#{url}%").
-        where("ancestry is not null").limit(10).count
-      # We also count root notes with a first child where content is not empty:
-      count2 = Note.
-        joins("inner join notes as t on t.ancestry = cast(notes.id as VARCHAR(255)) and t.position=1 and t.content != ''").
-        where("notes.ancestry is null").
-        where("lower(notes.content) like ?", "%#{url}%").limit(10).count
-      count = [count1 + count2, 10].min
-    else
-      count = 0
-    end
-    render json: count, status: :ok
+    result = NoteCounter.call(params["url"])
+
+    render json: result.errors, status: :bad_request if result.error?
+    render json: result.value, status: :ok
   end
 
   def show
-    notes = Note
-    notes = notes.where(id: params[:id]) if params[:id]
-    notes = notes.where(slug: params[:slug].downcase) if params[:slug]
-    note = notes.first
+    params.permit("id", "slug", "include_descendants")
+    params[:ids] = params.delete :id
 
-    if params[:include_descendants]
-      render json: note.to_json(methods: :descendants)
-    else
-      render json: note
-    end
+    result = NoteFinder.call(params)
+
+    return render json: result.errors, status: :bad_request if result.error?
+    render json: result.value[0], status: :ok
   end
 
   def create
     args = params.require(:note).permit(:content, :ancestry, :position, :slug).merge(user_id: current_user.id)
-    note = Note.new(args)
-    if note.save
-      track_action("Create note", note_id: note.id)
-      methods = []
-      methods << :descendants if params[:include_descendants]
-      methods << :ancestors if params[:include_ancestors]
-      methods << :user if params[:include_user]
-      render json: note.to_json(methods: methods), status: :created
+    result = NoteCreator.call(args)
+    if result.success?
+      note = result.value
+      track_action("Create note", note_id: note[:id])
+      render json: note, status: :created
     else
-      render json: note.errors.full_messages, status: :bad_request
+      render json: result.errors, status: :bad_request
     end
   end
 
   def update
-    updator = NoteUpdator.new(@note, params[:update_notes_with_links])
-    if updator.update(params.require(:note).permit(:content, :ancestry, :position, :slug))
-      track_action("Update note", note_id: @note.id)
-      render json: @note, status: :ok
+    result = NoteUpdator.call(params[:id], update_notes_with_links: params[:update_notes_with_links], data: params.require(:note).permit(:content, :ancestry, :position, :slug))
+    if result.success?
+      track_action("Update note", note_id: params[:id])
+      render json: result.value, status: :ok
     else
-      render json: @note.errors.full_messages, status: :not_modified
+      render json: result.errors, status: :not_modified
     end
   end
 
   def destroy
-    destroyer = NoteDeleter.new(@note, include_descendants: true)
-    if destroyer.delete
+    result = NoteDeleter.call(params[:id])
+    if result.success?
       track_action("Delete note")
-      render json: @note, status: :ok
+      render json: result.value, status: :ok
     else
-      Rails.logger.error("Error deleting note #{@note.inspect} - params: #{params.inspect}")
+      Rails.logger.error("Error deleting note #{params[:id]} - params: #{params.inspect}")
       render json: { errors: "Couldn't delete note or descendants" }, status: :not_modified
     end
   end

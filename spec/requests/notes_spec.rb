@@ -13,64 +13,62 @@ RSpec.describe NotesController, type: :request do
     log_in(user)
   end
 
-  def rm_timestamps!(obj)
-    obj.except!("created_at", "updated_at")
-    obj["descendants"].map { |o| o.except!("created_at", "updated_at") } if obj["descendants"]
-    obj["ancestors"].map { |o| o.except!("created_at", "updated_at") } if obj["ancestors"]
-    obj["user"].except!("created_at", "updated_at") if obj["user"]
-    obj
-  end
-
-  def rm_timestamps_from_array!(arr)
-    arr.map { |obj| rm_timestamps!(obj) }
-  end
-
   def prep(t)
     rm_timestamps!(t)&.sort_by { |k, v| k }
   end
 
   context "#index" do
-    it "should find notes by ids" do
+    it "should find notes" do
+      call_params = {
+        "ids" => ["1", "2"],
+        "ancestry" => nil
+      }
+      returned_notes = [
+        note1.as_json,
+        note2.as_json
+      ]
+      expect(NoteFinder).to receive(:call).
+            with(controller_parameters(call_params)).
+            and_return(Result.ok returned_notes)
+
+      get "/v1/notes", params: call_params
+      expect(response).to have_http_status(:success)
+      notes = JSON.parse(response.body).sort_by { |t| t["id"] }.map { |t| prep(t) }
+      expect(notes).to eq([prep(note1.attributes), prep(note2.attributes)])
+    end
+
+    it "should return a json error if there is an error", focus: true do
+      allow(NoteFinder).to receive(:call).and_return(Result.error "Something terrible happened")
       get "/v1/notes", params: { ids: [note1.id, note2.id], ancestry: nil }
-      expect(response).to have_http_status(:success)
-      notes = JSON.parse(response.body).sort_by { |t| t["id"] }.map { |t| prep(t) }
-      expect(notes).to eq([prep(note1.attributes), prep(note2.attributes)])
-    end
-
-    it "should filter per user_ids and ancestry" do
-      get "/v1/notes", params: { user_ids: [user.id], ancestry: nil }
-      expect(response).to have_http_status(:success)
-      notes = JSON.parse(response.body).sort_by { |t| t["id"] }.map { |t| prep(t) }
-      expect(notes).to eq([
-        prep({ "ancestry" => nil, "content" => "Climate Change", "id" => 1, "position" => 1, "user_id" => 1, "slug" => "climate_change" }),
-        prep({ "ancestry" => nil, "content" => "2020-08-28",     "id" => 2, "position" => 2, "user_id" => 1, "slug" => "2020-08-28" })
-      ])
-      expect(response.status).to eq(200)
-    end
-
-    describe "when include_user is true" do
-      it "should ONLY include exposed USER attributes" do
-        get "/v1/notes", params: { ids: [note1.id], ancestry: nil, include_user: true }
-        expect(response).to have_http_status(:success)
-        note = JSON.parse(response.body)[0]
-        expect(note["user"].except("created_at", "updated_at")).to eq({ "id" => note1.user.id, "name" => note1.user.name, "username" => note1.user.username })
-      end
-    end
-
-    it "should search by like" do
-      note1.update!(content: "This is great: [[https://thisurl.com/whatever]]")
-      note2.update!(content: "[[https://thisurl.com/whatever]]")
-      get "/v1/notes", params: { content_like: "%[[https://thisurl.com/whatever]]%" }
-      expect(response).to have_http_status(:success)
-      notes = JSON.parse(response.body).sort_by { |t| t["id"] }.map { |t| prep(t) }
-      expect(notes).to eq([prep(note1.attributes), prep(note2.attributes)])
+      expect(response).to have_http_status(:bad_request)
     end
   end
 
   context "#show" do
-    it "should return descendants if flag is passed" do
-      Note.where.not(id: [2, 3, 4]).destroy_all
+    it "should return a note" do
+      call_params = {
+        "ids" => "2",
+        "include_descendants" => "true"
+      }
+      returned_note = [{
+        "id" => 2,
+        "content" => "2020-08-28",
+        "user_id" => 1,
+        "ancestry" => nil,
+        "slug" => "2020-08-28",
+        "position" => 1,
+        "descendants" => [
+          { "id" => 3, "position" => 1, "content" => "I started to read [[How to take smart notes]]", "user_id" => 1, "ancestry" => "2", "slug" => "jdjiwe23m" },
+          { "id" => 4, "position" => 1, "content" => "I #love it", "user_id" => 1, "ancestry" => "2/3", "slug" => "ds98wekjwe" }
+        ]
+      }]
+
+      expect(NoteFinder).to receive(:call).
+            with(controller_parameters(call_params)).
+            and_return(Result.ok returned_note)
+
       get "/v1/notes/#{note2.id}", params: { include_descendants: true }
+
       expect(response).to have_http_status(:success)
       note2 = JSON.parse(response.body)
       expect(rm_timestamps!(note2)).to eq({
@@ -86,6 +84,12 @@ RSpec.describe NotesController, type: :request do
         ]
       })
       expect(response.status).to eq(200)
+    end
+
+    it "should return a json error if there is an error", focus: true do
+      allow(NoteFinder).to receive(:call).and_return(Result.error "Something terrible happened")
+      get "/v1/notes/#{note2.id}", params: { include_descendants: true }
+      expect(response).to have_http_status(:bad_request)
     end
   end
 
@@ -113,6 +117,17 @@ RSpec.describe NotesController, type: :request do
       expect(note1.reload.content).to eq("The sky is blue")
     end
 
+    it "should return the updated note" do
+      note1.update!(user_id: user.id)
+      put "/v1/notes/#{note1.id}", params: { note: { content: "The sky is blue" } }
+
+      returned_note = rm_timestamps!(JSON.parse(response.body))
+      updated_note = rm_timestamps!(note1.reload.as_json)
+
+      expect(response.status).to eq 200
+      expect(returned_note).to eq(updated_note)
+    end
+
     it "should return unauthorized if user_id doesn't match the auhtenticated user" do
       expect(note5.user_id).not_to eq(user.id)
       put "/v1/notes/#{note5.id}", params: { note: { content: "The sky is blue" } }
@@ -123,8 +138,11 @@ RSpec.describe NotesController, type: :request do
 
   context "#destroy" do
     it "should delete a note" do
+      response_note = note1.as_json
+
       expect { delete "/v1/notes/#{note1.id}" }.to change { Note.count }.by(-1)
       expect(response.status).to eq 200
+      expect(JSON.parse(response.body)).to eq(response_note)
     end
 
     it "should return unauthorized if id doesn't match the auhtenticated user" do

@@ -12,9 +12,16 @@ RSpec.describe NoteDeleter do
     t3 = t1.children.create!(content: "bla", user: user1)
     t3.children.create!(content: "bla", user: user1)
 
-    destroyer = NoteDeleter.new(t1, include_descendants: true)
     result = nil
-    expect { result = destroyer.delete }.to change { Note.count }.by(-4)
-    expect(result).to eq(true)
+    expect { result = NoteDeleter.call(t1.id) }.to change { Note.count }.by(-4)
+    expect(result.success?).to be true
+  end
+
+  it "should return error when note does not exist" do
+    non_existent_note = 555
+    result = NoteDeleter.call(non_existent_note)
+
+    expect(result.error?).to be true
+    expect(result.errors).to match(/Couldn't find Note/)
   end
 end
