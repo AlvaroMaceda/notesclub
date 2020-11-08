@@ -2,10 +2,11 @@
 
 class NoteCreator < ApplicationService
   def initialize(params)
+    @include_descendants = params[:include_descendants]
     @include_ancestors = params[:include_ancestors]
     @include_user = params[:include_user]
 
-    @data = params.except(:include_ancestors, :include_user)
+    @data = params.except(:include_descendants, :include_ancestors, :include_user)
   end
 
   def call
@@ -13,6 +14,7 @@ class NoteCreator < ApplicationService
     return Result.error note.errors.full_messages unless note.save
 
     methods = []
+    methods << :descendants if @include_descendants
     methods << :ancestors if @include_ancestors
     methods << :user if @include_user
 

@@ -31,7 +31,7 @@ class NotesController < ApplicationController
   end
 
   def create
-    args = params.require(:note).permit(:content, :ancestry, :position, :slug).merge(user_id: current_user.id)
+    args = params.require(:note).permit(:content, :ancestry, :position, :slug).merge(user_id: current_user.id, include_descendants: params[:include_descendants], include_ancestors: params[:include_ancestors])
     result = NoteCreator.call(args)
     if result.success?
       note = result.value
