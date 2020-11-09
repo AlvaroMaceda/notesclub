@@ -51,7 +51,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
           {content.split("\n").map((c) => {
             return (
               <p className="reference-line">
-                <Link to={path} onClick={() => window.location.href = path}>{content}</Link>
+                <Link to={path} onClick={() => window.location.href = path}>{c}</Link>
               </p>
             )
           })}
