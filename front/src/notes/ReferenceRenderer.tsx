@@ -41,7 +41,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
               <img src={user.avatar_url} alt="avatar" className="avatar-img" />
             </div>
             <div className="reference-username">
-              <Link to={user_path} onClick={() => window.location.href = user_path}>{user.name || user.username}</Link>
+              <b><Link to={user_path} onClick={() => window.location.href = user_path}>{user.name || user.username}</Link></b>
               { " " }
               <Link to={user_path} onClick={() => window.location.href = user_path}>@{user.username}</Link>
             </div>
