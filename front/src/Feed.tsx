@@ -3,7 +3,6 @@ import { User } from './User'
 import { Note, Reference } from './notes/Note'
 import { fetchBackendUser, fetchBackendNotes } from './backendSync'
 import ReferenceRenderer from './notes/ReferenceRenderer'
-import Search from './Search'
 
 interface FeedProps {
   blogUsername: string
@@ -86,9 +85,6 @@ class Feed extends React.Component<FeedProps, FeedState> {
 
     return (
       <div className="container">
-        {currentUser &&
-          <Search currentUser={currentUser} />
-        }
         <div className="topic-container">
           {blogger && notes && currentUser &&
             <>

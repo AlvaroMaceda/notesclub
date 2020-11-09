@@ -123,40 +123,28 @@ class Search extends React.Component<SearchProps, SearchState> {
     const todayNoteContent = `${year}-${month}-${day}`
 
     return (
-      <>
-        <h2>Search or create a new note</h2>
-        <div className="small">Write the note title or paste the url of a book, podcast, etc. to write notes about it</div>
-        <div className="row">
-          <div className="col-md-6">
-            <Autosuggest
-              onSuggestionSelected={(_, { suggestion }) => {
-                goToNote(suggestion.user?.username, suggestion.slug, true)
-              }}
-              suggestions={suggestions}
-              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-              onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-              getSuggestionValue={this.getSuggestionValue}
-              renderSuggestion={renderSuggestion}
-              inputProps={{
-                placeholder: `e.g. ${todayNoteContent}`,
-                value: value,
-                className: 'form-control',
-                onChange: (_, { newValue, method }) => {
-                  this.setState({ value: newValue })
-                },
-                onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
-                  if(event.key!=="Enter") return
-                  goToNote(currentUser.username,value)
-                }
-              }}
-            />
-            <div className="search-button">
-              <Button onClick={() => goToNote(currentUser.username, value)}>Search / create</Button>
-            </div>
-          </div>
-          <div className="col-md-6"></div>
-        </div>
-      </>
+      <Autosuggest
+        onSuggestionSelected={(_, { suggestion }) => {
+          goToNote(suggestion.user?.username, suggestion.slug, true)
+        }}
+        suggestions={suggestions}
+        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+        getSuggestionValue={this.getSuggestionValue}
+        renderSuggestion={renderSuggestion}
+        inputProps={{
+          placeholder: 'Search',
+          value: value,
+          className: 'form-control',
+          onChange: (_, { newValue, method }) => {
+            this.setState({ value: newValue })
+          },
+          onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if(event.key!=="Enter") return
+            goToNote(currentUser.username,value)
+          }
+        }}
+      />
     )
   }
 
