@@ -89,12 +89,14 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
   }
 
   setNoteAndCreateDescendantIfNone = (noteAndFamily: NoteWithFamily, isOwnBlog: boolean) => {
+    const { currentBlogUsername, currentNoteKey } = this.props
     this.setState({ currentNote: noteAndFamily, descendants: noteAndFamily.descendants, ancestors: noteAndFamily.ancestors })
     let descendants = noteAndFamily.descendants
     if (isOwnBlog && descendants) {
       const params = queryString.parse(this.props.location.search)
       if (params["add"]) {
         const newSubNoteContent = String(params["add"])
+        this.props.history.push(`/${currentBlogUsername}/${currentNoteKey}`)
         if (descendants.length > 0) {
           const lastDescendant = descendants[descendants.length - 1]
           if (lastDescendant.content === "" && getChildren(lastDescendant, descendants).length === 0) {
