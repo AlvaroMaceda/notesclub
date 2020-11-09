@@ -119,8 +119,13 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
       second_line = []
     }
     const second_line_count = second_line.length
-    const children = getChildren(note as Note, note.descendants)
-
+    let children = getChildren(note as Note, note.descendants)
+    if (children && children.length > 0) {
+      const lastChild = children[children.length - 1]
+      if (lastChild && lastChild.content === "") {
+        children.pop()
+      }
+    }
     return (
       <>
         {second_line_count > 0 &&

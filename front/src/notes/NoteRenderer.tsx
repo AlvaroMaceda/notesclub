@@ -1,14 +1,15 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { Note, noteKey, newNoteWithDescendants, sameNote, noteOrAncestorBelow, noteAbove, lastDescendantOrSelf } from './Note'
-import { createBackendNote, updateBackendNote, deleteBackendNote, fetchBackendNotes } from './../backendSync'
+import { createBackendNote, updateBackendNote, deleteBackendNote } from './../backendSync'
 import { getChildren, areSibling, getParent } from './ancestry'
 import { parameterize } from './../utils/parameterize'
 import { User } from './../User'
 import StringWithHtmlLinks from './StringWithHtmlLinks'
 import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
 import { Item } from './Item'
-import './../NoteRenderer.scss';
+import './../NoteRenderer.scss'
+import { fetchSuggestions } from './autocompleteUtils'
 
 interface NoteRendererProps {
   selectedNote: Note | null
@@ -368,24 +369,9 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     }
   }
 
-  fetchSuggestions = (token: string) => {
-    const { currentUser, setAppState } = this.props
-    token = token.replace(/^\[/, '')
-    if (currentUser) {
-      return (
-        fetchBackendNotes({ content_like: `%${encodeURIComponent(token)}%`, ancestry: null, user_ids: [currentUser.id] }, setAppState)
-          .then(notes => notes.map((note) => {
-            return (
-              { username: currentUser.username, content: note.content }
-            )
-          }))
-      )
-    } else {
-      return []
-    }
-  }
-
   renderSelectedNote = (note: Note) => {
+    const { currentUser, setAppState } = this.props
+
     return (
       <ReactTextareaAutocomplete
         ref={(textAreaRef) => { this.textAreaRef = textAreaRef; }}
@@ -399,13 +385,13 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
         itemClassName="editNoteItem"
         trigger={{
           "[[": {
-            dataProvider: token => this.fetchSuggestions(token),
+            dataProvider: token => fetchSuggestions(token, currentUser, setAppState),
             allowWhitespace: true,
             component: Item,
             output: (item, trigger) => `[[${item.content}]]`
           },
           "#": {
-            dataProvider: token => this.fetchSuggestions(token),
+            dataProvider: token => fetchSuggestions(token, currentUser, setAppState),
             component: Item,
             allowWhitespace: true,
             output: (item, trigger) => item.content.match(/\s/) ? `#[[${item.content}]]` : `#${item.content}`

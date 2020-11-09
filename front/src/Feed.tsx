@@ -3,6 +3,7 @@ import { User } from './User'
 import { Note, Reference } from './notes/Note'
 import { fetchBackendUser, fetchBackendNotes } from './backendSync'
 import ReferenceRenderer from './notes/ReferenceRenderer'
+import NoteCreator from './notes/NoteCreator'
 
 interface FeedProps {
   blogUsername: string
@@ -43,7 +44,6 @@ class Feed extends React.Component<FeedProps, FeedState> {
     if (notes && lastCreatedAt && document.scrollingElement && window.innerHeight + document.documentElement.scrollTop + 5 >= document.scrollingElement.scrollHeight) {
       fetchBackendNotes({
         ancestry: null,
-        skip_if_no_descendants: true,
         include_descendants: true,
         include_ancestors: true,
         include_user: true,
@@ -63,7 +63,6 @@ class Feed extends React.Component<FeedProps, FeedState> {
         if (blogger) {
           fetchBackendNotes({
             ancestry: null,
-            skip_if_no_descendants: true,
             include_descendants: true,
             include_ancestors: true,
             include_user: true,
@@ -81,10 +80,16 @@ class Feed extends React.Component<FeedProps, FeedState> {
 
   public render () {
     const { blogger, notes, selectedNote } = this.state
-    const { currentUser } = this.props
+    const { currentUser, setAppState } = this.props
 
     return (
       <div className="container">
+        { currentUser &&
+          <NoteCreator
+            currentUser={currentUser}
+            setAppState={setAppState}
+          />
+        }
         <div className="topic-container">
           {blogger && notes && currentUser &&
             <>
