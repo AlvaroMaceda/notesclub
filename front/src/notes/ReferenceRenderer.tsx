@@ -31,7 +31,6 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
     const user_path = `/${user.username}`
     const path = `${user_path}/${note.slug}`
     const content = note.content.replace(/\[\[|\]\]/g, '')
-    console.log(content)
 
     return (
       <>
@@ -48,9 +47,9 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
           </>
         }
         <div className="reference-content">
-          {content.split("\n").map((c) => {
+          {content.split("\n").map((c, index) => {
             return (
-              <p className="reference-line">
+              <p className="reference-line" key={index}>
                 <Link to={path} onClick={() => window.location.href = path}>{c}</Link>
               </p>
             )

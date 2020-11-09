@@ -6,6 +6,7 @@ import { fetchSuggestions } from './autocompleteUtils'
 import './../NoteCreator.scss'
 import { Button } from 'react-bootstrap'
 import { parameterize } from './../utils/parameterize'
+import { todaysSlug } from './../utils/todaysSlug'
 
 interface NoteCreatorProps {
   currentUser: User
@@ -75,7 +76,7 @@ class NoteCreator extends React.Component<NoteCreatorProps, NoteCreatorState> {
             }}
           />
         </div>
-        <Button onClick={() => window.location.href = `/${currentUser.username}/${newSlug}?content=${encodeURIComponent(content)}`}>Send</Button>
+        <Button onClick={() => window.location.href = `/${currentUser.username}/${todaysSlug()}?add=${encodeURIComponent(content)}`}>Send</Button>
         <span className="note-creator-tip">Use [[ or # to link to other notes, books, etc.</span>
       </div>
     )

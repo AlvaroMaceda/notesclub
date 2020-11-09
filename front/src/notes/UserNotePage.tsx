@@ -90,11 +90,26 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
 
   setNoteAndCreateDescendantIfNone = (noteAndFamily: NoteWithFamily, isOwnBlog: boolean) => {
     this.setState({ currentNote: noteAndFamily, descendants: noteAndFamily.descendants, ancestors: noteAndFamily.ancestors })
-    if (noteAndFamily.descendants) {
-      if (isOwnBlog && noteAndFamily.descendants.length === 1) {
-        this.setState({ selectedNote: noteAndFamily.descendants[0] })
-      } else if (isOwnBlog && noteAndFamily.descendants.length === 0) {
-        this.createDescendantAsThereAreNone()
+    let descendants = noteAndFamily.descendants
+    if (isOwnBlog && descendants) {
+      const params = queryString.parse(this.props.location.search)
+      if (params["add"]) {
+        const newSubNoteContent = String(params["add"])
+        if (descendants.length > 0) {
+          const lastDescendant = descendants[descendants.length - 1]
+          if (lastDescendant.content === "" && getChildren(lastDescendant, descendants).length === 0) {
+            descendants[descendants.length - 1].content = newSubNoteContent
+            this.setState({ selectedNote: lastDescendant, descendants: descendants })
+          } else {
+            this.createDescendant(newSubNoteContent)
+          }
+        } else {
+          this.createDescendant(newSubNoteContent)
+        }
+      } else if (isOwnBlog && descendants.length === 1) {
+        this.setState({ selectedNote: descendants[0] })
+      } else if (isOwnBlog && descendants.length === 0) {
+        this.createDescendant()
       }
     }
     this.setReferences()
@@ -144,23 +159,29 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
     this.setState(newState)
   }
 
-  createDescendantAsThereAreNone = (): void => {
+  createDescendant = (content?: string): void => {
     const { currentNote } = this.state
+    let { descendants } = this.state
     const { currentUser } = this.props
 
-    if (currentUser && currentNote) {
+    if (currentUser && currentNote && descendants) {
       const newNonSavedNote = newNoteWithDescendants({
-        position: 1,
+        position: descendants.length + 1,
         user_id: currentUser.id,
+        content: content || "",
         ancestry: currentNote.ancestry ? `${currentNote.ancestry}/${currentNote.id}` : String(currentNote.id)
       })
-      const descendants: Note[] = [newNonSavedNote]
+      descendants.push(newNonSavedNote)
+      this.setState({ descendants: descendants })
       createBackendNote({ note: newNonSavedNote, setAppState: this.props.setAppState })
         .then(noteWithId => {
-          this.setState({
-            descendants: descendants.map((d) => d.tmp_key === noteWithId.tmp_key ? noteWithId : d),
-            selectedNote: noteWithId
-          })
+          const { descendants } = this.state
+          if (descendants) {
+            this.setState({
+              descendants: descendants.map((d) => d.tmp_key === noteWithId.tmp_key ? noteWithId : d),
+              selectedNote: noteWithId
+            })
+          }
         })
     }
   }
