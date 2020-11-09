@@ -94,18 +94,16 @@ class Feed extends React.Component<FeedProps, FeedState> {
           {blogger && notes && currentUser &&
             <>
               <h1>Recent notes</h1>
-              <ul>
-                {notes.map((ref) => (
-                  <ReferenceRenderer
-                    key={ref.id}
-                    note={ref}
-                    selectedNote={selectedNote}
-                    setUserNotePageState={this.updateState}
-                    setAppState={this.props.setAppState}
-                    currentUser={currentUser}
-                    showUser={true} />
-                ))}
-              </ul>
+              {notes.map((ref) => (
+                <ReferenceRenderer
+                  key={ref.id}
+                  note={ref}
+                  selectedNote={selectedNote}
+                  setUserNotePageState={this.updateState}
+                  setAppState={this.props.setAppState}
+                  currentUser={currentUser}
+                  showUser={true} />
+              ))}
             </>
           }
           { (!blogger || !notes) &&
