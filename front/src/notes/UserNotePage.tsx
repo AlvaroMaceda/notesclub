@@ -257,16 +257,15 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
               }
               <h1>
                 <a href={`/${currentBlogger.username}`}>{currentBlogger.name}</a>
-                {" · "}
-                <CurrentNoteContentRenderer
-                  descendants={descendants}
-                  references={references}
-                  currentNote={currentNote}
-                  selectedNote={selectedNote}
-                  setUserNotePageState={this.updateState}
-                  setAppState={this.props.setAppState}
-                  currentUser={currentUser} />
               </h1>
+              <CurrentNoteContentRenderer
+                descendants={descendants}
+                references={references}
+                currentNote={currentNote}
+                selectedNote={selectedNote}
+                setUserNotePageState={this.updateState}
+                setAppState={this.props.setAppState}
+                currentUser={currentUser} />
 
               <ul>
                 {children.map((subNote) => (

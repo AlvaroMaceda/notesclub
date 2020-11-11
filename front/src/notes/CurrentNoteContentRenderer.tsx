@@ -121,13 +121,13 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
     const editCurrentNote = isOwnBlog && currentNoteSelected
 
     return (
-      <>
+      <div className="root-note">
         {!editCurrentNote &&
           <span onClick={() => this.selectCurrentNote()}>
             {isLink ?
               <StringWithHtmlLinks element={currentNote.content}/>
             :
-              currentNote.content
+              currentNote.content || <span className="grey">Untitled</span>
             }
             {!selectedNote && currentUser && currentNote.user_id === currentUser.id &&
               <Link to='#' onClick={this.confirmDelete} className="delete-button">
@@ -141,10 +141,11 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
           <Form.Group>
             <Form.Control
               type="text"
-              value={currentNote.content}
+              value={currentNote.content || "Untitled"}
               name="current_note"
               onKeyDown={this.onKeyDown}
               onChange={this.handleChange as any}
+              autoFocus
             />
           </Form.Group>
         }
@@ -164,7 +165,7 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
             </Button>
           </Modal.Footer>
         </Modal>
-      </>
+      </div>
     )
   }
 }
