@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { Note, noteKey, newNoteWithDescendants, sameNote, noteOrAncestorBelow, noteAbove, lastDescendantOrSelf } from './Note'
+import { Note, Reference, noteKey, newNoteWithDescendants, sameNote, noteOrAncestorBelow, noteAbove, lastDescendantOrSelf } from './Note'
 import { createBackendNote, updateBackendNote, deleteBackendNote } from './../backendSync'
-import { getChildren, areSibling, getParent } from './ancestry'
+import { getChildren, areSibling, getParent, getRoot } from './ancestry'
 import { parameterize } from './../utils/parameterize'
 import { User } from './../User'
 import StringWithHtmlLinks from './StringWithHtmlLinks'
@@ -14,6 +14,7 @@ import { fetchSuggestions } from './autocompleteUtils'
 interface NoteRendererProps {
   selectedNote: Note | null
   note: Note
+  rootNote?: Reference
   descendants: Note[]
   siblings: Note[]
   currentNote: Note
@@ -467,6 +468,19 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     }
   }
 
+  clickOnNote = (event: React.MouseEvent<HTMLElement>, note: Note, isSelected: boolean | null) => {
+    const { isReference, currentBlogger, rootNote } = this.props
+
+    if (!isSelected) {
+      if (isReference) {
+        const slug = rootNote?.slug || note.slug
+        window.location.href = `/${currentBlogger.username}/${slug}`
+      } else {
+        this.selectNote(note, event)
+      }
+    }
+  }
+
   public render () {
     const { show_list, selectedNote, note, renderSubnotes, descendants, currentBlogger, currentUser, currentNote } = this.props
     const isSelected = selectedNote && (selectedNote.id === note.id && selectedNote.tmp_key === note.tmp_key)
@@ -475,13 +489,13 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     return (
       <>
         {show_list &&
-          <li key={noteKey(note)} onClick={(event) => !isSelected && this.selectNote(note, event)}>
+          <li key={noteKey(note)} onClick={(event) => this.clickOnNote(event, note, isSelected)}>
             {isSelected && this.renderSelectedNote(note)}
             {!isSelected && this.renderUnselectedNote(note)}
           </li>
         }
         {!show_list &&
-          <div key={noteKey(note)} onClick={(event) => !isSelected && this.selectNote(note, event)}>
+          <div key={noteKey(note)} onClick={(event) => this.clickOnNote(event, note, isSelected)}>
             {isSelected && this.renderSelectedNote(note)}
             {!isSelected && this.renderUnselectedNote(note)}
           </div>
@@ -495,6 +509,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
                   currentUser={currentUser}
                   key={"sub" + noteKey(subNote)}
                   note={subNote}
+                  rootNote={this.props.rootNote}
                   descendants={descendants}
                   siblings={children}
                   currentNote={currentNote}

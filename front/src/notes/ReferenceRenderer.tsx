@@ -8,6 +8,7 @@ import '../Reference.scss'
 
 interface ReferenceRendererProps {
   note: Reference
+  rootNote?: Reference
   selectedNote: Note | null
   setUserNotePageState: Function
   setAppState: Function
@@ -71,6 +72,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
                 currentBlogger={note.user}
                 key={"sub" + noteKey(subNote)}
                 note={subNote}
+                rootNote={this.props.rootNote}
                 descendants={note.descendants}
                 siblings={children}
                 currentNote={note}
@@ -92,6 +94,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
                 currentBlogger={note.user}
                 key={"sub" + noteKey(subNote)}
                 note={subNote}
+                rootNote={this.props.rootNote}
                 descendants={note.descendants}
                 siblings={children}
                 currentNote={note}
@@ -119,6 +122,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
           <NoteRenderer
             currentBlogger={note.user}
             note={note}
+            rootNote={this.props.rootNote}
             descendants={descendantsAndNote}
             siblings={[note]}
             currentNote={parent}
@@ -135,6 +139,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
             <NoteRenderer
               currentBlogger={note.user}
               note={note}
+              rootNote={this.props.rootNote}
               descendants={descendantsAndNote}
               siblings={[note]}
               currentNote={parent}

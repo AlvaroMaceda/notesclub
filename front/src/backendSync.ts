@@ -51,11 +51,11 @@ interface fetchBackendNotesInterface {
   limit?: number
 }
 
-export const fetchBackendNotes = async (params: fetchBackendNotesInterface, setAppState: Function): Promise<NoteWithFamily[]> => {
+export const fetchBackendNotes = async (params: fetchBackendNotesInterface, setAppState?: Function): Promise<NoteWithFamily[]> => {
   if (params.ancestry === null) { params.ancestry = "" } // Axios skips null and undefined parameters
   const response = await axios.get(apiDomain() + '/v1/notes', { params: params, headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
     .then(res => Promise.resolve(res.data))
-    .catch(_ => syncError(setAppState))
+    .catch(_ => setAppState ? syncError(setAppState) : null)
   return (response)
 }
 
