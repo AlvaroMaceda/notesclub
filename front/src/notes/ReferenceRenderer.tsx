@@ -64,7 +64,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
 
   renderDescendants = (note: Reference, children: Note[], show_list: boolean = false) => {
     return (
-      <div className={(note.content === null || note.content === "") ? "reference-username" : "reference-content"}>
+      <div className={(note.content === null || note.content === "") ? "second-reference-content" : "reference-content"}>
         {!show_list &&
           <>
             {children.map((subNote) => (
