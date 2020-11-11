@@ -45,6 +45,7 @@ class Feed extends React.Component<FeedProps, FeedState> {
       fetchBackendNotes({
         ancestry: null,
         include_descendants: true,
+        include_ancestors: true,
         include_user: true,
         limit: 5,
         created_at_lt: lastCreatedAt

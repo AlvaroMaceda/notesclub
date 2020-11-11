@@ -28,7 +28,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
     }
   }
 
-  renderElement = (note: Note | Reference, user: User, showUser: boolean) => {
+  renderElement = (note: Note | Reference, user: User, showUser: boolean, klass?: string) => {
     const user_path = `/${user.username}`
     const path = `${user_path}/${note.slug}`
     const content = note.content.replace(/\[\[|\]\]/g, '')
@@ -48,15 +48,15 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
           </>
         }
         {note.content !== null && content !== "" &&
-          <div className="reference-content">
+          <span className={klass ? klass : ""}>
             {content.split("\n").map((c, index) => {
               return (
-                <p className="reference-line" key={index}>
+                <span className="reference-line" key={index}>
                   <Link to={path} onClick={() => window.location.href = path}>{c}</Link>
-                </p>
+                </span>
               )
             })}
-          </div>
+          </span>
         }
       </>
     )
@@ -64,7 +64,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
 
   renderDescendants = (note: Reference, children: Note[], show_list: boolean = false) => {
     return (
-      <div className="reference-content">
+      <div className={(note.content === null || note.content === "") ? "reference-username" : "reference-content"}>
         {!show_list &&
           <>
             {children.map((subNote) => (
@@ -117,7 +117,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
     descendantsAndNote = descendantsAndNote.concat(note)
 
     return (
-      <div className="reference-content">
+      <div className={(note.content === null || note.content === "") ? "first-reference-content" : "reference-content"}>
         {!show_list &&
           <NoteRenderer
             currentBlogger={note.user}
@@ -191,12 +191,12 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
       <>
         {second_line_count > 0 &&
           <div key={`ref_${first_element.id}`} className="reference">
-            {this.renderElement(first_element, note.user, showUser)}
-            <p>
+            {this.renderElement(first_element, note.user, showUser, "first-reference-content")}
+            <p className="second-line-p">
               {second_line.map((ancestor, index) => {
                 return (
                   <span key={ancestor.id}>
-                    {this.renderElement(ancestor, note.user, false)}
+                    {this.renderElement(ancestor, note.user, false, index === 0 ? "second-reference-content" : "")}
                     {index < second_line_count - 1 ? ' > ' : ''}
                   </span>
                 )
@@ -208,7 +208,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
 
         {second_line_count === 0 && first_element.id === note.id &&
           <div key={`ref_${first_element.id}`} className="reference">
-            {this.renderElement(first_element, note.user, showUser)}
+            {this.renderElement(first_element, note.user, showUser, "first-reference-content")}
 
             {this.renderDescendants(note, children)}
           </div>
@@ -216,7 +216,7 @@ class ReferenceRenderer extends React.Component<ReferenceRendererProps, Referenc
 
         {second_line_count === 0 && !sameNote(first_element, note) &&
           <div key={`ref_${first_element.id}`} className="reference">
-            {this.renderElement(first_element, note.user, true)}
+            {this.renderElement(first_element, note.user, true, "first-reference-content")}
             {this.renderParentWithDescendants(note, parent)}
           </div>
         }
