@@ -23,6 +23,7 @@ interface NoteRendererProps {
   currentBlogger: User
   currentUser?: User | null
   isReference: boolean
+  show_list?: boolean
 }
 
 const auto_grow = (element: HTMLElement) => {
@@ -467,17 +468,25 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
   }
 
   public render () {
-    const { selectedNote, note, renderSubnotes, descendants, currentBlogger, currentUser, currentNote } = this.props
+    const { show_list, selectedNote, note, renderSubnotes, descendants, currentBlogger, currentUser, currentNote } = this.props
     const isSelected = selectedNote && (selectedNote.id === note.id && selectedNote.tmp_key === note.tmp_key)
     const children = getChildren(note, descendants)
 
     return (
       <>
-        <li key={noteKey(note)} onClick={(event) => !isSelected && this.selectNote(note, event)}>
-          {isSelected && this.renderSelectedNote(note)}
-          {!isSelected && this.renderUnselectedNote(note)}
-        </li>
-        {renderSubnotes && children &&
+        {show_list &&
+          <li key={noteKey(note)} onClick={(event) => !isSelected && this.selectNote(note, event)}>
+            {isSelected && this.renderSelectedNote(note)}
+            {!isSelected && this.renderUnselectedNote(note)}
+          </li>
+        }
+        {!show_list &&
+          <div key={noteKey(note)} onClick={(event) => !isSelected && this.selectNote(note, event)}>
+            {isSelected && this.renderSelectedNote(note)}
+            {!isSelected && this.renderUnselectedNote(note)}
+          </div>
+        }
+        {renderSubnotes && children && children.length > 0 &&
           <li className="hide-bullet">
             <ul>
               {children.map((subNote) => (
@@ -493,7 +502,8 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
                   selectedNote={selectedNote}
                   setUserNotePageState={this.props.setUserNotePageState}
                   setAppState={this.props.setAppState}
-                  isReference={this.props.isReference} />
+                  isReference={this.props.isReference}
+                  show_list={true} />
               ))}
             </ul>
           </li>

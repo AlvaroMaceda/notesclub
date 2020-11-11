@@ -5,8 +5,9 @@ import { User } from './../User'
 import { fetchSuggestions } from './autocompleteUtils'
 import './../NoteCreator.scss'
 import { Button } from 'react-bootstrap'
-import { parameterize } from './../utils/parameterize'
 import { todaysSlug } from './../utils/todaysSlug'
+import { newNote } from './Note'
+import { createBackendNote } from './../backendSync'
 
 interface NoteCreatorProps {
   currentUser: User
@@ -40,10 +41,26 @@ class NoteCreator extends React.Component<NoteCreatorProps, NoteCreatorState> {
     this.setState({ content: target.value })
   }
 
+  createNote = () => {
+    const { currentUser, setAppState } = this.props
+    const { content } = this.state
+
+    const note = newNote({
+      user_id: currentUser.id,
+      ancestry: null,
+      position: -1, // We'll replace this with null before sending it to the backend so it adds it to the end
+      content: ""
+    })
+    const args = { note: note, setAppState: setAppState }
+    createBackendNote(args)
+      .then(note => {
+        window.location.href = `/${currentUser.username}/${note.slug}?add=${encodeURIComponent(content)}`
+      })
+    }
+
   public render () {
     const { content } = this.state
     const { currentUser, setAppState } = this.props
-    const newSlug = parameterize(content)
 
     return (
       <div className="create-note">
@@ -59,7 +76,7 @@ class NoteCreator extends React.Component<NoteCreatorProps, NoteCreatorState> {
             loadingComponent={() => <span>Loading</span>}
             dropdownClassName="editNoteDropDown"
             itemClassName="editNoteItem"
-            placeholder="What to remember?"
+            placeholder="What do you want to remember?"
             trigger={{
               "[[": {
                 dataProvider: token => fetchSuggestions(token, currentUser, setAppState),
@@ -76,7 +93,7 @@ class NoteCreator extends React.Component<NoteCreatorProps, NoteCreatorState> {
             }}
           />
         </div>
-        <Button onClick={() => window.location.href = `/${currentUser.username}/${todaysSlug()}?add=${encodeURIComponent(content)}`}>Send</Button>
+        <Button onClick={this.createNote}>Send</Button>
         <span className="note-creator-tip">Use [[ or # to link to other notes, books, etc.</span>
       </div>
     )

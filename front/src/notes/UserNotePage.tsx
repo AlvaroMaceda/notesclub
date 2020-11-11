@@ -248,7 +248,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
                           onClick={(event) => {
                             window.location.href = path
                           }}
-                        >{ancestor.content}</Link>
+                        >{ancestor.content || "Untitled"}</Link>
                         {(index < ancestor_count - 1) && " > "}
                       </span>
                     )
