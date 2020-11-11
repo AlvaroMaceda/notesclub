@@ -76,7 +76,7 @@ class NoteCreator extends React.Component<NoteCreatorProps, NoteCreatorState> {
             loadingComponent={() => <span>Loading</span>}
             dropdownClassName="editNoteDropDown"
             itemClassName="editNoteItem"
-            placeholder="What do you want to remember?"
+            placeholder="What would you like to remember?"
             trigger={{
               "[[": {
                 dataProvider: token => fetchSuggestions(token, currentUser, setAppState),
@@ -94,7 +94,7 @@ class NoteCreator extends React.Component<NoteCreatorProps, NoteCreatorState> {
           />
         </div>
         <Button onClick={this.createNote}>Send</Button>
-        <span className="note-creator-tip">Use [[ or # to link to other notes, books, etc.</span>
+        <span className="note-creator-tip">Use [[ or # to link to other notes, tags, books, podcasts, etc.</span>
       </div>
     )
   }
