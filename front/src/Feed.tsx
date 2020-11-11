@@ -46,6 +46,7 @@ class Feed extends React.Component<FeedProps, FeedState> {
         ancestry: null,
         include_descendants: true,
         include_ancestors: true,
+        skip_if_no_descendants: true,
         include_user: true,
         limit: 5,
         created_at_lt: lastCreatedAt
@@ -65,6 +66,7 @@ class Feed extends React.Component<FeedProps, FeedState> {
             ancestry: null,
             include_descendants: true,
             include_ancestors: true,
+            skip_if_no_descendants: true,
             include_user: true,
             limit: 20
           }, this.props.setAppState)
