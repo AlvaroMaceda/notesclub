@@ -3,7 +3,6 @@ import axios from 'axios'
 import { User } from './User'
 import { apiDomain } from './appConfig'
 import { Note, NoteWithFamily } from './notes/Note'
-// import { sleep } from './utils/sleep'
 
 export const fetchBackendUsers = async (ids: number[]) : Promise<User[]> => {
   const response = await axios.get(apiDomain() + '/v1/users', { params: { ids: ids }, headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
@@ -60,21 +59,13 @@ export const fetchBackendNotes = async (params: fetchBackendNotesInterface, setA
   return (response)
 }
 
-// export const fetchBackendReferences = async (params: fetchBackendNotesInterface, setAppState: Function): Promise<Reference[]> => {
-//   params = { ...params, ...{ include_user: true, include_descendants: true, include_ancestors: true } }
-//   if (params.ancestry === null) { params.ancestry = "" } // Axios skips null and undefined parameters
-//   const response = await axios.get(apiDomain() + '/v1/notes', { params: params, headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
-//     .then(res => { return (res.data) })
-//     .catch(_ => syncError(setAppState))
-//   return (response)
-// }
-
 interface createBackendNote {
   note: Note
   setAppState: Function
   include_ancestors?: boolean
   include_descendants?: boolean
 }
+
 export const createBackendNote = async (params: createBackendNote): Promise<NoteWithFamily> => {
   const position = params["note"].position === -1 ? null : params["note"].position
   const args = {
@@ -131,30 +122,3 @@ export const backendErrorsToMessage = (res: any) => {
   }
   return (errors_arr.join(". "))
 }
-
-// export const updateBackendNoteWithRetries = async (note: Note): Promise<Note> => {
-//   return (
-//     updateBackendNote(note)
-//       .then(t => t)
-//       .catch(_ => {
-//         console.log("Error updating note. Will retry in 200ms.")
-//         return (
-//           sleep(200)
-//             .then(_ => updateBackendNote(note)
-//                 .then(t => t)
-//                 .catch(_ => {
-//                   console.log("Error updating note. Will retry in 2 seconds.")
-//                   return (
-//                     sleep(2000)
-//                       .then(_ => updateBackendNote(note)
-//                         .then(t => t)
-//                         .catch(_ => Promise.reject("Error"))
-//                       )
-//                   )
-//                 })
-//             )
-//             .catch(_ => Promise.reject("Error"))
-//         )
-//       })
-//   )
-// }

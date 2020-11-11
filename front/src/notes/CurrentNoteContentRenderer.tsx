@@ -39,7 +39,7 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
   handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target
     const value = target.value
-    const { currentNote } = this.props
+    let { currentNote } = this.props
     let { selectedNote, descendants, references } = this.props
 
     const escapedContent = escapeRegExp(currentNote.content)
@@ -67,6 +67,7 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
       })
       const startTime = new Date()
 
+      currentNote.slug = "" // We want the backend to calculate it from the content and append something if there is already a note with that slug
       // We also need to update all notes which include [[currentNote.content]] in their content
       updateBackendNote(currentNote, this.props.setAppState, true)
         .then(note => {
@@ -75,6 +76,10 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
             this.setState({ lastUpdateDate: startTime })
             if (note && note.slug) {
               this.props.history.push(note.slug)
+              const { setUserNotePageState } = this.props
+              let { currentNote } = this.props
+              currentNote.slug = note.slug
+              setUserNotePageState({ currentNote: currentNote })
             }
           }
         })
