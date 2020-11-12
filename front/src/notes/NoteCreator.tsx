@@ -32,6 +32,7 @@ class NoteCreator extends React.Component<NoteCreatorProps, NoteCreatorState> {
       content: ""
     }
     this.textAreaRef = null
+    this.onKeyDown = this.onKeyDown.bind(this)
   }
 
   handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +56,20 @@ class NoteCreator extends React.Component<NoteCreatorProps, NoteCreatorState> {
       .then(note => {
         window.location.href = `/${currentUser.username}/${note.slug}?add=${encodeURIComponent(content)}`
       })
+  }
+
+  onKeyDown(event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    const { content } = this.state
+
+    if (event.key === "Enter") {
+      if (content === "") {
+        event.preventDefault()
+      } else {
+        event.preventDefault()
+        this.createNote()
+      }
     }
+  }
 
   public render () {
     const { content } = this.state
@@ -72,6 +86,7 @@ class NoteCreator extends React.Component<NoteCreatorProps, NoteCreatorState> {
             onFocus={(e) => auto_grow(e.target)}
             onChange={this.handleChange as any} autoFocus
             value={content}
+            onKeyDown={this.onKeyDown}
             loadingComponent={() => <span>Loading</span>}
             dropdownClassName="editNoteDropDown"
             itemClassName="editNoteItem"
