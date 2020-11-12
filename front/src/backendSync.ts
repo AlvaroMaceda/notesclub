@@ -93,7 +93,7 @@ export const updateBackendNote = async (note: Note, setAppState: Function, updat
   return (
     axios.put(apiDomain() + `/v1/notes/${note.id}`, args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
       .then(res => res.data)
-      .catch(_ => syncError(setAppState))
+      // .catch(_ => syncError(setAppState))
   )
 }
 
