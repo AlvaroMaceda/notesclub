@@ -5,7 +5,6 @@ import { User } from './../User'
 import { fetchSuggestions } from './autocompleteUtils'
 import './../NoteCreator.scss'
 import { Button } from 'react-bootstrap'
-import { todaysSlug } from './../utils/todaysSlug'
 import { newNote } from './Note'
 import { createBackendNote } from './../backendSync'
 

@@ -4,6 +4,7 @@ import { Note, Reference } from './notes/Note'
 import { fetchBackendUser, fetchBackendNotes } from './backendSync'
 import ReferenceRenderer from './notes/ReferenceRenderer'
 import { Link } from 'react-router-dom'
+import NoteCreator from './notes/NoteCreator'
 
 interface UserPageProps {
   blogUsername: string
@@ -80,36 +81,42 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
     const newState: UserPageState = { ...this.state, ...partialState }
     this.setState(newState)
   }
-
-  public render () {
+  public render() {
     const { blogger, notes, selectedNote } = this.state
-    const { currentUser } = this.props
+    const { currentUser, setAppState } = this.props
 
     return (
-      <div className="topic-container container">
-         {blogger && notes && currentUser &&
-          <>
-            {blogger.name === "Help" &&
-              <Link to="/" className="btn btn-primary" onClick={() => window.location.href = "/"}>Add / browse notes</Link>
-            }
-            <h1>{blogger.name === "Help" ? "Help" : `${blogger.name}'s recent notes`}</h1>
-            <ul>
+      <div className="container">
+        { currentUser &&
+          <NoteCreator
+            currentUser={currentUser}
+            setAppState={setAppState}
+          />
+        }
+        <div className="topic-container">
+          {blogger && notes && currentUser &&
+            <>
+              {blogger.name === "Help" &&
+                <Link to="/" onClick={() => window.location.href = "/"}>Browse all notes</Link>
+              }
+              <h1>{blogger.name || blogger.username}'s recent notes</h1>
               {notes.map((ref) => (
                 <ReferenceRenderer
                   key={ref.id}
                   note={ref}
+                  rootNote={ref}
                   selectedNote={selectedNote}
                   setUserNotePageState={this.updateState}
                   setAppState={this.props.setAppState}
                   currentUser={currentUser}
-                  showUser={false} />
+                  showUser={true} />
               ))}
-            </ul>
-          </>
-        }
-        { (!blogger || !notes) &&
-          <p>Loading</p>
-        }
+            </>
+          }
+          {(!blogger || !notes) &&
+            <p>Loading</p>
+          }
+        </div>
       </div>
     )
   }
