@@ -92,7 +92,7 @@ class NewBookPage extends React.Component<NewBookPageProps, NewBookPageState> {
           <div className="col-lg-6">
             <h1>Add book notes</h1>
 
-            <Form>
+            <Form className="add-new-book">
               <Form.Group>
                 <Form.Label>Title and/or author</Form.Label>
                 <Autosuggest

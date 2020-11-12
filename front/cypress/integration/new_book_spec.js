@@ -35,8 +35,9 @@ describe('Sign up', () => {
       status: 200
     })
 
-    cy.get('input')
-      .type('Sapiens')
+    cy.get('.add-new-book').within(($form) => {
+      cy.get('input').type('Sapiens')
+    })
 
     cy.contains('Sapiens by Yuval Noah Harari').click()
 
