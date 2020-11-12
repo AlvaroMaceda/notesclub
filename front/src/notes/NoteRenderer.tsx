@@ -427,13 +427,12 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
 
   renderUnselectedNote = (note: Note) => {
     const arr = note.content.split(this.NOTES_LINK_REGEX)
-
     return (
       <>
         {arr.map((element, index) => {
           const n = index % 4
-          if (element === undefined) {
-            return (<span key={index}></span>)
+          if (element === undefined || (n === 0 && element === "" && note.content !== "")) {
+            return (<></>)
           } else if (n === 0) {
             return (<StringWithHtmlLinks element={element} key={index} />)
           } else if (n === 1) {
