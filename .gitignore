@@ -37,10 +37,11 @@ config/database.yml.bak
 
 
 front/cypress/videos/
-
+front/cypress/screenshots/
 /config/credentials/produciton.key
 
 latest.dump
 .DS_Store
 front/.DS_Store
 front/public/.DS_Store
+

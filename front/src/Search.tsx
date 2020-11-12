@@ -8,8 +8,6 @@ import { Subject, asyncScheduler } from 'rxjs'
 import { switchMap, throttleTime, filter } from 'rxjs/operators'
 import { parameterize } from './utils/parameterize'
 import './Search.scss'
-import { Button } from 'react-bootstrap'
-
 
 interface SearchProps {
   currentUser: User
@@ -33,14 +31,6 @@ const renderSuggestion = (note: NoteWithFamily) => {
 }
 
 const hasEnoughLength = (value: string) => value.length >= MINIMUM_SEARCH_LENGTH
-
-const pad = (number: number) => {
-  if (number < 10) {
-    return '0' + number
-  }
-
-  return number
-}
 
 class Search extends React.Component<SearchProps, SearchState> {
 
@@ -116,47 +106,30 @@ class Search extends React.Component<SearchProps, SearchState> {
   public render() {
     const { suggestions, value } = this.state
     const { currentUser } = this.props
-    const today = new Date()
-    const year = today.getUTCFullYear()
-    const month = pad(today.getUTCMonth() + 1)
-    const day = pad(today.getUTCDate())
-    const todayNoteContent = `${year}-${month}-${day}`
 
     return (
-      <>
-        <h2>Search or create a new note</h2>
-        <div className="small">Write the note title or paste the url of a book, podcast, etc. to write notes about it</div>
-        <div className="row">
-          <div className="col-md-6">
-            <Autosuggest
-              onSuggestionSelected={(_, { suggestion }) => {
-                goToNote(suggestion.user?.username, suggestion.slug, true)
-              }}
-              suggestions={suggestions}
-              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-              onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-              getSuggestionValue={this.getSuggestionValue}
-              renderSuggestion={renderSuggestion}
-              inputProps={{
-                placeholder: `e.g. ${todayNoteContent}`,
-                value: value,
-                className: 'form-control',
-                onChange: (_, { newValue, method }) => {
-                  this.setState({ value: newValue })
-                },
-                onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
-                  if(event.key!=="Enter") return
-                  goToNote(currentUser.username,value)
-                }
-              }}
-            />
-            <div className="search-button">
-              <Button onClick={() => goToNote(currentUser.username, value)}>Search / create</Button>
-            </div>
-          </div>
-          <div className="col-md-6"></div>
-        </div>
-      </>
+      <Autosuggest
+        onSuggestionSelected={(_, { suggestion }) => {
+          goToNote(suggestion.user?.username, suggestion.slug, true)
+        }}
+        suggestions={suggestions}
+        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+        getSuggestionValue={this.getSuggestionValue}
+        renderSuggestion={renderSuggestion}
+        inputProps={{
+          placeholder: 'Search',
+          value: value,
+          className: 'form-control',
+          onChange: (_, { newValue, method }) => {
+            this.setState({ value: newValue })
+          },
+          onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if(event.key!=="Enter") return
+            goToNote(currentUser.username,value)
+          }
+        }}
+      />
     )
   }
 

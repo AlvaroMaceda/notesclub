@@ -18,10 +18,6 @@ export const areSibling = (t1: Note, t2: Note): boolean => {
   return (!sameNote(t1, t2) && t1.ancestry === t2.ancestry)
 }
 
-// export const getSiblings = (note: Note): Note[] => {
-//   return ()
-// }
-
 export const getParent = (note: Note, descendants: Note[]): Note | null => {
   if (note.ancestry === null) {
     return (null)
@@ -30,5 +26,13 @@ export const getParent = (note: Note, descendants: Note[]): Note | null => {
     const parent_id = ancestor_ids[ancestor_ids.length - 1]
     const parent_arr = descendants.filter((descendant) => descendant.id === Number(parent_id))
     return (parent_arr.length === 1 ? parent_arr[0] : null)
+  }
+}
+
+export const getRootId = (note: Note): number | undefined => {
+  if (note.ancestry === null) {
+    return (note.id)
+  } else {
+    return (Number(note.ancestry.split("/")[0]))
   }
 }

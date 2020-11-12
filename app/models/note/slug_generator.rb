@@ -8,10 +8,10 @@ class Note::SlugGenerator
   end
 
   def generate_unique_slug
-    if note.ancestry.nil?
-      generate_unique_slug_from_content
-    else
+    if note.ancestry.present? || note.content.blank?
       generate_unique_random_slug
+    else
+      generate_unique_slug_from_content
     end
   end
 

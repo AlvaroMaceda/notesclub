@@ -18,7 +18,11 @@ class StringWithHtmlLinks extends React.Component<StringWithHtmlLinksProps, Stri
       <>
         {arr.map((e, index) => {
           if (index % 2 === 0) {
-            return (<span key={index}>{e}</span>)
+            if (e === "") {
+              return(<span className="white" key={index}>.</span>)
+            } else {
+              return(<span key={index}>{e}</span>)
+            }
           } else {
             const e_shortened = e.length > 50 ? e.slice(0, 50) + "..." : e
 

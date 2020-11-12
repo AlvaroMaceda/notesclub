@@ -1,18 +1,20 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { Note, noteKey, newNoteWithDescendants, sameNote, noteOrAncestorBelow, noteAbove, lastDescendantOrSelf } from './Note'
-import { createBackendNote, updateBackendNote, deleteBackendNote, fetchBackendNotes } from './../backendSync'
+import { Note, Reference, noteKey, newNoteWithDescendants, sameNote, noteOrAncestorBelow, noteAbove, lastDescendantOrSelf } from './Note'
+import { createBackendNote, updateBackendNote, deleteBackendNote } from './../backendSync'
 import { getChildren, areSibling, getParent } from './ancestry'
 import { parameterize } from './../utils/parameterize'
 import { User } from './../User'
 import StringWithHtmlLinks from './StringWithHtmlLinks'
 import ReactTextareaAutocomplete from "@webscopeio/react-textarea-autocomplete"
 import { Item } from './Item'
-import './../NoteRenderer.scss';
+import './../NoteRenderer.scss'
+import { fetchSuggestions } from './autocompleteUtils'
 
 interface NoteRendererProps {
   selectedNote: Note | null
   note: Note
+  rootNote?: Reference
   descendants: Note[]
   siblings: Note[]
   currentNote: Note
@@ -22,6 +24,7 @@ interface NoteRendererProps {
   currentBlogger: User
   currentUser?: User | null
   isReference: boolean
+  show_list?: boolean
 }
 
 const auto_grow = (element: HTMLElement) => {
@@ -368,24 +371,9 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     }
   }
 
-  fetchSuggestions = (token: string) => {
-    const { currentUser, setAppState } = this.props
-    token = token.replace(/^\[/, '')
-    if (currentUser) {
-      return (
-        fetchBackendNotes({ content_like: `%${encodeURIComponent(token)}%`, ancestry: null, user_ids: [currentUser.id] }, setAppState)
-          .then(notes => notes.map((note) => {
-            return (
-              { username: currentUser.username, content: note.content }
-            )
-          }))
-      )
-    } else {
-      return []
-    }
-  }
-
   renderSelectedNote = (note: Note) => {
+    const { currentUser, setAppState } = this.props
+
     return (
       <ReactTextareaAutocomplete
         ref={(textAreaRef) => { this.textAreaRef = textAreaRef; }}
@@ -399,13 +387,13 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
         itemClassName="editNoteItem"
         trigger={{
           "[[": {
-            dataProvider: token => this.fetchSuggestions(token),
+            dataProvider: token => fetchSuggestions(token, currentUser, setAppState),
             allowWhitespace: true,
             component: Item,
             output: (item, trigger) => `[[${item.content}]]`
           },
           "#": {
-            dataProvider: token => this.fetchSuggestions(token),
+            dataProvider: token => fetchSuggestions(token, currentUser, setAppState),
             component: Item,
             allowWhitespace: true,
             output: (item, trigger) => item.content.match(/\s/) ? `#[[${item.content}]]` : `#${item.content}`
@@ -480,18 +468,39 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     }
   }
 
+  clickOnNote = (event: React.MouseEvent<HTMLElement>, note: Note, isSelected: boolean | null) => {
+    const { isReference, currentBlogger, rootNote } = this.props
+
+    if (!isSelected) {
+      if (isReference) {
+        const slug = rootNote?.slug || note.slug
+        window.location.href = `/${currentBlogger.username}/${slug}`
+      } else {
+        this.selectNote(note, event)
+      }
+    }
+  }
+
   public render () {
-    const { selectedNote, note, renderSubnotes, descendants, currentBlogger, currentUser, currentNote } = this.props
+    const { show_list, selectedNote, note, renderSubnotes, descendants, currentBlogger, currentUser, currentNote } = this.props
     const isSelected = selectedNote && (selectedNote.id === note.id && selectedNote.tmp_key === note.tmp_key)
     const children = getChildren(note, descendants)
 
     return (
       <>
-        <li key={noteKey(note)} onClick={(event) => !isSelected && this.selectNote(note, event)}>
-          {isSelected && this.renderSelectedNote(note)}
-          {!isSelected && this.renderUnselectedNote(note)}
-        </li>
-        {renderSubnotes && children &&
+        {show_list &&
+          <li key={noteKey(note)} onClick={(event) => this.clickOnNote(event, note, isSelected)}>
+            {isSelected && this.renderSelectedNote(note)}
+            {!isSelected && this.renderUnselectedNote(note)}
+          </li>
+        }
+        {!show_list &&
+          <div key={noteKey(note)} onClick={(event) => this.clickOnNote(event, note, isSelected)}>
+            {isSelected && this.renderSelectedNote(note)}
+            {!isSelected && this.renderUnselectedNote(note)}
+          </div>
+        }
+        {renderSubnotes && children && children.length > 0 &&
           <li className="hide-bullet">
             <ul>
               {children.map((subNote) => (
@@ -500,6 +509,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
                   currentUser={currentUser}
                   key={"sub" + noteKey(subNote)}
                   note={subNote}
+                  rootNote={this.props.rootNote}
                   descendants={descendants}
                   siblings={children}
                   currentNote={currentNote}
@@ -507,7 +517,8 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
                   selectedNote={selectedNote}
                   setUserNotePageState={this.props.setUserNotePageState}
                   setAppState={this.props.setAppState}
-                  isReference={this.props.isReference} />
+                  isReference={this.props.isReference}
+                  show_list={true} />
               ))}
             </ul>
           </li>

@@ -1,3 +1,6 @@
+.first-reference-content {
+  margin-left: 20px;
+}
 .avatar-img {
   width: 40px;
   height: 40px;
@@ -16,11 +19,33 @@
 
 .reference-username {
   margin-left: 50px;
+  margin-top: -5px;
   a {
     color: inherit;
   }
 }
 
-.reference-content {
+.second-line-p {
+  margin-bottom: 0px;
+}
+
+.first-reference-content {
+  margin-left: 20px;
+}
+
+.second-reference-content {
   margin-left: 50px;
+}
+
+.reference-content {
+  margin-left: 70px;
+}
+
+.reference-line {
+  padding: 0px;
+  margin: 0px;
+
+  a {
+    color: inherit;
+  }
 }

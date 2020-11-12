@@ -10,7 +10,7 @@ class Note < ApplicationRecord
   validates :id, uniqueness: true
 
   before_validation :set_content, on: [:create]
-  before_validation :set_slug, on: [:create]
+  before_validation :set_slug, on: [:create, :update]
   before_save :nulify_empty_ancestry
   # If at any time we need before_* or after_delete
   # or an association dependent on destroy

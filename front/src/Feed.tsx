@@ -3,7 +3,7 @@ import { User } from './User'
 import { Note, Reference } from './notes/Note'
 import { fetchBackendUser, fetchBackendNotes } from './backendSync'
 import ReferenceRenderer from './notes/ReferenceRenderer'
-import Search from './Search'
+import NoteCreator from './notes/NoteCreator'
 
 interface FeedProps {
   blogUsername: string
@@ -44,9 +44,9 @@ class Feed extends React.Component<FeedProps, FeedState> {
     if (notes && lastCreatedAt && document.scrollingElement && window.innerHeight + document.documentElement.scrollTop + 5 >= document.scrollingElement.scrollHeight) {
       fetchBackendNotes({
         ancestry: null,
-        skip_if_no_descendants: true,
         include_descendants: true,
         include_ancestors: true,
+        skip_if_no_descendants: true,
         include_user: true,
         limit: 5,
         created_at_lt: lastCreatedAt
@@ -64,9 +64,9 @@ class Feed extends React.Component<FeedProps, FeedState> {
         if (blogger) {
           fetchBackendNotes({
             ancestry: null,
-            skip_if_no_descendants: true,
             include_descendants: true,
             include_ancestors: true,
+            skip_if_no_descendants: true,
             include_user: true,
             limit: 20
           }, this.props.setAppState)
@@ -82,29 +82,31 @@ class Feed extends React.Component<FeedProps, FeedState> {
 
   public render () {
     const { blogger, notes, selectedNote } = this.state
-    const { currentUser } = this.props
+    const { currentUser, setAppState } = this.props
 
     return (
       <div className="container">
-        {currentUser &&
-          <Search currentUser={currentUser} />
+        { currentUser &&
+          <NoteCreator
+            currentUser={currentUser}
+            setAppState={setAppState}
+          />
         }
         <div className="topic-container">
           {blogger && notes && currentUser &&
             <>
               <h1>Recent notes</h1>
-              <ul>
-                {notes.map((ref) => (
-                  <ReferenceRenderer
-                    key={ref.id}
-                    note={ref}
-                    selectedNote={selectedNote}
-                    setUserNotePageState={this.updateState}
-                    setAppState={this.props.setAppState}
-                    currentUser={currentUser}
-                    showUser={true} />
-                ))}
-              </ul>
+              {notes.map((ref) => (
+                <ReferenceRenderer
+                  key={ref.id}
+                  note={ref}
+                  rootNote={ref}
+                  selectedNote={selectedNote}
+                  setUserNotePageState={this.updateState}
+                  setAppState={this.props.setAppState}
+                  currentUser={currentUser}
+                  showUser={true} />
+              ))}
             </>
           }
           { (!blogger || !notes) &&

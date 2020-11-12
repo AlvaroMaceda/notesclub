@@ -11,7 +11,6 @@ class NoteUpdator < ApplicationService
     @note = Note.find(@note_id)
     @original_content = @note.content
 
-    @data[:slug] = Note::ContentSlugGenerator.new(@data[:content]).generate if @data[:content].present? && @data[:ancestry].nil?
     Note.transaction do
       @note.update!(@data)
       create_new_notes_from_links!

@@ -1,3 +1,12 @@
 .delete-button {
   margin-left: 10px;
 }
+
+.root-note {
+  font-size: 200%;
+
+  input[type="text"] {
+    font-size: 100%;
+    height: 100%;
+  }
+}
