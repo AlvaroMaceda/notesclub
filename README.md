@@ -74,6 +74,13 @@ You can also user [Guard](https://github.com/guard/guard) to watch changes and r
 bundle exec guard
 ```
 
+### API documentation
+
+WORK IN PROGRESS
+
+To generate API documentation from tests: ```rake rswag:specs:swaggerize```
+
+
 
 ## Frontend (React)
 

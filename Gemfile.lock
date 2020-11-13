@@ -58,6 +58,8 @@ GEM
       zeitwerk (~> 2.2, >= 2.2.2)
     acts_as_list (1.0.2)
       activerecord (>= 4.2)
+    addressable (2.7.0)
+      public_suffix (>= 2.0.2, < 5.0)
     airbrake (11.0.0)
       airbrake-ruby (~> 5.0)
     airbrake-ruby (5.0.2)
@@ -141,6 +143,8 @@ GEM
       activesupport (>= 5.0.0)
     jmespath (1.4.0)
     json (2.3.1)
+    json-schema (2.8.1)
+      addressable (>= 2.4)
     jwt (2.2.2)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -176,6 +180,7 @@ GEM
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    public_suffix (4.0.6)
     puma (4.3.6)
       nio4r (~> 2.0)
     rack (2.2.3)
@@ -243,6 +248,10 @@ GEM
       rspec-mocks (~> 3.9)
       rspec-support (~> 3.9)
     rspec-support (3.9.3)
+    rswag-specs (2.3.1)
+      activesupport (>= 3.1, < 7.0)
+      json-schema (~> 2.2)
+      railties (>= 3.1, < 7.0)
     rubocop (1.1.0)
       parallel (~> 1.10)
       parser (>= 2.7.1.5)
@@ -318,6 +327,7 @@ DEPENDENCIES
   rails (~> 6.0.3.3, >= 6.0.3.3)
   recaptcha
   rspec-rails (~> 4.0)
+  rswag-specs
   rubocop
   rubocop-performance
   rubocop-rails
