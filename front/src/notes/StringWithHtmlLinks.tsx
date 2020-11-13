@@ -19,7 +19,7 @@ class StringWithHtmlLinks extends React.Component<StringWithHtmlLinksProps, Stri
         {arr.map((e, index) => {
           if (index % 2 === 0) {
             if (element === "") {
-              return (<br />)
+              return (<br key={index} />)
             } else if (e === "") {
               return(<span key={index}></span>)
             } else {
