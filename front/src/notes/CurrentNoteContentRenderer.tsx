@@ -146,7 +146,7 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
           <Form.Group>
             <Form.Control
               type="text"
-              value={currentNote.content || "Untitled"}
+              value={currentNote.content}
               name="current_note"
               onKeyDown={this.onKeyDown}
               onChange={this.handleChange as any}
