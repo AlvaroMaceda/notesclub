@@ -432,7 +432,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
         {arr.map((element, index) => {
           const n = index % 4
           if (element === undefined || (n === 0 && element === "" && note.content !== "")) {
-            return (<></>)
+            return (null)
           } else if (n === 0) {
             return (<StringWithHtmlLinks element={element} key={index} />)
           } else if (n === 1) {
