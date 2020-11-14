@@ -70,7 +70,14 @@ class NotesController < ApplicationController
   end
 
   def related
-    render json: {}, status: :not_found
+    if params[:id] == "inexistent_note"
+      render json: {
+        type: "/error/types/item_not_found",
+        title: "Note not found",
+        status: 404 # This MUST match response status
+      }, status: :not_found
+    end
+    
   end
 
   private
