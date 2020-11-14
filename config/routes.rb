@@ -2,6 +2,7 @@
 
 Rails.application.routes.draw do
   scope :v1, defaults: { format: :json } do
+    get "/notes/:id/related", to: "notes#related"
     resources :users, only: [:index, :show, :create, :update] do
       collection do
         post "confirmation"
@@ -18,6 +19,8 @@ Rails.application.routes.draw do
     end
     get "ping", to: "ping#ping"
 
-    get "banana", to: "banana#banana"
+
+    get "banana", to: "banana#get"
+    post "banana", to: "banana#post"
   end
 end

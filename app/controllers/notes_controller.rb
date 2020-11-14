@@ -4,7 +4,7 @@ class NotesController < ApplicationController
   before_action :set_note, only: [:update, :destroy]
   before_action :authenticate_param_id!, only: [:update, :destroy]
   before_action :authenticate_param_user_id!, only: [:create]
-  skip_before_action :authenticate_user!, only: [:index, :count]
+  skip_before_action :authenticate_user!, only: [:index, :count, :related]
 
   def index
     result = NoteFinder.call(params)
@@ -67,6 +67,10 @@ class NotesController < ApplicationController
       Rails.logger.error("Error deleting note #{params[:id]} - params: #{params.inspect}")
       render json: { errors: "Couldn't delete note or descendants" }, status: :not_modified
     end
+  end
+
+  def related
+    render json: {}, status: :not_found
   end
 
   private
