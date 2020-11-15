@@ -62,10 +62,11 @@ components:
       - type
     base_note:
       description: Basic Note data
+      additionalProperties: false
       properties:
         id:
           description: Note id
-          type: integer
+          type: string
         content:
           description: Note content
           type: string
@@ -76,14 +77,14 @@ components:
           nullable: true
         ancestry:
           description: Id of the note's parent
-          type: integer
+          type: string
           nullable: true
         created_at:
           description: Creation date and time
-          type: string
+          type: date-time
         updated_at:
           description: Last modification date and time
-          type: string
+          type: date-time
         slug:
           description: Slug of the note
           type: string
