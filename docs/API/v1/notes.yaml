@@ -24,8 +24,11 @@ paths:
           type: string
       responses:
         '404':
-          description: ":not_found"
-          content: {}
+          description: Note not found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/rfc7807"
 servers:
 - url: https://{defaultHost}
   variables:
@@ -34,7 +37,7 @@ servers:
 components:
   schemas:
     rfc7807:
-      description: schema for rfc7807
+      description: Schema for rfc7807 (errors)
       properties:
         type:
           description: A URI reference [RFC3986] that identifies the problem type.
@@ -57,3 +60,44 @@ components:
           type: string
       required:
       - type
+    base_note:
+      description: Basic Note data
+      properties:
+        id:
+          description: Note id
+          type: integer
+        content:
+          description: Note content
+          type: string
+          nullable: true
+        user_id:
+          description: Id of the note's user
+          type: integer
+          nullable: true
+        ancestry:
+          description: Id of the note's parent
+          type: integer
+          nullable: true
+        created_at:
+          description: Creation date and time
+          type: string
+        updated_at:
+          description: Last modification date and time
+          type: string
+        slug:
+          description: Slug of the note
+          type: string
+        position:
+          description: Note's position respect to its siblings, if any. Starts at
+            1. For root notes its value is 1
+          type: integer
+          nullable: true
+      required:
+      - id
+      - content
+      - user_id
+      - ancestry
+      - created_at
+      - updated_at
+      - slug
+      - position

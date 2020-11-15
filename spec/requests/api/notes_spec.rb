@@ -24,7 +24,7 @@ RSpec.describe "Notes API" do
       #   end
       # end
 
-      response "404", ":not_found" do
+      response "404", "Note not found" do
         schema "$ref" => "#/components/schemas/rfc7807"
 
         let(:id) { "inexistent_note" }
