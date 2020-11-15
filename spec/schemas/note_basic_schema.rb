@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-APISchemas["v1/notes.yaml"][:base_note] = {
+APISchemas["v1/notes.yaml"][:note_basic] = {
   description: "Basic Note data",
   additionalProperties: false,
   properties: {
@@ -15,7 +15,7 @@ APISchemas["v1/notes.yaml"][:base_note] = {
     },
     user_id: {
       description: "Id of the note's user",
-      type: "integer",
+      type: "string",
       nullable: true
     },
     ancestry: {

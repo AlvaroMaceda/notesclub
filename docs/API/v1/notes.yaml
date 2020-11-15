@@ -12,7 +12,13 @@ paths:
       responses:
         '200':
           description: banana found
-          content: {}
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/note_descendants"
+            application/xml:
+              schema:
+                "$ref": "#/components/schemas/note_descendants"
   "/v1/notes/{id}/related":
     get:
       summary: retrieves related notes
@@ -60,7 +66,7 @@ components:
           type: string
       required:
       - type
-    base_note:
+    note_basic:
       description: Basic Note data
       additionalProperties: false
       properties:
@@ -73,7 +79,7 @@ components:
           nullable: true
         user_id:
           description: Id of the note's user
-          type: integer
+          type: string
           nullable: true
         ancestry:
           description: Id of the note's parent
@@ -102,3 +108,41 @@ components:
       - updated_at
       - slug
       - position
+    user:
+      description: User data
+      additionalProperties: false
+      properties:
+        id:
+          description: User id
+          type: string
+        name:
+          description: Name of the user
+          type: string
+        username:
+          description: Username
+          type: string
+        avatar_url:
+          description: URL of user's avatar
+          type: string
+          format: URI
+        created_at:
+          description: Creation date and time
+          type: date-time
+        updated_at:
+          description: Last modification date and time
+          type: date-time
+      required:
+      - id
+      - name
+      - username
+      - avatar_url
+      - created_at
+      - updated_at
+      - slug
+      - position
+    note_descendants:
+      description: Descendants notes of a note
+      additionalProperties: false
+      type: array
+      items:
+        "$ref": "#/components/schemas/note_basic"

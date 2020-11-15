@@ -49,8 +49,11 @@ RSpec.configure do |config|
   Dir[Rails.root.join("spec/schemas/**/*.rb")].each { |f| require f }
 
   # If orden is not relevant, we could move this inside each scheam definition file
+  # add_schema config.swagger_docs, "v1/notes.yaml", :banana
   add_schema config.swagger_docs, "v1/notes.yaml", :rfc7807
-  add_schema config.swagger_docs, "v1/notes.yaml", :base_note
+  add_schema config.swagger_docs, "v1/notes.yaml", :note_basic
+  add_schema config.swagger_docs, "v1/notes.yaml", :user
+  add_schema config.swagger_docs, "v1/notes.yaml", :note_descendants
 
   # Specify the format of the output Swagger file when running 'rswag:specs:swaggerize'.
   # The swagger_docs configuration option has the filename including format in
