@@ -5,7 +5,7 @@ import { Note, Reference, newNoteWithDescendants, noteKey, newNote, NoteWithFami
 import NoteRenderer from './NoteRenderer'
 import CurrentNoteContentRenderer from './CurrentNoteContentRenderer'
 import { User } from './../User'
-import { fetchBackendUser, fetchBackendNotes, createBackendNote, updateBackendNote } from './../backendSync'
+import { fetchBackendUser, fetchBackendNotes, createBackendNote } from './../backendSync'
 import { getChildren } from './ancestry'
 import { Link } from 'react-router-dom'
 import ReferenceRenderer from './ReferenceRenderer'
@@ -62,7 +62,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
   }
 
   sync = () => {
-    const { synced, currentNote, descendants } = this.state
+    const { synced, currentNote } = this.state
 
     if (!synced && currentNote) {
       this.setState({ synced: true })
@@ -90,7 +90,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
     let { descendants, selectedNote } = this.state
     if (newDescendants && descendants) {
       let newDescendantsByTmpKey: NewDescendantsByTmpKey = {}
-      newDescendants.map((descendant) => {
+      newDescendants.forEach((descendant) => {
         if (descendant.tmp_key && descendant.id) {
           newDescendantsByTmpKey[descendant.tmp_key] = descendant.id
         }
