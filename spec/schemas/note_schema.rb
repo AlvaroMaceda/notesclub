@@ -13,11 +13,11 @@ APISchemas["v1/notes.yaml"][:note] = {
         { "$ref": "#/components/schemas/note_descendants" }
       ]
     },
-    # user: {
-    #   oneOf: [
-    #     { "type": "null" },
-    #     { "$ref": "#/components/schemas/user" }
-    #   ]
-    # }
+    user: {
+      oneOf: [
+        { "type": "null" },
+        { "$ref": "#/components/schemas/user" }
+      ]
+    }
   }
 }

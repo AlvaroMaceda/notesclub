@@ -52,7 +52,7 @@ RSpec.configure do |config|
   # # add_schema config.swagger_docs, "v1/notes.yaml", :banana
   # add_schema config.swagger_docs, "v1/notes.yaml", :banana1
   # add_schema config.swagger_docs, "v1/notes.yaml", :banana2
-  add_schema config.swagger_docs, "v1/notes.yaml", :rfc7807
+  # add_schema config.swagger_docs, "v1/notes.yaml", :rfc7807
   add_schema config.swagger_docs, "v1/notes.yaml", :note_basic
   add_schema config.swagger_docs, "v1/notes.yaml", :user
   add_schema config.swagger_docs, "v1/notes.yaml", :note_descendants

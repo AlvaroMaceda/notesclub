@@ -6,7 +6,7 @@ class BananaController < ApplicationController
   def get
 
     user = {
-      id: 2,
+      id: "3",
       name: "Marie Curie",
       username: "curie",
       created_at: "2020-10-12T12:20:07.759Z",
@@ -51,7 +51,8 @@ class BananaController < ApplicationController
       user: user
     }
 
-    p response
+    # p response
+    puts response.to_json
     render json: response, status: :ok
   end
 

@@ -19,7 +19,8 @@ APISchemas["v1/notes.yaml"][:user] = {
     avatar_url: {
       description: "URL of user's avatar",
       type: "string",
-      format: "URI"
+      format: "URI",
+      nullable: true
     },
     created_at: {
       description: "Creation date and time",
@@ -30,5 +31,5 @@ APISchemas["v1/notes.yaml"][:user] = {
       type: "date-time" # "2020-10-23T16:35:29.977Z",
     },
   },
-  required: %w[id name username avatar_url created_at updated_at slug position]
+  required: %w[id name username created_at updated_at]
 }
