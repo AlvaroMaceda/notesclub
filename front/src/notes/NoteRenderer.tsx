@@ -90,7 +90,6 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
           this.props.setUserNotePageState({descendants: descendants, selectedNote: selectedNote, synced: false})
         }
       } else {
-        console.log("aggg")
         // selectedNote.id is null -> the note has been created and we're waiting for the id from the backend
         // We could alert but maybe it's better do nothing (they'll retry and then it will work)
         // this.props.setAppState({ alert: {variant: "danger", message: "Sorry, too fast. We're in alpha! It should be ok now."}})

@@ -86,8 +86,6 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
   }
 
   setIdsForNewDescendants = (noteWithDescendants: NoteWithFamily) => {
-    console.log("noteWithDescendants:")
-    console.log(noteWithDescendants)
     const newDescendants = noteWithDescendants.descendants
     let { descendants, selectedNote } = this.state
     if (newDescendants && descendants) {
@@ -97,8 +95,6 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
           newDescendantsByTmpKey[descendant.tmp_key] = descendant.id
         }
       })
-      console.log("newDescendantsByTmpKey:")
-      console.log(newDescendantsByTmpKey)
       descendants = descendants.map((descendant) => {
         if (!descendant.id && descendant.tmp_key && newDescendantsByTmpKey[descendant.tmp_key]) {
           descendant.id = newDescendantsByTmpKey[descendant.tmp_key]
