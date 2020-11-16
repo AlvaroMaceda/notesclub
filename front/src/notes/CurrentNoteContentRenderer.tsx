@@ -132,7 +132,7 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
             {isLink ?
               <StringWithHtmlLinks element={currentNote.content}/>
             :
-              currentNote.content || (isOwnBlog ? <span className="grey">Untitled</span> : null)
+              currentNote.content || (isOwnBlog ? <span className="lightgrey">Untitled</span> : null)
             }
             {!selectedNote && currentUser && currentNote.user_id === currentUser.id &&
               <Link to='#' onClick={this.confirmDelete} className="delete-button">
