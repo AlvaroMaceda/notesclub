@@ -2,7 +2,7 @@
 
 APISchemas["v1/notes.yaml"][:note_basic] = {
   description: "Basic Note data",
-  additionalProperties: false,
+  # It can't have additionalProperties: false because this schema is extended
   properties: {
     id: {
       description: "Note id",

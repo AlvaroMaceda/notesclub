@@ -2,12 +2,9 @@
 
 APISchemas["v1/notes.yaml"][:banana] = {
   description: "User data",
-  additionalProperties: false,
+  # additionalProperties: false,
   properties: {
-    # allOf: [{ "$ref": "/component/schema/user" }],
     banana: { type: "string" }
   },
   required: %w[banana]
 }
-
-

@@ -28,7 +28,7 @@ APISchemas["v1/notes.yaml"][:user] = {
     updated_at: {
       description: "Last modification date and time",
       type: "date-time" # "2020-10-23T16:35:29.977Z",
-    },    
+    },
   },
   required: %w[id name username avatar_url created_at updated_at slug position]
 }
