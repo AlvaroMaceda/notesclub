@@ -23,9 +23,9 @@ class NoteUpdator < ApplicationService
     methods = []
     methods << :descendants if include_descendants?(@note)
 
-    DESCENDANTS SHOULD RETURN TMP_KEY
-
-    Result.ok @note.reload.as_json(methods: methods).symbolize_keys
+    output = @note.reload.as_json.symbolize_keys
+    output["descendants"] = descendants_with_tmp_keys
+    Result.ok output
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error("Error updating note #{@note.inspect}\nparams: #{@data.inspect}\n#{e.message}\n#{e.backtrace.join("\n")}")
     Result.error @note.errors.full_messages
@@ -37,24 +37,20 @@ class NoteUpdator < ApplicationService
   private
     attr_reader :update_notes_with_links, :original_content, :descendants, :current_user
 
+    # descendants' tmp_keys are provided as an input so the frontend can match the created records
+    def descendants_with_tmp_keys
+      @note.descendants.as_json.map do |descendant|
+        tmp_key = @tmp_keys_by_id[descendant["id"]]
+        descendant["tmp_key"] = tmp_key if tmp_key.present?
+        descendant
+      end
+    end
+
     def include_descendants?(note)
       descendants && note.ancestry.nil?
     end
 
     def update_descendants!(note)
-      # note.descendants.destroy_all
-      # descendants.each do |descendant|
-      #   args = {
-      #     ancestry: descendant["ancestry"],
-      #     position: descendant["position"],
-      #     content: descendant["content"]
-      #   }
-      #   n = Note.new(args.merge(user_id: current_user.id))
-      #   n.id = descendant["id"] if descendant["id"].present?
-      #   n.created_at = descendant["created_at"] if descendant["created_at"].present?
-      #   n.save!
-      # end
-
       descendants_hash = descendants.inject({}) do |sum, descendant|
         sum[descendant["id"]] = descendant if descendant["id"]
         sum
@@ -72,6 +68,7 @@ class NoteUpdator < ApplicationService
         sum
       end
 
+      @tmp_keys_by_id = {}
       DescendantsSorter.new(descendants).sort.each do |descendant|
         new_args = {
           content: descendant["content"],
@@ -79,7 +76,8 @@ class NoteUpdator < ApplicationService
           ancestry: descendant["ancestry"] }
         new_args[:position] = descendant["positon"] if descendant["position"].present?
         if descendant["id"].blank?
-          Note.create!(new_args.merge(user_id: current_user.id))
+          new_note = Note.create!(new_args.merge(user_id: current_user.id))
+          @tmp_keys_by_id[new_note.id] = descendant["tmp_key"]
         else
           descendant_id = descendant["id"].to_i
           db_descendant = db_descendants_hash[descendant_id]
