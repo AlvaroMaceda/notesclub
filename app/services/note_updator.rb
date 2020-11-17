@@ -74,7 +74,7 @@ class NoteUpdator < ApplicationService
           content: descendant["content"],
           slug: descendant["slug"],
           ancestry: descendant["ancestry"] }
-        new_args[:position] = descendant["positon"] if descendant["position"].present?
+        new_args[:position] = descendant["position"] if descendant["position"].present?
         if descendant["id"].blank?
           new_note = Note.create!(new_args.merge(user_id: current_user.id))
           @tmp_keys_by_id[new_note.id] = descendant["tmp_key"]
