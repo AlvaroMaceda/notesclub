@@ -19,7 +19,9 @@ APISchemas["v1/notes.yaml"][:note_basic] = {
       nullable: true
     },
     ancestry: {
-      description: "Id of the note's parent",
+      description:
+        "Id of the note's parents separated by '/'. For example: " \
+        "'46/51/52/53' where 53 would be the parent, 52 the grandparent, etc.",
       type: "string",
       nullable: true
     },
