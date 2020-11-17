@@ -11,7 +11,7 @@ class NoteUpdator < ApplicationService
 
   def call
     @note = Note.find(@note_id)
-    raise "note.user must be current_user" if @note.user_id != current_user.id
+    raise "note.user must be current_user" if current_user && @note.user_id != current_user.id
 
     @original_content = @note.content
     Note.transaction do
@@ -22,7 +22,7 @@ class NoteUpdator < ApplicationService
     end
 
     output = @note.reload.as_json.symbolize_keys
-    output["descendants"] = descendants_with_tmp_keys
+    output[:descendants] = descendants_with_tmp_keys
     Result.ok output
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error("Error updating note #{@note.inspect}\nparams: #{@data.inspect}\n#{e.message}\n#{e.backtrace.join("\n")}")

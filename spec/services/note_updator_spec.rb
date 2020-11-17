@@ -8,10 +8,12 @@ RSpec.describe NoteUpdator do
   let(:note) { notes(:note1) }
 
   it "returns the updated note" do
-    result = NoteUpdator.call(note.id, data: { content: note.content + " additional content" })
+    result = NoteUpdator.call(note.id, data: { content: note.content + " additional content" }, current_user: note.user)
 
     expect(result.success?).to be true
-    expect(rm_timestamps(result.value)).to eq rm_timestamps(note.reload.as_json)
+    expected_result = note.reload.as_json.symbolize_keys
+    expected_result[:descendants] = []
+    expect(rm_timestamps(result.value)).to eq rm_timestamps(expected_result)
   end
 
   it "should create new notes if they do not exist" do
@@ -24,7 +26,7 @@ RSpec.describe NoteUpdator do
 
     new_content = "[[#{new_note_1_content}]] and [[#{new_note_2_content}]] and [[This already exists]]"
 
-    expect { NoteUpdator.call(note.id, data: { content: new_content }) }.to change { Note.count }.by(2)
+    expect { NoteUpdator.call(note.id, data: { content: new_content }, current_user: note.user) }.to change { Note.count }.by(2)
     expect(note.reload.content).to eq(new_content)
 
     new_note_1 = Note.find_by(slug: new_note_1_slug)
