@@ -2,11 +2,11 @@
 # And sort according to ancestry and position to prepare for insert
 class DescendantsSorter
   def initialize(descendants)
-    @descendants = descendants
+    @descendants = descendants.to_a
   end
 
   def sort
-    # raise "descendants must be an array of hashes" if !descendants.is_a?(Array) || descendants.any?{|d| !d.is_a?(Hash)}
+    raise "descendants must be an array of hashes" if descendants.any?{|d| !d.is_a?(Hash)}
 
     descendants.sort_by do |descendant|
       [
