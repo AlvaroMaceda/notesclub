@@ -6,7 +6,7 @@ APISchemas["v1/notes.yaml"][:user] = {
   properties: {
     id: {
       description: "User id",
-      type: "string"
+      type: "integer"
     },
     name: {
       description: "Name of the user",

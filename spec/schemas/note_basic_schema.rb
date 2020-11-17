@@ -6,7 +6,7 @@ APISchemas["v1/notes.yaml"][:note_basic] = {
   properties: {
     id: {
       description: "Note id",
-      type: "string"
+      type: "integer"
     },
     content: {
       description: "Note content",
