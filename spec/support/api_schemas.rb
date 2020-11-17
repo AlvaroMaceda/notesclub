@@ -18,4 +18,3 @@ class APISchemas
     end
   end
 end
-

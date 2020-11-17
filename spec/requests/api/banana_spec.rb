@@ -15,7 +15,6 @@ RSpec.describe "Notes API", focus: true do
           p JSON.parse(response.body)
         end
       end
-
     end
   end
 end

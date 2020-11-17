@@ -77,7 +77,6 @@ class NotesController < ApplicationController
         status: 404 # This MUST match response status
       }, status: :not_found
     end
-    
   end
 
   private

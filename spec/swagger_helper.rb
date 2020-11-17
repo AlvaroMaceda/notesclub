@@ -4,7 +4,7 @@ require "rails_helper"
 
 def add_schema(item, document, schema)
   schema_definition = APISchemas[document][schema]
-  item[document][:components][:schemas].merge!({ schema => schema_definition})
+  item[document][:components][:schemas].merge!({ schema => schema_definition })
 end
 
 RSpec.configure do |config|
