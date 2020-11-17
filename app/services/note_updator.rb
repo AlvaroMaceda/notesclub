@@ -57,11 +57,7 @@ class NoteUpdator < ApplicationService
       deleted_ids = note.descendant_ids - descendant_ids
       Note.where(id: deleted_ids).destroy_all
 
-      # descendants_hash
-
-      db_descendants = note.descendants
-
-      db_descendants_hash = db_descendants.inject({}) do |sum, descendant|
+      db_descendants_hash = note.descendants.inject({}) do |sum, descendant|
         sum[descendant.id] = descendant
         sum
       end
