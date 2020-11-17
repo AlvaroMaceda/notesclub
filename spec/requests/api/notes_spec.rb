@@ -3,6 +3,13 @@
 require "swagger_helper"
 
 RSpec.describe "Notes API" do
+  fixtures(:users, :notes)
+  let(:user) { users(:user1) }
+
+  before do
+    log_in(user)
+  end
+
   path "/v1/notes/{id}/related" do
     get "retrieves related notes" do
       produces "application/json"

@@ -4,7 +4,7 @@ class NotesController < ApplicationController
   before_action :set_note, only: [:update, :destroy]
   before_action :authenticate_param_id!, only: [:update, :destroy]
   before_action :authenticate_param_user_id!, only: [:create]
-  skip_before_action :authenticate_user!, only: [:index, :count, :related]
+  skip_before_action :authenticate_user!, only: [:index, :count]
 
   def index
     result = NoteFinder.call(params)
