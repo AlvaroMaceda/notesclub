@@ -20,8 +20,6 @@ class NoteUpdator < ApplicationService
       update_descendants!(@note) if include_descendants?(@note)
       update_notes_with_links! if update_notes_with_links
     end
-    methods = []
-    methods << :descendants if include_descendants?(@note)
 
     output = @note.reload.as_json.symbolize_keys
     output["descendants"] = descendants_with_tmp_keys
