@@ -421,7 +421,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
   }
 
   selectNote = (note: Note, event: React.MouseEvent<HTMLElement>) => {
-    const { selectedNote, currentBlogger, currentUser } = this.props
+    const { currentBlogger, currentUser } = this.props
     const isOwnBlog = currentUser && currentUser.id === currentBlogger.id
 
     if (event.altKey) {
