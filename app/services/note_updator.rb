@@ -22,7 +22,7 @@ class NoteUpdator < ApplicationService
     end
 
     output = @note.reload.as_json.symbolize_keys
-    output[:descendants] = descendants_with_tmp_keys
+    output[:descendants] = descendants_with_tmp_keys if include_descendants?(@note)
     Result.ok output
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error("Error updating note #{@note.inspect}\nparams: #{@data.inspect}\n#{e.message}\n#{e.backtrace.join("\n")}")
