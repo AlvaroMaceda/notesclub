@@ -72,4 +72,31 @@ RSpec.describe NoteUpdator do
       expect(note4.reload.content).to eq("Great [[Books]]")
     end
   end
+
+  describe "descendants" do
+    it "should update descendants" do
+      note1 = note.children.create!(content: "Books", user_id: note.user_id)
+      note2 = note.children.create!(content: "I like [[Books]] and [[Music]] and [[Books]]", user_id: note.user_id)
+      note3 = note.children.create!(content: "Favourite [[Books]]", user_id: note.user_id)
+      note4 = note.children.create!(content: "Great [[Books]]", user_id: note.user_id)
+
+      result = NoteUpdator.call(
+        note.id,
+        update_notes_with_links: true,
+        data: { content: "Books and articles" },
+        descendants: [
+          { "id" => note1.id, "content" => "New content", "user_id" => note1.user_id, "ancestry" => note1.ancestry, "position" => note1.position },
+          { "id" => note3.id, "content" => "New content", "user_id" => note3.user_id, "ancestry" => note3.ancestry, "position" => 2 },
+          { "id" => note4.id, "content" => "New content", "user_id" => note4.user_id, "ancestry" => note4.ancestry, "position" => 3 },
+        ]
+      )
+
+      expect(result.success?).to be true
+      expect(note1.reload.content).to eq("New content")
+      expect(note1.reload.position).to eq(1)
+      expect(note3.reload.position).to eq(2)
+      expect(note4.reload.position).to eq(3)
+      expect{ note2.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
 end
