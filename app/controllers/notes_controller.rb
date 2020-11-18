@@ -43,7 +43,13 @@ class NotesController < ApplicationController
   end
 
   def update
-    result = NoteUpdator.call(params[:id], update_notes_with_links: params[:update_notes_with_links], data: params.require(:note).permit(:content, :ancestry, :position, :slug))
+    result = NoteUpdator.call(
+      params[:id],
+      data: params.require(:note).permit(:content, :ancestry, :position, :slug),
+      update_notes_with_links: params[:update_notes_with_links],
+      descendants: params[:descendants],
+      current_user: current_user
+    )
     if result.success?
       track_action("Update note", note_id: params[:id])
       render json: result.value, status: :ok

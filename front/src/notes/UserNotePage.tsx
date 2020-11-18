@@ -10,6 +10,8 @@ import { getChildren } from './ancestry'
 import { Link } from 'react-router-dom'
 import ReferenceRenderer from './ReferenceRenderer'
 import LoginOrSignup from '../LoginOrSignup'
+import axios from 'axios'
+import { apiDomain } from './../appConfig'
 
 interface UserNotePageProps extends RouteComponentProps<any> {
   setAppState: Function
@@ -25,14 +27,94 @@ interface UserNotePageState {
   descendants?: Note[]
   ancestors?: Note[]
   references?: Reference[]
+  synced: boolean
+}
+
+interface NewDescendantsByTmpKey {
+  [key: string]: number
+}
+
+interface StateArgsToUpdate {
+  descendants: Note[]
+  selectedNote?: Note
 }
 
 class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState> {
+  private timerId?: ReturnType<typeof setTimeout>
+
   constructor(props: UserNotePageProps) {
     super(props)
 
     this.state = {
-      selectedNote: null
+      selectedNote: null,
+      synced: true
+    }
+  }
+
+  componentDidMount() {
+    this.timerId = setInterval(() => this.sync(), 2000)
+  }
+
+  componentWillUnmount() {
+    if (this.timerId) {
+      clearInterval(this.timerId)
+    }
+  }
+
+  sync = () => {
+    const { synced, currentNote } = this.state
+
+    if (!synced && currentNote) {
+      this.setState({ synced: true })
+      this.syncNoteAndDescendants()
+    }
+  }
+
+  syncNoteAndDescendants = () => {
+    const { currentNote, descendants } = this.state
+
+    if (currentNote) {
+      const args = {
+        note: currentNote,
+        update_notes_with_links: true,
+        descendants: descendants
+      }
+
+      axios.put(apiDomain() + `/v1/notes/${currentNote.id}`, args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
+        .then(res => this.setIdsForNewDescendants(res.data))
+    }
+  }
+
+  setIdsForNewDescendants = (noteWithDescendants: NoteWithFamily) => {
+    const newDescendants = noteWithDescendants.descendants
+    let { descendants, selectedNote } = this.state
+    if (newDescendants && descendants) {
+      let newDescendantsByTmpKey: NewDescendantsByTmpKey = {}
+      newDescendants.forEach((descendant) => {
+        if (descendant.tmp_key && descendant.id) {
+          newDescendantsByTmpKey[descendant.tmp_key] = descendant.id
+        }
+      })
+      descendants = descendants.map((descendant) => {
+        if (!descendant.id && descendant.tmp_key && newDescendantsByTmpKey[descendant.tmp_key]) {
+          descendant.id = newDescendantsByTmpKey[descendant.tmp_key]
+        }
+        return (descendant)
+      })
+      if (selectedNote && !selectedNote.id && selectedNote.tmp_key) {
+        let selectedNoteUpdatedId = newDescendantsByTmpKey[selectedNote.tmp_key]
+        if (!selectedNoteUpdatedId && (noteWithDescendants.tmp_key === selectedNote.tmp_key) && noteWithDescendants.id) {
+          selectedNoteUpdatedId = noteWithDescendants.id
+        }
+        if (selectedNoteUpdatedId) {
+          selectedNote.id = selectedNoteUpdatedId
+          this.setState({ descendants: descendants, selectedNote: selectedNote })
+        } else {
+          this.setState({ descendants: descendants })
+        }
+      } else {
+        this.setState({ descendants: descendants })
+      }
     }
   }
 

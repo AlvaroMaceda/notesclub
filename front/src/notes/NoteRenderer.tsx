@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { Note, Reference, noteKey, newNoteWithDescendants, sameNote, noteOrAncestorBelow, noteAbove, lastDescendantOrSelf } from './Note'
-import { createBackendNote, updateBackendNote, deleteBackendNote } from './../backendSync'
 import { getChildren, areSibling, getParent } from './ancestry'
 import { parameterize } from './../utils/parameterize'
 import { User } from './../User'
@@ -87,10 +86,10 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
           selectedNote.ancestry = `${selectedNote.ancestry}/${(siblingAbove as Note).id}`
           selectedNote.position = children.length + 1 // add at the end
           descendants.splice(selectedNoteIndex, 1, selectedNote)
-          this.props.setUserNotePageState({descendants: descendants, selectedNote: selectedNote})
-          updateBackendNote(selectedNote, this.props.setAppState)
+          this.props.setUserNotePageState({descendants: descendants, selectedNote: selectedNote, synced: false})
         }
       } else {
+        // console.log("waiting for sync")
         // selectedNote.id is null -> the note has been created and we're waiting for the id from the backend
         // We could alert but maybe it's better do nothing (they'll retry and then it will work)
         // this.props.setAppState({ alert: {variant: "danger", message: "Sorry, too fast. We're in alpha! It should be ok now."}})
@@ -136,8 +135,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
           selectedNote.position = parent.position + 1
 
           descendants.splice(selectedNoteIndex, 1, selectedNote)
-          this.props.setUserNotePageState({ descendants: descendants, selectedNote: selectedNote })
-          updateBackendNote(selectedNote, this.props.setAppState)
+          this.props.setUserNotePageState({ descendants: descendants, selectedNote: selectedNote, synced: false })
         }
       }
     }
@@ -160,8 +158,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
         }
         return (descendant)
       })
-      this.props.setUserNotePageState({ descendants: descendants, selectedNote: selectedNote })
-      updateBackendNote(selectedNote, this.props.setAppState)
+      this.props.setUserNotePageState({ descendants: descendants, selectedNote: selectedNote, synced: false })
     }
   }
 
@@ -224,8 +221,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
         }
         return (descendant)
       })
-      this.props.setUserNotePageState({ descendants: descendants, selectedNote: selectedNote })
-      updateBackendNote(selectedNote, this.props.setAppState)
+      this.props.setUserNotePageState({ descendants: descendants, selectedNote: selectedNote, synced: false })
     }
   }
 
@@ -238,54 +234,29 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
 
       switch (event.key) {
         case "Enter":
-          if (isReference) {
-            updateBackendNote(selectedNote, this.props.setAppState)
-            this.props.setUserNotePageState({ selectedNote: null })
-          } else {
-            const newPosition = selectedNote.position + 1
+          const newPosition = selectedNote.position + 1
 
-            descendants = descendants.map((descendant) => {
-              if (areSibling(descendant, note) && descendant.position >= newPosition) {
-                descendant.position += 1
-              }
-              return (descendant)
-            })
-            const newNonSavedNote = newNoteWithDescendants({
-              position: newPosition,
-              user_id: selectedNote.user_id,
-              ancestry: selectedNote.ancestry
-            })
-            descendants.push(newNonSavedNote)
-            updateBackendNote(selectedNote, this.props.setAppState)
+          descendants = descendants.map((descendant) => {
+            if (areSibling(descendant, note) && descendant.position >= newPosition) {
+              descendant.position += 1
+            }
+            return (descendant)
+          })
+          const newNonSavedNote = newNoteWithDescendants({
+            position: newPosition,
+            user_id: selectedNote.user_id,
+            ancestry: selectedNote.ancestry
+          })
+          descendants.push(newNonSavedNote)
 
-            this.props.setUserNotePageState({ selectedNote: newNonSavedNote, descendants: descendants })
-            createBackendNote({ note: newNonSavedNote, setAppState: this.props.setAppState })
-              .then(noteWithId => {
-                const selected = this.props.selectedNote
-                let newSelected
-                if (selected && (selected.tmp_key === noteWithId.tmp_key)) {
-                  noteWithId.content = selected.content
-                  newSelected = noteWithId
-                } else {
-                  newSelected = selected
-                }
-
-                this.props.setUserNotePageState({
-                  descendants: descendants.map((d) => d.tmp_key === noteWithId.tmp_key ? noteWithId : d),
-                  selectedNote: newSelected
-                })
-              })
-            event.preventDefault()
-          }
+          this.props.setUserNotePageState({ selectedNote: newNonSavedNote, descendants: descendants, synced: false })
+          event.preventDefault()
           break
         case "Escape":
-          updateBackendNote(selectedNote, this.props.setAppState)
-          this.props.setUserNotePageState({ selectedNote: null })
+          this.props.setUserNotePageState({ selectedNote: null, synced: false })
           break
         case "Tab":
-          if (!isReference) {
-            event.shiftKey ? this.unindentNote() : this.indentNote()
-          }
+          event.shiftKey ? this.unindentNote() : this.indentNote()
           event.preventDefault()
           break
         case "ArrowDown":
@@ -350,8 +321,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
             if (newSelected && selectedNoteIndex !== undefined) {
               // delete selectedNote from descendants:
               descendants.splice(selectedNoteIndex, 1)
-              deleteBackendNote(selectedNote, this.props.setAppState)
-              this.props.setUserNotePageState({ descendants: descendants, selectedNote: newSelected })
+              this.props.setUserNotePageState({ descendants: descendants, selectedNote: newSelected, synced: false })
             }
             event.preventDefault()
           }
@@ -451,18 +421,12 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
   }
 
   selectNote = (note: Note, event: React.MouseEvent<HTMLElement>) => {
-    const { selectedNote, currentBlogger, currentUser } = this.props
+    const { currentBlogger, currentUser } = this.props
     const isOwnBlog = currentUser && currentUser.id === currentBlogger.id
 
     if (event.altKey) {
       window.location.href = `/${currentBlogger.username}/${note.slug}`
     } else if (isOwnBlog) {
-      // Update previously selected note:
-      if (selectedNote) {
-        updateBackendNote(selectedNote, this.props.setAppState)
-      }
-
-      // Select new note:
       this.props.setUserNotePageState({ selectedNote: note })
     }
   }
