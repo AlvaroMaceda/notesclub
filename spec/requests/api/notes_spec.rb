@@ -2,12 +2,12 @@
 
 require "swagger_helper"
 
-RSpec.describe "Notes API" do
+RSpec.describe "Notes API", focus: true do
   fixtures(:users, :notes)
   let(:user) { users(:user1) }
 
-  before do
-    log_in(user)
+  before do |test|
+    log_in(user) unless test.metadata[:logged_out]
   end
 
   path "/v1/notes/{id}/related" do
@@ -15,7 +15,7 @@ RSpec.describe "Notes API" do
       produces "application/json"
       parameter name: :id, in: :path, type: :string
 
-      # response "200", "related notes found" do
+      # response "200", "Related notes found" do
       #   schema type: :object,
       #       properties: {
       #         id: { type: :integer },
@@ -31,7 +31,20 @@ RSpec.describe "Notes API" do
       #   end
       # end
 
+      response "401", "Unauthorized" do
+        let(:id) { "a_note" }
+
+        # We must use before/it form of calling to pass :logged_out to "before" block
+        before do |example|
+          submit_request(example.metadata)
+        end
+        it "returns a 401 response", :logged_out do |example|
+          assert_response_matches_metadata(example.metadata)
+        end
+      end
+
       response "404", "Note not found" do
+        # skip && next # Note that you must add a next statement to really skip test
         schema "$ref" => "#/components/schemas/rfc7807"
 
         let(:id) { "inexistent_note" }
