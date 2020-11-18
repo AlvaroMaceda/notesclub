@@ -368,7 +368,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
                 </div>
               ))}
               {linkToOwnPage &&
-                <p>
+                <p className="create-your-note">
                   <Link to={ownPagePath} onClick={() => window.location.href=ownPagePath}>Create your note "{currentNote.content}"</Link>.
                 </p>
               }
