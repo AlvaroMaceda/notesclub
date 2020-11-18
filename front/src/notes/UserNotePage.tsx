@@ -12,6 +12,7 @@ import ReferenceRenderer from './ReferenceRenderer'
 import LoginOrSignup from '../LoginOrSignup'
 import axios from 'axios'
 import { apiDomain } from './../appConfig'
+import './UserNotePage.scss'
 
 interface UserNotePageProps extends RouteComponentProps<any> {
   setAppState: Function
@@ -370,21 +371,19 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
                 </p>
               }
               {references && references.length > 0 &&
-                <>
+                <div className="all-references">
                   References:
-                  <div>
-                    {references.map((ref) => (
-                      <ReferenceRenderer
-                        key={ref.id}
-                        note={ref}
-                        selectedNote={selectedNote}
-                        setUserNotePageState={this.updateState}
-                        setAppState={this.props.setAppState}
-                        currentUser={currentUser}
-                        showUser={true} />
-                    ))}
-                  </div>
-                </>
+                  {references.map((ref) => (
+                    <ReferenceRenderer
+                      key={ref.id}
+                      note={ref}
+                      selectedNote={selectedNote}
+                      setUserNotePageState={this.updateState}
+                      setAppState={this.props.setAppState}
+                      currentUser={currentUser}
+                      showUser={true} />
+                  ))}
+                </div>
               }
             </>
           }
