@@ -4,18 +4,6 @@ info:
   title: API V1
   version: v1
 paths:
-  "/v1/banana":
-    get:
-      summary: retrieves bananas
-      tags:
-      - focus
-      responses:
-        '200':
-          description: banana found
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/note"
   "/v1/notes/{id}/related":
     get:
       summary: retrieves related notes
@@ -26,6 +14,9 @@ paths:
         schema:
           type: string
       responses:
+        '401':
+          description: Unauthorized
+          content: {}
         '404':
           description: Note not found
           content:
@@ -39,6 +30,60 @@ servers:
       default: www.example.com
 components:
   schemas:
+    notes_array:
+      description: Array of Notes
+      type: array
+      items:
+        "$ref": "#/components/schemas/note"
+    user:
+      description: User data
+      additionalProperties: false
+      properties:
+        id:
+          description: User id
+          type: integer
+        name:
+          description: Name of the user
+          type: string
+        username:
+          description: Username
+          type: string
+        avatar_url:
+          description: URL of user's avatar
+          type: string
+          format: URI
+          nullable: true
+        created_at:
+          description: Creation date and time
+          type: date-time
+        updated_at:
+          description: Last modification date and time
+          type: date-time
+      required:
+      - id
+      - name
+      - username
+      - created_at
+      - updated_at
+    note:
+      description: Note with user and descendants
+      type: object
+      allOf:
+      - "$ref": "#/components/schemas/note_basic"
+      properties:
+        descendants:
+          oneOf:
+          - type: 'null'
+          - "$ref": "#/components/schemas/note_descendants"
+        user:
+          oneOf:
+          - type: 'null'
+          - "$ref": "#/components/schemas/user"
+    note_descendants:
+      description: Descendants notes of a note
+      type: array
+      items:
+        "$ref": "#/components/schemas/note_basic"
     rfc7807:
       description: Schema for rfc7807 (errors)
       properties:
@@ -68,7 +113,7 @@ components:
       properties:
         id:
           description: Note id
-          type: string
+          type: integer
         content:
           description: Note content
           type: string
@@ -105,52 +150,3 @@ components:
       - updated_at
       - slug
       - position
-    user:
-      description: User data
-      additionalProperties: false
-      properties:
-        id:
-          description: User id
-          type: string
-        name:
-          description: Name of the user
-          type: string
-        username:
-          description: Username
-          type: string
-        avatar_url:
-          description: URL of user's avatar
-          type: string
-          format: URI
-          nullable: true
-        created_at:
-          description: Creation date and time
-          type: date-time
-        updated_at:
-          description: Last modification date and time
-          type: date-time
-      required:
-      - id
-      - name
-      - username
-      - created_at
-      - updated_at
-    note_descendants:
-      description: Descendants notes of a note
-      type: array
-      items:
-        "$ref": "#/components/schemas/note_basic"
-    note:
-      description: Note with user and descendants
-      type: object
-      allOf:
-      - "$ref": "#/components/schemas/note_basic"
-      properties:
-        descendants:
-          oneOf:
-          - type: 'null'
-          - "$ref": "#/components/schemas/note_descendants"
-        user:
-          oneOf:
-          - type: 'null'
-          - "$ref": "#/components/schemas/user"
