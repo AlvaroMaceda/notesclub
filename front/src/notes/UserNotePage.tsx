@@ -351,19 +351,21 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
                 currentUser={currentUser} />
 
               {children.map((subNote) => (
-                <NoteRenderer
-                  currentBlogger={currentBlogger}
-                  key={"sub" + noteKey(subNote)}
-                  note={subNote}
-                  descendants={descendants}
-                  siblings={children}
-                  currentNote={currentNote}
-                  renderSubnotes={true}
-                  selectedNote={selectedNote}
-                  setUserNotePageState={this.updateState}
-                  setAppState={this.props.setAppState}
-                  currentUser={currentUser}
-                  isReference={false} />
+                <div className="top-children">
+                  <NoteRenderer
+                    currentBlogger={currentBlogger}
+                    key={"sub" + noteKey(subNote)}
+                    note={subNote}
+                    descendants={descendants}
+                    siblings={children}
+                    currentNote={currentNote}
+                    renderSubnotes={true}
+                    selectedNote={selectedNote}
+                    setUserNotePageState={this.updateState}
+                    setAppState={this.props.setAppState}
+                    currentUser={currentUser}
+                    isReference={false} />
+                </div>
               ))}
               {linkToOwnPage &&
                 <p>
