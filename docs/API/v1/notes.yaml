@@ -4,6 +4,18 @@ info:
   title: API V1
   version: v1
 paths:
+  "/v1/banana":
+    get:
+      summary: retrieves bananas
+      tags:
+      - focus
+      responses:
+        '200':
+          description: banana found
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/note"
   "/v1/notes/{id}/related":
     get:
       summary: retrieves related notes
@@ -18,7 +30,7 @@ paths:
           description: Unauthorized
           content: {}
         '404':
-          description: Note not found
+          description: Not found
           content:
             application/json:
               schema:
@@ -55,10 +67,12 @@ components:
           nullable: true
         created_at:
           description: Creation date and time
-          type: date-time
+          type: string
+          format: date-time
         updated_at:
           description: Last modification date and time
-          type: date-time
+          type: string
+          format: date-time
       required:
       - id
       - name
@@ -72,13 +86,9 @@ components:
       - "$ref": "#/components/schemas/note_basic"
       properties:
         descendants:
-          oneOf:
-          - type: 'null'
-          - "$ref": "#/components/schemas/note_descendants"
+          "$ref": "#/components/schemas/note_descendants"
         user:
-          oneOf:
-          - type: 'null'
-          - "$ref": "#/components/schemas/user"
+          "$ref": "#/components/schemas/user"
     note_descendants:
       description: Descendants notes of a note
       type: array
@@ -129,10 +139,12 @@ components:
           nullable: true
         created_at:
           description: Creation date and time
-          type: date-time
+          type: string
+          format: date-time
         updated_at:
           description: Last modification date and time
-          type: date-time
+          type: string
+          format: date-time
         slug:
           description: Slug of the note
           type: string

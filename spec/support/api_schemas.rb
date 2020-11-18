@@ -18,7 +18,7 @@ class APISchemas
     end
 
     def configure(swagger_docs)
-      # We are assuming definition order is not relevant
+      # We are assuming that definition order is not relevant
       @schemas.each_key do |document|
         add_document swagger_docs, document
       end

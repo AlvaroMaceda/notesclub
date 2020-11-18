@@ -24,11 +24,13 @@ APISchemas["v1/notes.yaml"][:user] = {
     },
     created_at: {
       description: "Creation date and time",
-      type: "date-time" # "2020-10-23T16:35:29.977Z",
+      type: "string",
+      format: "date-time" # "2020-10-23T16:35:29.977Z",
     },
     updated_at: {
       description: "Last modification date and time",
-      type: "date-time" # "2020-10-23T16:35:29.977Z",
+      type: "string",
+      format: "date-time" # "2020-10-23T16:35:29.977Z",
     },
   },
   required: %w[id name username created_at updated_at]

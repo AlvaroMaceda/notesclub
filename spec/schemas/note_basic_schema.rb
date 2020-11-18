@@ -27,11 +27,13 @@ APISchemas["v1/notes.yaml"][:note_basic] = {
     },
     created_at: {
       description: "Creation date and time",
-      type: "date-time" # "2020-10-23T16:35:29.977Z",
+      type: "string",
+      format: "date-time" # "2020-10-23T16:35:29.977Z",
     },
     updated_at: {
       description: "Last modification date and time",
-      type: "date-time" # "2020-10-23T16:35:29.977Z",
+      type: "string",
+      format: "date-time" # "2020-10-23T16:35:29.977Z",
     },
     slug: {
       description: "Slug of the note",

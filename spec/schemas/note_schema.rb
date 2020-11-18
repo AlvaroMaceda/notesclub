@@ -7,17 +7,7 @@ APISchemas["v1/notes.yaml"][:note] = {
     { "$ref": "#/components/schemas/note_basic" },
   ],
   properties: {
-    descendants: {
-      oneOf: [
-        { "type": "null" },
-        { "$ref": "#/components/schemas/note_descendants" }
-      ]
-    },
-    user: {
-      oneOf: [
-        { "type": "null" },
-        { "$ref": "#/components/schemas/user" }
-      ]
-    }
+    descendants: { "$ref": "#/components/schemas/note_descendants" },
+    user: { "$ref": "#/components/schemas/user" }
   }
 }

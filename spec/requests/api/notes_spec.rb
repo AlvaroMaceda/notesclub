@@ -15,7 +15,7 @@ RSpec.describe "Notes API", focus: true do
       produces "application/json"
       parameter name: :id, in: :path, type: :string
 
-      # response "200", "Related notes found" do
+      # response "200", "Successful operation" do
       #   schema type: :object,
       #       properties: {
       #         id: { type: :integer },
@@ -43,7 +43,7 @@ RSpec.describe "Notes API", focus: true do
         end
       end
 
-      response "404", "Note not found" do
+      response "404", "Not found" do
         # skip && next # Note that you must add a next statement to really skip test
         schema "$ref" => "#/components/schemas/rfc7807"
 
