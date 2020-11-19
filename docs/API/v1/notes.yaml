@@ -26,6 +26,12 @@ paths:
         schema:
           type: string
       responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/notes_array"
         '401':
           description: Unauthorized
           content: {}
@@ -130,7 +136,7 @@ components:
           nullable: true
         user_id:
           description: Id of the note's user
-          type: string
+          type: integer
           nullable: true
         ancestry:
           description: 'Id of the note''s parents separated by ''/''. For example:

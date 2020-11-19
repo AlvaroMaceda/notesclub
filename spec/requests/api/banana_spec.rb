@@ -15,7 +15,7 @@ RSpec.describe "Notes API", focus: true do
         schema "$ref" => "#/components/schemas/note"
 
         run_test! do |response|
-          p JSON.parse(response.body)
+          # p JSON.parse(response.body)
         end
       end
     end

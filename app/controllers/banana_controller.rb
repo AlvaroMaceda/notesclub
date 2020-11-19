@@ -17,7 +17,7 @@ class BananaController < ApplicationController
       {
         id: 3,
         content: "lalala",
-        user_id: "1",
+        user_id: 1,
         ancestry: nil,
         slug: "banana",
         position: 1,
@@ -27,7 +27,7 @@ class BananaController < ApplicationController
       {
         id: 4,
         content: "popopo",
-        user_id: "100",
+        user_id: 100,
         ancestry: "33",
         slug: "potato",
         position: 1,
@@ -36,10 +36,10 @@ class BananaController < ApplicationController
       }
     ]
 
-    response = {
+    note = {
       id: 3,
       content: "lalala",
-      user_id: "1",
+      user_id: 1,
       ancestry: nil,
       slug: "banana",
       position: 1,
@@ -50,9 +50,8 @@ class BananaController < ApplicationController
       user: user
     }
 
-    # p response
-    puts response.to_json
-    render json: response, status: :ok
+    # puts note.to_json
+    render json: note, status: :ok
   end
 
   def get_banana

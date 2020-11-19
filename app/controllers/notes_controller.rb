@@ -70,13 +70,21 @@ class NotesController < ApplicationController
   end
 
   def related
+    # This is not working, it's only to test response format
     if params[:id] == "inexistent_note"
-      render json: {
+      return render json: {
         type: "/error/types/item_not_found",
         title: "Note not found",
         status: 404 # This MUST match response status
       }, status: :not_found
     end
+
+    params[:ids] = [1, 2, 3]
+    result = NoteFinder.call(params)
+    # p result.value
+
+    return render json: result.errors, status: :bad_request if result.error?
+    render json: result.value, status: :ok
   end
 
   private

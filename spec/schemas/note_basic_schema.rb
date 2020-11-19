@@ -15,7 +15,7 @@ APISchemas["v1/notes.yaml"][:note_basic] = {
     },
     user_id: {
       description: "Id of the note's user",
-      type: "string",
+      type: "integer",
       nullable: true
     },
     ancestry: {
