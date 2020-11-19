@@ -21,3 +21,10 @@ end
 def rm_timestamps_from_array!(arr)
   arr.map { |obj| rm_timestamps!(obj) }
 end
+
+def notes_data(a)
+  return rm_timestamps(a) unless a.kind_of?(Array)
+  a.map do |t|
+    rm_timestamps(t.as_json)
+  end
+end
