@@ -30,16 +30,28 @@ Also, it should not return the passed note (from the note.user) as a related not
 
 def make_note(note_data)
   id = NoteCreator.call(note_data).value[:id]
-  note_data.merge!(id: id).stringify_keys
+  relevant_data note_data.merge!(id: id).stringify_keys
+end
+
+RELEVANT_FIELDS = [
+  :id, :content, :slug, :user_id,
+  :ancestry, :descendants
+]
+def relevant_data(notes)
+  relevant_note_fields notes, RELEVANT_FIELDS
 end
 
 RSpec.describe NoteRelatedFinder do
-  fixtures(:users) #, :notes)
+  fixtures(:users)
   let(:user1) { users(:user1) }
   let(:user2) { users(:user2) }
-  # let(:note1) { notes(:note1) }
-  # let(:note2) { notes(:note2) }
-  # let(:note5) { notes(:note5) }
+
+  let(:note) { make_note(
+    content: "Note to be linked",
+    ancestry: nil,
+    slug: "note",
+    user_id: user1.id
+  )}
 
   before(:each) do
     unrelated_note1 = {
@@ -71,62 +83,84 @@ RSpec.describe NoteRelatedFinder do
   end
 
   describe "returns notes with a backlink to the note" do
-    it "with [[...]] format" do
-      note = {
-        content: "Note to be linked",
-        ancestry: nil,
-        position: 1,
-        slug: "note",
-        user_id: user1.id
-      }
-      note_id = NoteCreator.call(note).value[:id]
-
+    xit "with [[...]] format" do
       related_note_1 = make_note(
         content: "Note from the same user linking to the [[Note to be linked]]",
         ancestry: nil,
-        position: 1,
         slug: "related_1",
         user_id: user1.id
       )
       related_note_2 = make_note(
         content: "Another note linking to the [[Note to be linked]] from another user",
         ancestry: nil,
-        position: 1,
         slug: "related_2",
         user_id: user2.id
       )
 
-      result = NoteRelatedFinder.call(note_id)
+      result = NoteRelatedFinder.call(note["id"])
 
       expect(result.success?).to be true
-      expect(notes_data(result.value)).to match_array([
+      expect(relevant_data(result.value)).to match_array(relevant_data([
         related_note_1,
         related_note_2
-      ])
+      ]))
     end
 
     it "with ##... format" do
-      skip
+      related_note_1 = make_note(
+        content: "Note from the same user linking to the ##Note to be linked",
+        ancestry: nil,
+        slug: "related_1",
+        user_id: user1.id
+      )
+      related_note_2 = make_note(
+        content: "Another note linking to the ##Note to be linked from another user",
+        ancestry: nil,
+        slug: "related_2",
+        user_id: user2.id
+      )
+
+      result = NoteRelatedFinder.call(note["id"])
+
+      expect(result.success?).to be true
+      expect(relevant_data(result.value)).to match_array(relevant_data([
+        related_note_1,
+        related_note_2
+      ]))
     end
 
-    it "excludes the note passed as parameter" do
-      skip
+    xit "returns empty array if there aren't related notes" do
     end
 
-    it "returns descendants" do
-      skip
+    xit "includes descendants" do
     end
 
-    it "returns ancestors" do
-      skip
+    xit "includes ancestors" do
     end
 
-    it "returns user data" do
-      skip
+    xit "includes user data" do
     end
   end
 
   describe "returns root notes with the same content" do
-    skip
+    xit "include root notes" do
+    end
+
+    xit "does not include non-root notes" do
+    end
+
+    xit "excludes the note passed as parameter" do
+      related_note_1 = make_note(
+        content: note["content"],
+        ancestry: nil,
+        slug: "related_1",
+        user_id: user1.id
+      )
+
+      result = NoteRelatedFinder.call(note["id"])
+
+      expect(result.success?).to be true
+      expect(relevant_data(result.value)).to match_array(relevant_data([related_note_1]))
+    end
   end
 end

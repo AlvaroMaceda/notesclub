@@ -8,7 +8,10 @@ class NoteRelatedFinder < ApplicationService
   def call
     note = Note.find(@note_id)
     ## https://blog.bigbinary.com/2016/05/30/rails-5-adds-or-support-in-active-record.html
-    notes = Note.where("content like '%[[#{note.content}]]%'")
+    notes = Note.where("content like '%[[#{note.content}]]%'").or(
+      Note.where("content like '%#\##{note.content}%'")
+      )
+    # p notes
     Result.ok notes.as_json
   rescue ActiveRecord::RecordNotFound
     Result.error "Couldn't find Note #{@note_id}"
