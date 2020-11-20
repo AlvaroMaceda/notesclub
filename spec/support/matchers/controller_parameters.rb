@@ -5,7 +5,7 @@ RSpec::Matchers.define :controller_parameters do |expected|
     expected == actual.except("format", "controller", "action").as_json
   end
 
-  description do |banana|
+  description do
     "ActionController::Parameters with #{expected}"
   end
 end
