@@ -236,7 +236,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
               refs = refs.sort((a, b) => a.user_id === currentUser.id ? -1 : 1)
             }
             this.setState({ references: refs })
-         Hmm})
+          })
        } else {
          this.setState({ references: [] })
        }
