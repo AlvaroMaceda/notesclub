@@ -12,7 +12,6 @@ RSpec.describe NoteUpdator do
 
     expect(result.success?).to be true
     expected_result = note.reload.as_json.symbolize_keys
-    expected_result[:descendants] = []
     expect(rm_timestamps(result.value)).to eq rm_timestamps(expected_result)
   end
 
@@ -62,7 +61,7 @@ RSpec.describe NoteUpdator do
       note3 = Note.create!(content: "Favourite [[Books]]", user: user1)
       note4 = Note.create!(content: "Great [[Books]]", user: user2)
 
-      result = NoteUpdator.call(note1.id, update_notes_with_links: true, data: { content: "Books and articles" })
+      result = NoteUpdator.call(note1.id, update_notes_with_links: true, data: { content: "Books and articles" }, current_user: note1.user)
 
       expect(result.success?).to be true
       expect(note1.reload.content).to eq("Books and articles")
@@ -88,7 +87,8 @@ RSpec.describe NoteUpdator do
           { "id" => note1.id, "content" => "New content", "user_id" => note1.user_id, "ancestry" => note1.ancestry, "position" => note1.position },
           { "id" => note3.id, "content" => "New content", "user_id" => note3.user_id, "ancestry" => note3.ancestry, "position" => 2 },
           { "id" => note4.id, "content" => "New content", "user_id" => note4.user_id, "ancestry" => note4.ancestry, "position" => 3 },
-        ]
+        ],
+        current_user: note.user
       )
 
       expect(result.success?).to be true

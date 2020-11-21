@@ -14,11 +14,15 @@ class NoteUpdator < ApplicationService
     raise "note.user must be current_user" if current_user && @note.user_id != current_user.id
 
     @original_content = @note.content
+    if Note.exists?(user_id: current_user.id, slug: @note["slug"])
+      struct = OpenStruct.new(id: @note.id, slug: @data["slug"], content: @data["content"], user_id: current_user.id)
+      @data["slug"] = Note::SlugGenerator.new(struct).generate_unique_slug if @note.slug != @data["slug"]
+    end
     Note.transaction do
       @note.update!(@data)
       create_new_notes_from_links!
       update_descendants!(@note) if include_descendants?(@note)
-      update_notes_with_links! if update_notes_with_links
+      update_notes_with_links! if update_notes_with_links && @note.ancestry.nil? && @note.content != @data["content"]
     end
 
     output = @note.reload.as_json.symbolize_keys
@@ -102,8 +106,8 @@ class NoteUpdator < ApplicationService
         where.not(id: @note.id).
         where(user_id: @note.user_id).
         where("content like ?", "%[[#{orig_cont}]]%").find_each do |t|
-        t.update!(content: t.content.gsub(/\[\[#{orig_cont}\]\]/, "[[#{cont}]]"))
-      end
+          t.update!(content: t.content.gsub(/\[\[#{orig_cont}\]\]/, "[[#{cont}]]"))
+        end
     end
 
     def create_new_note!(content)

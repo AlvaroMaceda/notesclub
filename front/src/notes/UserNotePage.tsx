@@ -82,7 +82,19 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
       }
 
       axios.put(apiDomain() + `/v1/notes/${currentNote.id}`, args, { headers: { 'Content-Type': 'application/json', "Accept": "application/json" }, withCredentials: true })
-        .then(res => this.setIdsForNewDescendants(res.data))
+        .then(res => {
+          this.changeSlugIfItExisted(res.data as Note)
+          this.setIdsForNewDescendants(res.data)
+        })
+    }
+  }
+
+  changeSlugIfItExisted = (note: Note) => {
+    let { currentNote } = this.state
+    if (note.slug && currentNote && note.slug !== currentNote.slug) {
+      this.props.history.push(note.slug)
+      currentNote.slug = note.slug
+      this.setState({ currentNote: currentNote })
     }
   }
 

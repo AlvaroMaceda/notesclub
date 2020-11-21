@@ -2,13 +2,13 @@ import * as React from 'react'
 import { Form, Button, Modal } from 'react-bootstrap'
 import { Note, Reference, sameNote } from './Note'
 import { User } from './../User'
-import { updateBackendNote } from './../backendSync'
 import StringWithHtmlLinks from './StringWithHtmlLinks'
 import { deleteBackendNote } from './../backendSync'
 import './CurrentNoteContentRenderer.scss'
 import { escapeRegExp } from './../utils/escapeRegex'
 import { withRouter } from 'react-router-dom'
 import { Link, RouteComponentProps } from 'react-router-dom'
+import { parameterize } from '../utils/parameterize'
 
 interface CurrentNoteContentRendererProps extends RouteComponentProps {
   selectedNote: Note | null
@@ -22,7 +22,6 @@ interface CurrentNoteContentRendererProps extends RouteComponentProps {
 
 interface CurrentNoteContentRendererState {
   showDeleteModal: boolean
-  lastUpdateDate?: Date
 }
 
 class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRendererProps, CurrentNoteContentRendererState> {
@@ -58,31 +57,17 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
         return (reference)
       })
       selectedNote.content = value
-
+      selectedNote.slug = parameterize(value)
+      if (selectedNote.slug) {
+        this.props.history.push(selectedNote.slug)
+      }
       this.props.setUserNotePageState({
         selectedNote: selectedNote,
         currentNote: selectedNote,
         descendants: descendants,
-        references: references
+        references: references,
+        synced: false
       })
-      const startTime = new Date()
-
-      currentNote.slug = "" // We want the backend to calculate it from the content and append something if there is already a note with that slug
-      // We also need to update all notes which include [[currentNote.content]] in their content
-      updateBackendNote(currentNote, this.props.setAppState, true)
-        .then(note => {
-          const { lastUpdateDate } = this.state
-          if (!lastUpdateDate || startTime > lastUpdateDate) {
-            this.setState({ lastUpdateDate: startTime })
-            if (note && note.slug) {
-              this.props.history.push(note.slug)
-              const { setUserNotePageState } = this.props
-              let { currentNote } = this.props
-              currentNote.slug = note.slug
-              setUserNotePageState({ currentNote: currentNote })
-            }
-          }
-        })
     }
   }
 
