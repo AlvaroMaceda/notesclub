@@ -1,6 +1,11 @@
 # Notes Club
 https://notes.club
 
+## Background
+Writing is thinking. Note-taking fosters writing. In the open.
+
+The solution to most world problems are out there in peaces. Let's put them together one note at a time.
+
 ## License
 [MIT license](LICENSE)
 
