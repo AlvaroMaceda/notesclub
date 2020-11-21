@@ -104,12 +104,13 @@ class NoteUpdator < ApplicationService
     def update_notes_with_links!
       orig_cont = Regexp.escape(original_content)
       cont = @note.content
-      Note.
-        where.not(id: @note.id).
-        where(user_id: @note.user_id).
-        where("content like ?", "%[[#{orig_cont}]]%").find_each do |t|
-          t.update!(content: t.content.gsub(/\[\[#{orig_cont}\]\]/, "[[#{cont}]]"))
-        end
+      notes = Note.where.not(id: @note.id).where(user_id: @note.user_id)
+      notes.where("content like ?", "%[[#{orig_cont}]]%").find_each do |t|
+        t.update!(content: t.content.gsub(/\[\[#{orig_cont}\]\]/, "[[#{cont}]]"))
+      end
+      notes.where("content like ?", "%##{orig_cont}%").find_each do |t|
+        t.update!(content: t.content.gsub("##{orig_cont}", cont.include?(" ") ? "#[[#{cont}]]" : "##{cont}"))
+      end
     end
 
     def create_new_note!(content)

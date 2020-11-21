@@ -58,7 +58,7 @@ RSpec.describe NoteUpdator do
     it "should update all notes from the user with links" do
       note1 = Note.create!(content: "Books", user: user1)
       note2 = Note.create!(content: "I like [[Books]] and [[Music]] and [[Books]]", user: user1)
-      note3 = Note.create!(content: "Favourite [[Books]]", user: user1)
+      note3 = Note.create!(content: "Favourite #Books", user: user1)
       note4 = Note.create!(content: "Great [[Books]]", user: user2)
 
       result = NoteUpdator.call(note1.id, update_notes_with_links: true, data: { content: "Books and articles" }, current_user: note1.user)
@@ -66,7 +66,7 @@ RSpec.describe NoteUpdator do
       expect(result.success?).to be true
       expect(note1.reload.content).to eq("Books and articles")
       expect(note2.reload.content).to eq("I like [[Books and articles]] and [[Music]] and [[Books and articles]]")
-      expect(note3.reload.content).to eq("Favourite [[Books and articles]]")
+      expect(note3.reload.content).to eq("Favourite #[[Books and articles]]")
       # Should not modify t4 because user is different
       expect(note4.reload.content).to eq("Great [[Books]]")
     end
