@@ -218,24 +218,28 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
     const content_like = currentNote ? currentNote.content : currentNoteKey
 
     if (currentUser !== undefined ) {
-      fetchBackendNotes(
-        {
-          include_descendants: true,
-          include_ancestors: true,
-          include_user: true,
-          content_like: `%[[${content_like}]]%`
-        },
-        this.props.setAppState)
-        .then(references => {
-          let refs = (references as Reference[]).filter((r) => !this.inCurrentNote(r))
-          if (currentNote) {
-            refs = refs.sort((a, b) => a.user_id === currentNote.user_id ? -1 : 1)
-          }
-          if (currentUser) {
-            refs = refs.sort((a, b) => a.user_id === currentUser.id ? -1 : 1)
-          }
-          this.setState({ references: refs })
-        })
+      if (contentNote.content && contentNote.content !== "") {
+        fetchBackendNotes(
+          {
+            include_descendants: true,
+            include_ancestors: true,
+            include_user: true,
+            content_like: `%[[${content_like}]]%`
+          },
+          this.props.setAppState)
+          .then(references => {
+            let refs = (references as Reference[]).filter((r) => !this.inCurrentNote(r))
+            if (currentNote) {
+              refs = refs.sort((a, b) => a.user_id === currentNote.user_id ? -1 : 1)
+            }
+            if (currentUser) {
+              refs = refs.sort((a, b) => a.user_id === currentUser.id ? -1 : 1)
+            }
+            this.setState({ references: refs })
+         Hmm})
+       } else {
+         this.setState({ references: [] })
+       }
     }
   }
 
