@@ -218,7 +218,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
     const content_like = currentNote ? currentNote.content : currentNoteKey
 
     if (currentUser !== undefined ) {
-      if (contentNote.content && contentNote.content !== "") {
+      if (currentNote.content && currentNote.content !== "") {
         fetchBackendNotes(
           {
             include_descendants: true,
