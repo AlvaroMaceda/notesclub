@@ -337,7 +337,7 @@ class NoteRenderer extends React.Component<NoteRendererProps, NoteRendererState>
     let { selectedNote } = this.props
     if (selectedNote) {
       selectedNote.content = value
-      this.props.setUserNotePageState({ selectedNote: selectedNote })
+      this.props.setUserNotePageState({ selectedNote: selectedNote, synced: false })
     }
   }
 
