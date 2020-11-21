@@ -18,11 +18,12 @@ class NoteUpdator < ApplicationService
       struct = OpenStruct.new(id: @note.id, slug: @data["slug"], content: @data["content"], user_id: current_user.id)
       @data["slug"] = Note::SlugGenerator.new(struct).generate_unique_slug if @note.slug != @data["slug"]
     end
+    content_in_db_before = @note.content
     Note.transaction do
       @note.update!(@data)
       create_new_notes_from_links!
       update_descendants!(@note) if include_descendants?(@note)
-      update_notes_with_links! if update_notes_with_links && @note.ancestry.nil? && @note.content != @data["content"]
+      update_notes_with_links! if update_notes_with_links && @note.ancestry.nil? && content_in_db_before != @data["content"]
     end
 
     output = @note.reload.as_json.symbolize_keys
@@ -42,7 +43,8 @@ class NoteUpdator < ApplicationService
     # descendants' tmp_keys are provided as an input so the frontend can match the created records
     def descendants_with_tmp_keys
       @note.descendants.as_json.map do |descendant|
-        tmp_key = @tmp_keys_by_id[descendant["id"]]
+        descendant_id = descendant["id"]
+        tmp_key = @tmp_keys_by_id[descendant_id]
         descendant["tmp_key"] = tmp_key if tmp_key.present?
         descendant
       end
