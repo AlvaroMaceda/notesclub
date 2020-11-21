@@ -2,7 +2,7 @@
 
 require "swagger_helper"
 
-RSpec.describe "Notes API", focus: true do
+RSpec.describe "Notes API" do
   fixtures(:users, :notes)
   let(:user) { users(:user1) }
 

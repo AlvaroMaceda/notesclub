@@ -16,6 +16,8 @@ class Note < ApplicationRecord
   # or an association dependent on destroy
   # We'll need to change NoteDeleter#delete_descendants
 
+  scope :root_notes, -> { where(ancestry: nil) }
+
   def as_json(options = {})
     json = super(options)
     methods = options[:methods] || []

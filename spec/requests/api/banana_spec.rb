@@ -2,7 +2,7 @@
 
 require "swagger_helper"
 
-RSpec.describe "Notes API", focus: true do
+RSpec.describe "Notes API" do
   # skip "This method is for testing things"
   # next # Note that you must add a next statement to really skip test
 

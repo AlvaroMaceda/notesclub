@@ -29,7 +29,10 @@ Also, it should not return the passed note (from the note.user) as a related not
 =end
 
 def make_note(note_data)
-  id = NoteCreator.call(note_data).value[:id]
+  result = NoteCreator.call(note_data)
+  # Don't get mad if we make an error with spec's data
+  raise "Incorrect data for the note. Review your spec's call to make_note" unless result.success?
+  id = result.value[:id]
   relevant_data note_data.merge!(id: id).stringify_keys
 end
 
@@ -83,7 +86,7 @@ RSpec.describe NoteRelatedFinder do
   end
 
   describe "returns notes with a backlink to the note" do
-    xit "with [[...]] format" do
+    it "with [[...]] format" do
       related_note_1 = make_note(
         content: "Note from the same user linking to the [[Note to be linked]]",
         ancestry: nil,
@@ -96,13 +99,20 @@ RSpec.describe NoteRelatedFinder do
         slug: "related_2",
         user_id: user2.id
       )
+      non_root_related_note = make_note(
+        content: "One non-root note linking to [[Note to be linked]]",
+        ancestry: related_note_1["id"].to_s,
+        slug: "non_root_related_note",
+        user_id: user1.id
+      )
 
       result = NoteRelatedFinder.call(note["id"])
 
       expect(result.success?).to be true
       expect(relevant_data(result.value)).to match_array(relevant_data([
         related_note_1,
-        related_note_2
+        related_note_2,
+        non_root_related_note
       ]))
     end
 
@@ -129,38 +139,79 @@ RSpec.describe NoteRelatedFinder do
       ]))
     end
 
-    xit "returns empty array if there aren't related notes" do
-    end
+    it "returns empty array if there aren't related notes" do
+      standalone_note = make_note(
+        content: "This note doesn't have related notes",
+        ancestry: nil,
+        slug: "related_1",
+        user_id: user1.id
+      )
 
-    xit "includes descendants" do
-    end
+      result = NoteRelatedFinder.call(standalone_note["id"])
 
-    xit "includes ancestors" do
-    end
-
-    xit "includes user data" do
+      expect(result.success?).to be true
+      expect(result.value).to eq []
     end
   end
 
   describe "returns root notes with the same content" do
-    xit "include root notes" do
-    end
-
-    xit "does not include non-root notes" do
-    end
-
-    xit "excludes the note passed as parameter" do
-      related_note_1 = make_note(
+    it "include only root notes", focus: true do
+      root_note_1 = make_note(
         content: note["content"],
         ancestry: nil,
-        slug: "related_1",
+        slug: "root_note_1",
+        user_id: user1.id
+      )
+      root_note_2 = make_note(
+        content: note["content"],
+        ancestry: nil,
+        slug: "root_note_2",
+        user_id: user1.id
+      )
+      # non-root note
+      make_note(
+        content: note["content"],
+        ancestry: root_note_2["id"],
+        slug: "non_root_note",
         user_id: user1.id
       )
 
       result = NoteRelatedFinder.call(note["id"])
 
       expect(result.success?).to be true
-      expect(relevant_data(result.value)).to match_array(relevant_data([related_note_1]))
+      expect(relevant_data(result.value)).to match_array(relevant_data([
+        root_note_1,
+        root_note_2
+      ]))
     end
+
+    it "excludes the note passed as parameter" do
+      result = NoteRelatedFinder.call(note["id"])
+
+      expect(result.success?).to be true
+      expect(result.value).to eq []
+    end
+  end
+
+  # Order:
+  # If there is an authenticated user (defined in method current_user), it should return the related notes from the authenticated user first.
+  # After the notes from the authenticated user, it should return the notes of the user of the passed note.
+  describe "orders the results" do
+    describe "without authenticated user" do
+      skip "TO-DO"
+    end
+
+    describe "with authenticated user" do
+      skip "TO-DO"
+    end
+  end
+
+  xit "includes descendants" do
+  end
+
+  xit "includes ancestors" do
+  end
+
+  xit "includes user data" do
   end
 end
