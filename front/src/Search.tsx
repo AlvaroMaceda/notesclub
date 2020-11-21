@@ -90,6 +90,7 @@ class Search extends React.Component<SearchProps, SearchState> {
   async launchLookUpRequest(value: string) {
     const args = {
       content_like: `%${value}%`,
+      root_notes_first: true,
       limit: 15,
       include_user: true
     }

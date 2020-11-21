@@ -9,6 +9,7 @@ class NoteFinder < ApplicationService
       :slug, :except_slug,
       :user_ids,
       :content, :content_like,
+      :root_notes_first,
       :ancestry,
       :skip_if_no_descendants,
       :include_user, :include_ancestors, :include_descendants,
@@ -56,7 +57,12 @@ class NoteFinder < ApplicationService
     end
     limit = @params[:limit] ? [@params[:limit].to_i, 100].min : 100
     limit = 1 if @params[:slug] || (@params[:ids] && @params[:ids].size == 1)
-    notes = notes.order(id: :desc).limit(limit)
+    if @params[:root_notes_first]
+      notes = notes.order("case when notes.ancestry is null then 0 else 1 end, notes.id desc")
+    else
+      notes = notes.order(id: :desc)
+    end
+    notes = notes.limit(limit)
 
     methods = []
     methods << :descendants if @params[:include_descendants]
