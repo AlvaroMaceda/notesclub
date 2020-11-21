@@ -363,7 +363,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
                 currentUser={currentUser} />
 
               {children.map((subNote) => (
-                <div className="top-children">
+                <div className="top-children" key={subNote.id || subNote.tmp_key}>
                   <NoteRenderer
                     currentBlogger={currentBlogger}
                     key={"sub" + noteKey(subNote)}
