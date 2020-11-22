@@ -119,7 +119,7 @@ class CurrentNoteContentRenderer extends React.Component<CurrentNoteContentRende
             :
               currentNote.content || (isOwnBlog ? <span className="lightgrey">Untitled</span> : null)
             }
-            {!selectedNote && currentUser && currentNote.user_id === currentUser.id &&
+            {isOwnBlog &&
               <Link to='#' onClick={this.confirmDelete} className="delete-button">
                 <img src={process.env.PUBLIC_URL + '/images/close-outline.svg'} alt="delete" />
               </Link>
