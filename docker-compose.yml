@@ -4,10 +4,10 @@ services:
 
   database:
     image: postgres:12.1
-    # user: "${UID}:${GID}"
-    # Temporary
     ports:
       - 5433:5432
+    # Uncomment this to show all statements in console
+    # command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]      
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./docker/database_init.sql:/docker-entrypoint-initdb.d/init.sql
