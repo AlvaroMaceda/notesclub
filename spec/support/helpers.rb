@@ -65,3 +65,22 @@ def relevant_note_fields(note, relevant_fields = DEFAULT_NOTE_RELEVANT_FIELDS)
     note
   end
 end
+
+# This function can dump the test datatabase in the middle of a test run, in case you need to debug some SQL
+# It will only work if you disable DatabaseCleaner commenting all lines in database_cleaner.rb
+# so you should be running a single test, maybe using --tag option in rspec
+def dump_test_database(dump_name = "test_dump_#{Time.now.strftime('%Y%m%d-%H%M%S')}.dump")
+  host = ActiveRecord::Base.connection_config[:host]
+  port = ActiveRecord::Base.connection_config[:port]
+  database = ActiveRecord::Base.connection_config[:database]
+  username = ActiveRecord::Base.connection_config[:username]
+
+  cmd = <<~EOF
+    pg_dump \
+     --host #{host} --port #{port} --username #{username} \
+     --data-only --verbose --no-owner --no-acl \
+     --encoding=utf8 \
+     #{database} --file=#{Rails.root}/tmp/#{dump_name}
+  EOF
+  system(cmd)
+end
