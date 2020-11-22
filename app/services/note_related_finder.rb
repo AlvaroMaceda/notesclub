@@ -1,23 +1,22 @@
-# frozen_string_literal: true
+# frozen_string_literal: false
+# TO-DO: remove false here, it fails with sanitize_sql
 
 class NoteRelatedFinder < ApplicationService
-  def initialize(note_id, connected_user_id: nil, include_ancestors: false, include_descendants: false, include_user: false)
+  def initialize(note_id, authenticated_user_id: nil, include_ancestors: false, include_descendants: false, include_user: false)
     @note_id = note_id
+    @authenticated_user_id = authenticated_user_id
   end
 
   def call
     @note = Note.find(@note_id)
-    ## https://blog.bigbinary.com/2016/05/30/rails-5-adds-or-support-in-active-record.html
-    # notes = Note.where("content like ?", "%[[#{note.content}]]%").or(
-    #   Note.where("content like ?", "%#\##{note.content}%")
-    # )
 
     notes = notes_which_link_using_brackets.or(
       notes_which_link_using_hash
     ).or(
       notes_with_same_content
+    ).order(
+      ordering_clause
     )
-    # puts notes.to_sql
 
     Result.ok notes.as_json
   rescue ActiveRecord::RecordNotFound
@@ -37,5 +36,17 @@ class NoteRelatedFinder < ApplicationService
       Note.root_notes.
         where(content: @note.content).
         where.not(id: @note_id)
+    end
+
+    TOP_POSITION = 1
+    SECOND_POSITION = 2
+    BOTTOM_POSITION = 999
+    def ordering_clause
+      order_clause = "CASE user_id "
+      order_clause << ActiveRecord::Base.sanitize_sql(["WHEN ? THEN ? ", @authenticated_user_id, TOP_POSITION]) if @authenticated_user_id
+      order_clause << ActiveRecord::Base.sanitize_sql(["WHEN ? THEN ? ", @note.user_id, SECOND_POSITION])
+      order_clause << ActiveRecord::Base.sanitize_sql(["ELSE ? ", BOTTOM_POSITION ])
+      order_clause << "END"
+      Arel.sql(order_clause)
     end
 end

@@ -2,36 +2,10 @@
 
 require "rails_helper"
 
-=begin
-Create a new endpoint /notes/:id/related
-
-It could receive (or not) the following parameters:
-
-    include_descendants
-    include_ancestors
-    include_user
-
-At the moment, related notes are those that:
-
-    - have a backlink/reference to the passed note
-    (e.g. where("content like %[[#{note.content}]]%") or where("content like %##{note.content}%"))
-
-    - are a root note (ancestry: nil) and content is exactly note.content.
-    For example, if the passed note is /hec/favourite_books, I want to see
-    the notes with the same content from other users such as /alvaro/favourite_books.
-
-Order:
-
-    If there is an authenticated user (defined in method current_user), it should return the related notes from the authenticated user first.
-    After the notes from the authenticated user, it should return the notes of the user of the passed note.
-
-Also, it should not return the passed note (from the note.user) as a related note.
-=end
-
 def make_note(note_data)
   result = NoteCreator.call(note_data)
   # Don't get mad if we make an error with spec's data
-  raise "Incorrect data for the note. Review your spec's call to make_note" unless result.success?
+  raise "Incorrect data for the note. Review your spec's call to make_note: #{result.errors}" unless result.success?
   id = result.value[:id]
   relevant_data note_data.merge!(id: id).stringify_keys
 end
@@ -48,6 +22,7 @@ RSpec.describe NoteRelatedFinder do
   fixtures(:users)
   let(:user1) { users(:user1) }
   let(:user2) { users(:user2) }
+  let(:user3) { users(:user3) }
 
   let(:note) { make_note(
     content: "Note to be linked",
@@ -85,22 +60,22 @@ RSpec.describe NoteRelatedFinder do
     expect(result.errors).to match(/Couldn't find Note 999/)
   end
 
-  describe "returns notes with a backlink to the note" do
+  describe "returns notes with a link to the note" do
     it "with [[...]] format" do
       related_note_1 = make_note(
-        content: "Note from the same user linking to the [[Note to be linked]]",
+        content: "Note from the same user linking to the [[#{note["content"]}]]",
         ancestry: nil,
         slug: "related_1",
         user_id: user1.id
       )
       related_note_2 = make_note(
-        content: "Another note linking to the [[Note to be linked]] from another user",
+        content: "Another note linking to the [[#{note["content"]}]] from another user",
         ancestry: nil,
         slug: "related_2",
         user_id: user2.id
       )
       non_root_related_note = make_note(
-        content: "One non-root note linking to [[Note to be linked]]",
+        content: "One non-root note linking to [[#{note["content"]}]]",
         ancestry: related_note_1["id"].to_s,
         slug: "non_root_related_note",
         user_id: user1.id
@@ -118,13 +93,13 @@ RSpec.describe NoteRelatedFinder do
 
     it "with ##... format" do
       related_note_1 = make_note(
-        content: "Note from the same user linking to the ##Note to be linked",
+        content: "Note from the same user linking to the ##" + note["content"],
         ancestry: nil,
         slug: "related_1",
         user_id: user1.id
       )
       related_note_2 = make_note(
-        content: "Another note linking to the ##Note to be linked from another user",
+        content: "Another note linking to the ##" + note["content"] + " from another user",
         ancestry: nil,
         slug: "related_2",
         user_id: user2.id
@@ -155,7 +130,7 @@ RSpec.describe NoteRelatedFinder do
   end
 
   describe "returns root notes with the same content" do
-    it "include only root notes", focus: true do
+    it "include only root notes" do
       root_note_1 = make_note(
         content: note["content"],
         ancestry: nil,
@@ -193,25 +168,88 @@ RSpec.describe NoteRelatedFinder do
     end
   end
 
-  # Order:
-  # If there is an authenticated user (defined in method current_user), it should return the related notes from the authenticated user first.
-  # After the notes from the authenticated user, it should return the notes of the user of the passed note.
   describe "orders the results" do
-    describe "without authenticated user" do
-      skip "TO-DO"
+    it "returning the notes of the note's user before the other notes" do
+      note_user_id = note["user_id"]
+      another_user_id = user3.id
+
+      # rubocop:disable Lint/UselessAssignment
+      another_user_note = make_note(
+        content: "Note linking to the [[#{note["content"]}]]",
+        ancestry: nil,
+        slug: "related_1",
+        user_id: another_user_id
+      )
+      user_note_1 = make_note(
+        content: note["content"],
+        ancestry: nil,
+        slug: "user_note_1",
+        user_id: note_user_id
+      )
+      # rubocop:enable Lint/UselessAssignment
+
+      result = NoteRelatedFinder.call(note["id"])
+
+      expect(result.success?).to be true
+
+      notes = result.value
+      expect(notes.count).to eq 2
+      expect(notes[0]["user_id"]).to eq note_user_id
+      expect(notes[1]["user_id"]).to eq another_user_id
     end
 
-    describe "with authenticated user" do
-      skip "TO-DO"
+    it "returning first the authenticated user's notes, then note's user's notes", focus: true do
+      auth_user = user2
+      note_user = user1
+      another_user = user3
+
+      # rubocop:disable Lint/UselessAssignment
+      auth_user_note_1 = make_note(
+        content: note["content"],
+        ancestry: nil,
+        slug: "auth_user_note_1",
+        user_id: auth_user.id
+      )
+      auth_user_note_2 = make_note(
+        content: "Note linking to the [[#{note["content"]}]]",
+        ancestry: nil,
+        slug: "auth_user_note_2",
+        user_id: auth_user.id
+      )
+      user_note_1 = make_note(
+        content: note["content"],
+        ancestry: nil,
+        slug: "user_note_1",
+        user_id: note_user.id
+      )
+      user_note_2 = make_note(
+        content: "Note linking to the [[#{note["content"]}]]",
+        ancestry: nil,
+        slug: "user_note_2",
+        user_id: note_user.id
+      )
+      another_user_note = make_note(
+        content: "Note linking to the [[#{note["content"]}]]",
+        ancestry: nil,
+        slug: "another_user_note",
+        user_id: another_user.id
+      )
+      # rubocop:enable Lint/UselessAssignment
+
+      result = NoteRelatedFinder.call(note["id"], authenticated_user_id: auth_user.id)
+
+      expect(result.success?).to be true
+
+      notes = result.value
+      expect(notes.count).to eq 5
+      expect(notes[0]["user_id"]).to eq auth_user.id
+      expect(notes[1]["user_id"]).to eq auth_user.id
+      expect(notes[2]["user_id"]).to eq note_user.id
+      expect(notes[3]["user_id"]).to eq note_user.id
+      expect(notes[4]["user_id"]).to eq another_user.id
     end
   end
 
-  xit "includes descendants" do
-  end
-
-  xit "includes ancestors" do
-  end
-
-  xit "includes user data" do
+  xit "includes descendants, ancestors and user data" do
   end
 end
