@@ -33,7 +33,7 @@ end
 DEFAULT_NOTE_RELEVANT_FIELDS = [
   :id, :content, :slug,
   :user_id, :position,
-  :ancestry, :descendants
+  :ancestry, :descendants, :ancestors
 ]
 def slice_symbol_and_string(hash, *keys)
   if keys.count == 1 && keys[0].kind_of?(Array)
@@ -54,11 +54,11 @@ def relevant_note_fields(note, relevant_fields = DEFAULT_NOTE_RELEVANT_FIELDS)
 
     note = slice_symbol_and_string(note, relevant_fields)
     # Descendants
-    note["descendants"] = relevant_note_fields(note["descendants"]) if note["descendants"]
-    note[:descendants] = relevant_note_fields(note[:descendants]) if note[:descendants]
+    note["descendants"] = relevant_note_fields(note["descendants"], relevant_fields) if note["descendants"]
+    note[:descendants] = relevant_note_fields(note[:descendants], relevant_fields) if note[:descendants]
     # Ancestors
-    note["ancestors"] = relevant_note_fields(note["ancestors"]) if note["ancestors"]
-    note[:ancestors] = relevant_note_fields(note[:ancestors]) if note[:ancestors]
+    note["ancestors"] = relevant_note_fields(note["ancestors"], relevant_fields) if note["ancestors"]
+    note[:ancestors] = relevant_note_fields(note[:ancestors], relevant_fields) if note[:ancestors]
     # User
     note["user"] = note["user"].except("created_at", "updated_at") if note["user"]
 

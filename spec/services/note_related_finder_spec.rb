@@ -11,8 +11,8 @@ def make_note(note_data)
 end
 
 RELEVANT_FIELDS = [
-  :id, :content, :slug, :user_id,
-  :ancestry, :descendants
+  :id, :content, :slug, :user_id, :user,
+  :ancestry, :ancestors, :descendants
 ]
 def relevant_data(notes)
   relevant_note_fields notes, RELEVANT_FIELDS
@@ -198,7 +198,7 @@ RSpec.describe NoteRelatedFinder do
       expect(notes[1]["user_id"]).to eq another_user_id
     end
 
-    it "returning first the authenticated user's notes, then note's user's notes", focus: true do
+    it "returning first the authenticated user's notes, then note's user's notes" do
       auth_user = user2
       note_user = user1
       another_user = user3
@@ -250,6 +250,47 @@ RSpec.describe NoteRelatedFinder do
     end
   end
 
-  xit "includes descendants, ancestors and user data" do
+  it "includes descendants, ancestors and user data", focus: true do
+    note_user = user2
+    ancestor_note = make_note(
+      content: "This is an ancestor of the note",
+      ancestry: nil,
+      slug: "ancestor",
+      user_id: note_user.id
+    )
+    note_to_return = make_note(
+      content: "Note linking to the [[#{note["content"]}]]",
+      ancestry: ancestor_note["id"].to_s,
+      slug: "note_to_return",
+      user_id: note_user.id
+    )
+    # rubocop:disable Lint/UselessAssignment
+    descendant_note = make_note(
+      content: "This is a descendant of the note",
+      ancestry: "#{note_to_return['ancestry']}/#{note_to_return['id']}",
+      slug: "descendant",
+      user_id: note_user.id
+    )
+    # rubocop:enable Lint/UselessAssignment
+
+    result = NoteRelatedFinder.call(note["id"],
+                include_descendants: true, include_ancestors: true, include_user: true)
+
+    expected_result = [
+      note_to_return.merge(
+        {
+          "ancestors" => [ancestor_note],
+          "descendants" => [descendant_note],
+          "user" => {
+            "id" => note_user.id,
+            "name" => note_user.name,
+            "username" => note_user.username,
+            "avatar_url" => note_user.avatar_url
+          }
+        }
+      )
+    ]
+    expect(result.success?).to be true
+    expect(relevant_data(result.value)).to eq expected_result
   end
 end

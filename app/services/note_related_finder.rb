@@ -5,6 +5,11 @@ class NoteRelatedFinder < ApplicationService
   def initialize(note_id, authenticated_user_id: nil, include_ancestors: false, include_descendants: false, include_user: false)
     @note_id = note_id
     @authenticated_user_id = authenticated_user_id
+
+    @methods = []
+    @methods << :descendants if include_descendants
+    @methods << :ancestors if include_ancestors
+    @methods << :user if include_user
   end
 
   def call
@@ -18,7 +23,7 @@ class NoteRelatedFinder < ApplicationService
       ordering_clause
     )
 
-    Result.ok notes.as_json
+    Result.ok notes.as_json(methods: @methods)
   rescue ActiveRecord::RecordNotFound
     Result.error "Couldn't find Note #{@note_id}"
   end
