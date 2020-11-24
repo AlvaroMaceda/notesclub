@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "pp"
+
 def rm_timestamps!(obj)
   obj.except!("created_at", "updated_at")
   obj["descendants"].map { |o| o.except!("created_at", "updated_at") } if obj["descendants"]
@@ -43,27 +45,39 @@ def slice_symbol_and_string(hash, *keys)
   hash.slice(*keys_to_slice)
 end
 
-def relevant_note_fields(note, relevant_fields = DEFAULT_NOTE_RELEVANT_FIELDS)
-  if note.kind_of?(Array)
-    notes = note
+def relevant_note_fields(note_hash, relevant_fields = DEFAULT_NOTE_RELEVANT_FIELDS)
+  if note_hash.kind_of?(Array)
+    notes = note_hash
     notes.map do |n|
       relevant_note_fields n, relevant_fields
     end
   else
-    note = note.deep_dup
+    note_hash = note_hash.deep_dup
 
-    note = slice_symbol_and_string(note, relevant_fields)
+    note_hash = slice_symbol_and_string(note_hash, relevant_fields)
     # Descendants
-    note["descendants"] = relevant_note_fields(note["descendants"], relevant_fields) if note["descendants"]
-    note[:descendants] = relevant_note_fields(note[:descendants], relevant_fields) if note[:descendants]
+    note_hash["descendants"] = relevant_note_fields(note_hash["descendants"], relevant_fields) if note_hash["descendants"]
+    note_hash[:descendants] = relevant_note_fields(note_hash[:descendants], relevant_fields) if note_hash[:descendants]
     # Ancestors
-    note["ancestors"] = relevant_note_fields(note["ancestors"], relevant_fields) if note["ancestors"]
-    note[:ancestors] = relevant_note_fields(note[:ancestors], relevant_fields) if note[:ancestors]
+    note_hash["ancestors"] = relevant_note_fields(note_hash["ancestors"], relevant_fields) if note_hash["ancestors"]
+    note_hash[:ancestors] = relevant_note_fields(note_hash[:ancestors], relevant_fields) if note_hash[:ancestors]
     # User
-    note["user"] = note["user"].except("created_at", "updated_at") if note["user"]
+    note_hash["user"] = note_hash["user"].except("created_at", "updated_at") if note_hash["user"]
 
-    note
+    note_hash
   end
+end
+
+def notes_slugs(notes)
+  notes.map { |note| note.with_indifferent_access[:slug] }
+end
+
+def make_note(note_data)
+  result = NoteCreator.call(note_data)
+  # Don't get mad if we make an error with spec's data
+  raise "Incorrect data for the note. Review your spec's call to make_note: #{result.errors}" unless result.success?
+  id = result.value[:id]
+  note_data.merge!(id: id).stringify_keys
 end
 
 # This function can dump the test datatabase in the middle of a test run, in case you need to debug some SQL

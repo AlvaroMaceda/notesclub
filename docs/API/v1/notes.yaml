@@ -4,27 +4,32 @@ info:
   title: API V1
   version: v1
 paths:
-  "/v1/banana":
-    get:
-      summary: retrieves bananas
-      tags:
-      - focus
-      responses:
-        '200':
-          description: banana found
-          content:
-            application/json:
-              schema:
-                "$ref": "#/components/schemas/note"
   "/v1/notes/{id}/related":
     get:
       summary: retrieves related notes
+      tags:
+      - notes
       parameters:
       - name: id
         in: path
         required: true
         schema:
           type: string
+      - name: include_ancestors
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: include_descendants
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: include_user
+        in: query
+        required: false
+        schema:
+          type: boolean
       responses:
         '200':
           description: Successful operation
@@ -41,11 +46,17 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/rfc7807"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/rfc7807"
 servers:
 - url: https://{defaultHost}
   variables:
     defaultHost:
-      default: www.example.com
+      default: api.notes.club
 components:
   schemas:
     notes_array:
@@ -63,6 +74,7 @@ components:
         name:
           description: Name of the user
           type: string
+          nullable: true
         username:
           description: Username
           type: string

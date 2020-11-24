@@ -10,7 +10,8 @@ APISchemas["v1/notes.yaml"][:user] = {
     },
     name: {
       description: "Name of the user",
-      type: "string"
+      type: "string",
+      nullable: true
     },
     username: {
       description: "Username",

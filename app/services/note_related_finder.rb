@@ -1,5 +1,4 @@
 # frozen_string_literal: false
-# TO-DO: remove false here, it fails with sanitize_sql
 
 class NoteRelatedFinder < ApplicationService
   def initialize(note_id, authenticated_user_id: nil, include_ancestors: false, include_descendants: false, include_user: false)

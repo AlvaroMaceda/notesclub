@@ -33,7 +33,7 @@ RSpec.configure do |config|
           url: "https://{defaultHost}",
           variables: {
             defaultHost: {
-              default: "www.example.com"
+              default: "api.notes.club"
             }
           }
         }

@@ -2,13 +2,7 @@
 
 require "rails_helper"
 
-def make_note(note_data)
-  result = NoteCreator.call(note_data)
-  # Don't get mad if we make an error with spec's data
-  raise "Incorrect data for the note. Review your spec's call to make_note: #{result.errors}" unless result.success?
-  id = result.value[:id]
-  relevant_data note_data.merge!(id: id).stringify_keys
-end
+
 
 RELEVANT_FIELDS = [
   :id, :content, :slug, :user_id, :user,
@@ -62,56 +56,60 @@ RSpec.describe NoteRelatedFinder do
 
   describe "returns notes with a link to the note" do
     it "with [[...]] format" do
+      # rubocop:disable Lint/UselessAssignment
       related_note_1 = make_note(
+        slug: "related_note_1",
         content: "Note from the same user linking to the [[#{note["content"]}]]",
         ancestry: nil,
-        slug: "related_1",
         user_id: user1.id
       )
       related_note_2 = make_note(
+        slug: "related_note_2",
         content: "Another note linking to the [[#{note["content"]}]] from another user",
         ancestry: nil,
-        slug: "related_2",
         user_id: user2.id
       )
       non_root_related_note = make_note(
+        slug: "non_root_related_note",
         content: "One non-root note linking to [[#{note["content"]}]]",
         ancestry: related_note_1["id"].to_s,
-        slug: "non_root_related_note",
         user_id: user1.id
       )
+      # rubocop:enable Lint/UselessAssignment
 
       result = NoteRelatedFinder.call(note["id"])
 
       expect(result.success?).to be true
-      expect(relevant_data(result.value)).to match_array(relevant_data([
-        related_note_1,
-        related_note_2,
-        non_root_related_note
-      ]))
+      expect(notes_slugs(result.value)).to match_array([
+        "related_note_1",
+        "related_note_2",
+        "non_root_related_note"
+      ])
     end
 
     it "with ##... format" do
+      # rubocop:disable Lint/UselessAssignment
       related_note_1 = make_note(
+        slug: "related_note_1",
         content: "Note from the same user linking to the ##" + note["content"],
         ancestry: nil,
-        slug: "related_1",
         user_id: user1.id
       )
       related_note_2 = make_note(
+        slug: "related_note_2",
         content: "Another note linking to the ##" + note["content"] + " from another user",
         ancestry: nil,
-        slug: "related_2",
         user_id: user2.id
       )
+      # rubocop:enable Lint/UselessAssignment
 
       result = NoteRelatedFinder.call(note["id"])
 
       expect(result.success?).to be true
-      expect(relevant_data(result.value)).to match_array(relevant_data([
-        related_note_1,
-        related_note_2
-      ]))
+      expect(notes_slugs(result.value)).to match_array([
+        "related_note_1",
+        "related_note_2"
+      ])
     end
 
     it "returns empty array if there aren't related notes" do
@@ -131,33 +129,34 @@ RSpec.describe NoteRelatedFinder do
 
   describe "returns root notes with the same content" do
     it "include only root notes" do
+      # rubocop:disable Lint/UselessAssignment
       root_note_1 = make_note(
+        slug: "root_note_1",
         content: note["content"],
         ancestry: nil,
-        slug: "root_note_1",
         user_id: user1.id
       )
       root_note_2 = make_note(
+        slug: "root_note_2",
         content: note["content"],
         ancestry: nil,
-        slug: "root_note_2",
         user_id: user1.id
       )
-      # non-root note
-      make_note(
+      non_root_note = make_note(
+        slug: "non_root_note",
         content: note["content"],
         ancestry: root_note_2["id"],
-        slug: "non_root_note",
         user_id: user1.id
       )
+      # rubocop:enable Lint/UselessAssignment
 
       result = NoteRelatedFinder.call(note["id"])
 
       expect(result.success?).to be true
-      expect(relevant_data(result.value)).to match_array(relevant_data([
-        root_note_1,
-        root_note_2
-      ]))
+      expect(notes_slugs(result.value)).to match_array([
+        "root_note_1",
+        "root_note_2"
+      ])
     end
 
     it "excludes the note passed as parameter" do
@@ -250,25 +249,25 @@ RSpec.describe NoteRelatedFinder do
     end
   end
 
-  it "includes descendants, ancestors and user data", focus: true do
+  it "includes descendants, ancestors and user data" do
     note_user = user2
     ancestor_note = make_note(
+      slug: "ancestor_note",
       content: "This is an ancestor of the note",
       ancestry: nil,
-      slug: "ancestor",
       user_id: note_user.id
     )
     note_to_return = make_note(
+      slug: "note_to_return",
       content: "Note linking to the [[#{note["content"]}]]",
       ancestry: ancestor_note["id"].to_s,
-      slug: "note_to_return",
       user_id: note_user.id
     )
     # rubocop:disable Lint/UselessAssignment
     descendant_note = make_note(
+      slug: "descendant_note",
       content: "This is a descendant of the note",
       ancestry: "#{note_to_return['ancestry']}/#{note_to_return['id']}",
-      slug: "descendant",
       user_id: note_user.id
     )
     # rubocop:enable Lint/UselessAssignment

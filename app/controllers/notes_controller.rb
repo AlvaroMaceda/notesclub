@@ -70,20 +70,31 @@ class NotesController < ApplicationController
   end
 
   def related
-    # This is not working, it's only to test response format
-    if params[:id] == "inexistent_note"
-      return render json: {
-        type: "/error/types/item_not_found",
-        title: "Note not found",
-        status: 404 # This MUST match response status
-      }, status: :not_found
+    result = NoteRelatedFinder.call(
+      params[:id],
+      include_ancestors: params[:include_ancestors],
+      include_descendants: params[:include_descendants],
+      include_user: params[:include_user]
+    )
+
+    # TO-DO: redesign Result, maybe returning exceptions and deleting the class?
+    if result.error?
+      if result.errors.match?(/Couldn't find Note/)
+        return render json: {
+          type: "/error/types/item_not_found",
+          title: "Note not found",
+          status: 404 # This MUST match response status
+        }, status: :not_found
+      else
+        return render json: {
+          type: "/error/types/bad_request",
+          title: "Bad request",
+          detail: result.errors,
+          status: 400 # This MUST match response status
+        }, status: :bad_request
+      end
     end
 
-    params[:ids] = [1, 2, 3]
-    result = NoteFinder.call(params)
-    # p result.value
-
-    return render json: result.errors, status: :bad_request if result.error?
     render json: result.value, status: :ok
   end
 
