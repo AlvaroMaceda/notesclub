@@ -58,20 +58,12 @@ RSpec.describe "Notes API" do
 
           expect(NoteRelatedFinder).to receive(:call).with(
             id,
+            authenticated_user_id: logged_user.id,
             include_ancestors: include_ancestors,
             include_descendants: include_descendants,
             include_user: include_user
           ).and_call_original
 
-          submit_request(example.metadata)
-          assert_response_matches_metadata(example.metadata)
-        end
-      end
-
-      response "401", "Unauthorized" do
-        let(:id) { "a_note" }
-
-        it "returns a 401 response", :logged_out do |example|
           submit_request(example.metadata)
           assert_response_matches_metadata(example.metadata)
         end
