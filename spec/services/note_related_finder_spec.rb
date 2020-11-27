@@ -125,6 +125,31 @@ RSpec.describe NoteRelatedFinder do
       expect(result.success?).to be true
       expect(result.value).to eq []
     end
+
+    it "is case insensitive" do
+      random_case_content = note["content"].chars.map { |c| rand(2).zero? ? c.upcase : c.downcase }.join
+
+      # rubocop:disable Lint/UselessAssignment
+      related_note_1 = make_note(
+        slug: "related_note_1",
+        content: "Note from the same user linking to the [[#{random_case_content}]]",
+        ancestry: nil,
+        user_id: user1.id
+      )
+      related_note_2 = make_note(
+        slug: "related_note_2",
+        content: "Note from the same user linking to the ##" + random_case_content,
+        ancestry: nil,
+        user_id: user1.id
+      )
+      # rubocop:enable Lint/UselessAssignment
+
+      result = NoteRelatedFinder.call(note["id"])
+      expect(notes_slugs(result.value)).to match_array([
+        "related_note_1",
+        "related_note_2"
+      ])
+    end
   end
 
   describe "returns root notes with the same content" do
@@ -164,6 +189,26 @@ RSpec.describe NoteRelatedFinder do
 
       expect(result.success?).to be true
       expect(result.value).to eq []
+    end
+
+    it "is case insensitive" do
+      random_case_content = note["content"].chars.map { |c| rand(2).zero? ? c.upcase : c.downcase }.join
+
+      # rubocop:disable Lint/UselessAssignment
+      root_note_1 = make_note(
+        slug: "root_note_1",
+        content: random_case_content,
+        ancestry: nil,
+        user_id: user1.id
+      )
+      # rubocop:enable Lint/UselessAssignment
+
+      result = NoteRelatedFinder.call(note["id"])
+
+      expect(result.success?).to be true
+      expect(notes_slugs(result.value)).to match_array([
+        "root_note_1"
+      ])
     end
   end
 
