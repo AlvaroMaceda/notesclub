@@ -218,24 +218,21 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
     const content_like = currentNote ? currentNote.content : currentNoteKey
 
     if (currentUser !== undefined ) {
-      if (currentNote && currentNote.content && currentNote.content !== "") {
-        fetchBackendNotes(
+      if (currentNote?.id) {
+        const args = {
+          include_descendants: true,
+          include_ancestors: true,
+          include_user: true,
+        }
+        axios.get<Reference[]>(
+          apiDomain() + `/v1/notes/${currentNote.id}/related`,
           {
-            include_descendants: true,
-            include_ancestors: true,
-            include_user: true,
-            content_like: `%[[${content_like}]]%`
-          },
-          this.props.setAppState)
-          .then(references => {
-            let refs = (references as Reference[]).filter((r) => !this.inCurrentNote(r))
-            if (currentNote) {
-              refs = refs.sort((a, b) => a.user_id === currentNote.user_id ? -1 : 1)
-            }
-            if (currentUser) {
-              refs = refs.sort((a, b) => a.user_id === currentUser.id ? -1 : 1)
-            }
-            this.setState({ references: refs })
+            params: args,
+            headers: { 'Content-Type': 'application/json', "Accept": "application/json" },
+            withCredentials: true
+          })
+          .then(res => {
+            this.setState({ references: res.data })
           })
        } else {
          this.setState({ references: [] })
@@ -390,7 +387,7 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
               }
               {references && references.length > 0 &&
                 <div className="all-references">
-                  References:
+                  <p>Related:</p>
                   {references.map((ref) => (
                     <ReferenceRenderer
                       key={ref.id}

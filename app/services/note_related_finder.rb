@@ -12,33 +12,40 @@ class NoteRelatedFinder < ApplicationService
   end
 
   def call
-    @note = Note.find(@note_id)
-
-    notes = notes_which_link_using_brackets.or(
-      notes_which_link_using_hash
-    ).or(
-      notes_with_same_content
-    ).order(
-      ordering_clause
-    )
-
+    notes = find_and_order_notes
     Result.ok notes.as_json(methods: @methods)
   rescue ActiveRecord::RecordNotFound
     Result.error "Couldn't find Note #{@note_id}"
   end
 
   private
+    def note
+      @note ||= Note.find(@note_id)
+    end
+
+    def find_and_order_notes
+      return [] if note.content.blank?
+
+      notes_which_link_using_brackets.or(
+      notes_which_link_using_hash
+      ).or(
+        notes_with_same_content
+      ).order(
+        ordering_clause
+      )
+    end
+
     def notes_which_link_using_brackets
-      Note.where("content like ?", "%[[#{@note.content}]]%")
+      Note.where("content ilike ?", "%[[#{note.content}]]%")
     end
 
     def notes_which_link_using_hash
-      Note.where("content like ?", "%#\##{@note.content}%")
+      Note.where("content ilike ?", "%\##{note.content}%")
     end
 
     def notes_with_same_content
       Note.root_notes.
-        where(content: @note.content).
+        where("lower(content) = ?", @note.content.downcase).
         where.not(id: @note_id)
     end
 
@@ -48,7 +55,7 @@ class NoteRelatedFinder < ApplicationService
     def ordering_clause
       order_clause = "CASE user_id "
       order_clause << ActiveRecord::Base.sanitize_sql(["WHEN ? THEN ? ", @authenticated_user_id, TOP_POSITION]) if @authenticated_user_id
-      order_clause << ActiveRecord::Base.sanitize_sql(["WHEN ? THEN ? ", @note.user_id, SECOND_POSITION])
+      order_clause << ActiveRecord::Base.sanitize_sql(["WHEN ? THEN ? ", note.user_id, SECOND_POSITION])
       order_clause << ActiveRecord::Base.sanitize_sql(["ELSE ? ", BOTTOM_POSITION ])
       order_clause << "END"
       Arel.sql(order_clause)

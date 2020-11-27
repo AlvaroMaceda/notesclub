@@ -4,7 +4,7 @@ class NotesController < ApplicationController
   before_action :set_note, only: [:update, :destroy]
   before_action :authenticate_param_id!, only: [:update, :destroy]
   before_action :authenticate_param_user_id!, only: [:create]
-  skip_before_action :authenticate_user!, only: [:index, :count]
+  skip_before_action :authenticate_user!, only: [:index, :related, :count]
 
   def index
     result = NoteFinder.call(params)
@@ -72,6 +72,7 @@ class NotesController < ApplicationController
   def related
     result = NoteRelatedFinder.call(
       params[:id],
+      authenticated_user_id: current_user&.id,
       include_ancestors: params[:include_ancestors],
       include_descendants: params[:include_descendants],
       include_user: params[:include_user]
