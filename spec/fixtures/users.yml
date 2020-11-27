@@ -12,3 +12,10 @@ user2:
   jwt_token: eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyIjoxfQ.CT5dQ_lDiZhMWqjCKwbfxDABQiEh5KMJWwzUCKBm7Yg
   username: someone
   invited_by_id: 1
+user3:
+  id: 3
+  email: marie@curie.com
+  encrypted_password: $2a$11$FkTkyfcf01gvOJ4WuR01C.4z4PGCiMPblBWiQMgSFVuDoXwWNljEe
+  jwt_token: eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MiwiZXhwIjoxNjExMDc0MzM4fQ.-DAe12d1vXOkGp47Dbp92YYlqevitfpB14aKDojrelM
+  username: marie_curie
+  invited_by_id: 1

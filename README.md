@@ -74,6 +74,13 @@ You can also user [Guard](https://github.com/guard/guard) to watch changes and r
 bundle exec guard
 ```
 
+### API documentation
+
+The application uses rspec-swagger to tests and document the API endpoint using OpenAPI specification. API tests are under `spec/requests/api` folder. Not all API endpoints are documented at the moment, it's a work in progress.
+
+Schema definitions are under `spec/schemas`. All schemas under that directory are included automatically to API's specification. 
+
+To generate API documentation from tests, run `rake rswag:specs:swaggerize`. This must be done when API tests are modified to keep the documentation updated. It will generate the documentation under docs/API/\[VERSION] directory.
 
 ## Frontend (React)
 

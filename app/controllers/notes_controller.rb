@@ -69,6 +69,35 @@ class NotesController < ApplicationController
     end
   end
 
+  def related
+    result = NoteRelatedFinder.call(
+      params[:id],
+      include_ancestors: params[:include_ancestors],
+      include_descendants: params[:include_descendants],
+      include_user: params[:include_user]
+    )
+
+    # TO-DO: redesign Result, maybe returning exceptions and deleting the class?
+    if result.error?
+      if result.errors.match?(/Couldn't find Note/)
+        return render json: {
+          type: "/error/types/item_not_found",
+          title: "Note not found",
+          status: 404 # This MUST match response status
+        }, status: :not_found
+      else
+        return render json: {
+          type: "/error/types/bad_request",
+          title: "Bad request",
+          detail: result.errors,
+          status: 400 # This MUST match response status
+        }, status: :bad_request
+      end
+    end
+
+    render json: result.value, status: :ok
+  end
+
   private
     def track_note
       id = params["user_ids"].first

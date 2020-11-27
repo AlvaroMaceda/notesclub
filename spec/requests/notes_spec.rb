@@ -37,7 +37,7 @@ RSpec.describe NotesController, type: :request do
       expect(notes).to eq([prep(note1.attributes), prep(note2.attributes)])
     end
 
-    it "should return a json error if there is an error", focus: true do
+    it "should return a json error if there is an error" do
       allow(NoteFinder).to receive(:call).and_return(Result.error "Something terrible happened")
       get "/v1/notes", params: { ids: [note1.id, note2.id], ancestry: nil }
       expect(response).to have_http_status(:bad_request)
@@ -86,7 +86,7 @@ RSpec.describe NotesController, type: :request do
       expect(response.status).to eq(200)
     end
 
-    it "should return a json error if there is an error", focus: true do
+    it "should return a json error if there is an error" do
       allow(NoteFinder).to receive(:call).and_return(Result.error "Something terrible happened")
       get "/v1/notes/#{note2.id}", params: { include_descendants: true }
       expect(response).to have_http_status(:bad_request)

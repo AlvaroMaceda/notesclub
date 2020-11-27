@@ -2,6 +2,7 @@
 
 Rails.application.routes.draw do
   scope :v1, defaults: { format: :json } do
+    get "/notes/:id/related", to: "notes#related"
     resources :users, only: [:index, :show, :create, :update] do
       collection do
         post "confirmation"

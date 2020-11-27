@@ -2,13 +2,6 @@
 
 require "rails_helper"
 
-def data(a)
-  return rm_timestamps(a) unless a.kind_of?(Array)
-  a.map do |t|
-    rm_timestamps(t.as_json)
-  end
-end
-
 RSpec.describe NoteFinder do
   fixtures(:users, :notes)
   let(:user) { users(:user1) }
@@ -21,14 +14,14 @@ RSpec.describe NoteFinder do
       result = NoteFinder.call(ids: note1.id, ancestry: nil)
 
       expect(result.success?).to be true
-      expect(data(result.value)).to match_array data([note1])
+      expect(notes_data(result.value)).to match_array notes_data([note1])
     end
 
     it "when more than one id is provided" do
       result = NoteFinder.call(ids: [note1.id, note2.id], ancestry: nil)
 
       expect(result.success?).to be true
-      expect(data(result.value)).to match_array data([note1, note2])
+      expect(notes_data(result.value)).to match_array notes_data([note1, note2])
     end
   end
 
@@ -36,7 +29,7 @@ RSpec.describe NoteFinder do
     result = NoteFinder.call(user_ids: user.id, ancestry: nil)
 
     expect(result.success?).to be true
-    expect(data(result.value)).to match_array([
+    expect(notes_data(result.value)).to match_array([
       { "ancestry" => nil, "content" => "Climate Change", "id" => 1, "position" => 1, "user_id" => 1, "slug" => "climate_change" },
       { "ancestry" => nil, "content" => "2020-08-28",     "id" => 2, "position" => 2, "user_id" => 1, "slug" => "2020-08-28" }
     ])
@@ -68,7 +61,7 @@ RSpec.describe NoteFinder do
     result = NoteFinder.call(content_like: "%[[https://thisurl.com/whatever]]%")
 
     expect(result.success?).to be true
-    expect(data(result.value)).to match_array data([note1, note2])
+    expect(notes_data(result.value)).to match_array notes_data([note1, note2])
   end
 
   describe "when include descendant is true" do
@@ -77,7 +70,7 @@ RSpec.describe NoteFinder do
 
       result = NoteFinder.call(ids: note2.id, include_descendants: true)
 
-      expect(data(result.value[0])).to eq({
+      expect(notes_data(result.value[0])).to eq({
         "id" => 2,
         "content" => "2020-08-28",
         "user_id" => 1,
@@ -96,7 +89,7 @@ RSpec.describe NoteFinder do
 
       result = NoteFinder.call(ids: note2.id, include_descendants: "true")
 
-      expect(data(result.value[0])).to eq({
+      expect(notes_data(result.value[0])).to eq({
         "id" => 2,
         "content" => "2020-08-28",
         "user_id" => 1,

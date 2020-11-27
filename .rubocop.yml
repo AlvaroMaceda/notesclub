@@ -13,6 +13,8 @@ AllCops:
     - '**/tmp/**/*'
     - '**/vendor/**/*'
     - '**/node_modules/**/*'
+    - 'db/schema.rb'
+    - 'db/migrate/**'
 
 # Prefer assert_not over assert !
 Rails/AssertNot:

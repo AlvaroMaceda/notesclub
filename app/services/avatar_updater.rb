@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AvatarUpdater
   def initialize(user)
     @user = user
@@ -9,16 +11,15 @@ class AvatarUpdater
   end
 
   private
+    attr_reader :user
 
-  attr_reader :user
+    def email_md5
+      return "00000000000000000000000000000000" if email.blank?
 
-  def email_md5
-    return "00000000000000000000000000000000" if email.blank?
+      Digest::MD5.hexdigest(email)
+    end
 
-    Digest::MD5.hexdigest(email)
-  end
-
-  def email
-    user.email.strip.downcase
-  end
+    def email
+      user.email.strip.downcase
+    end
 end
