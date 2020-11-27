@@ -37,9 +37,6 @@ paths:
             application/json:
               schema:
                 "$ref": "#/components/schemas/notes_array"
-        '401':
-          description: Unauthorized
-          content: {}
         '404':
           description: Not found
           content:
