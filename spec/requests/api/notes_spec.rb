@@ -2,7 +2,7 @@
 
 require "swagger_helper"
 
-RSpec.describe "Notes API", focus: true do
+RSpec.describe "Notes API" do
   fixtures(:users, :notes)
   let(:logged_user) { users(:user3) }
   let(:user1) { users(:user1) }
@@ -12,12 +12,6 @@ RSpec.describe "Notes API", focus: true do
     log_in(logged_user) unless test.metadata[:logged_out]
   end
 
-  # It could receive (or not) the following parameters:
-
-  #   include_descendants
-  #   include_ancestors
-  #   include_user
-  # https://swagger.io/docs/specification/describing-parameters/
   path "/v1/notes/{id}/related" do
     get "retrieves related notes" do
       tags "notes"
