@@ -18,9 +18,5 @@ Rails.application.routes.draw do
       end
     end
     get "ping", to: "ping#ping"
-
-
-    get "banana", to: "banana#get"
-    post "banana", to: "banana#post"
   end
 end
