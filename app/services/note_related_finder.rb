@@ -27,7 +27,7 @@ class NoteRelatedFinder < ApplicationService
       return [] if note.content.blank?
 
       notes_which_link_using_brackets.or(
-      notes_which_link_using_hash
+        notes_which_link_using_hash
       ).or(
         notes_with_same_content
       ).order(

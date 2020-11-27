@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This receives an array of descendants
 # And sort according to ancestry and position to prepare for insert
 class DescendantsSorter
@@ -15,6 +17,5 @@ class DescendantsSorter
   end
 
   private
-
-  attr_reader :descendants
+    attr_reader :descendants
 end
