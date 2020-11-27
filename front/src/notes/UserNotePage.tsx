@@ -215,7 +215,6 @@ class UserNotePage extends React.Component<UserNotePageProps, UserNotePageState>
   setReferences = () => {
     const { currentNote } = this.state
     const { currentUser, currentNoteKey } = this.props
-    const content_like = currentNote ? currentNote.content : currentNoteKey
 
     if (currentUser !== undefined ) {
       if (currentNote?.id) {
