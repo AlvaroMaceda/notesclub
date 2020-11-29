@@ -96,7 +96,7 @@ RSpec.describe NoteUpdator do
       expect(note1.reload.position).to eq(1)
       expect(note3.reload.position).to eq(2)
       expect(note4.reload.position).to eq(3)
-      expect{ note2.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { note2.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end
