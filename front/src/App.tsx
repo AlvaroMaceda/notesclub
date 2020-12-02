@@ -92,10 +92,10 @@ class App extends React.Component<AppProps, AppState> {
           <Redirect path="/notes/:noteKey" exact to="/login" />
         }
         <Route path="/:blogUsername/:noteKey" exact render={({ match }) => <UserNotePage currentBlogUsername={match.params.blogUsername} currentNoteKey={match.params.noteKey} currentUser={currentUser} setAppState={this.updateState} />} />
+        <Route path="/:blogUsername" exact render={({ match }) => <UserPage currentUser={currentUser} blogUsername={match.params.blogUsername} setAppState={this.updateState} />} />
         {currentUser &&
           <Switch>
             <Route path="/" exact render={({ match }) => <Feed currentUser={currentUser} blogUsername={match.params.blogUsername} setAppState={this.updateState} />} />
-            <Route path="/:blogUsername" exact render={({ match }) => <UserPage currentUser={currentUser} blogUsername={match.params.blogUsername} setAppState={this.updateState} />} />
           </Switch>
         }
         {currentUser === undefined &&

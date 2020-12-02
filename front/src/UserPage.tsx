@@ -9,7 +9,7 @@ import NoteCreator from './notes/NoteCreator'
 interface UserPageProps {
   blogUsername: string
   setAppState: Function
-  currentUser?: User
+  currentUser?: User | null
 }
 
 interface UserPageState {
@@ -94,7 +94,7 @@ class UserPage extends React.Component<UserPageProps, UserPageState> {
           />
         }
         <div className="topic-container">
-          {blogger && notes && currentUser &&
+          {blogger && notes &&
             <>
               {blogger.name === "Help" &&
                 <Link to="/" onClick={() => window.location.href = "/"}>Browse all notes</Link>
